@@ -2,15 +2,19 @@
 pragma solidity 0.8.26;
 
 import {Script, console} from "forge-std/Script.sol";
-import {ReferralHook} from "../src/ReferralHook.sol";
+import {FixerHook} from "../src/FixerHook.sol";
 import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
 import {Hooks} from "v4-core/libraries/Hooks.sol";
 import {HookMiner} from "./HookMiner.sol";
 
-/// @title Deploy ReferralHook
-/// @notice Deployment script for the ReferralHook contract
+/// @title Deploy FixerHook
+/// @notice Deployment script for the FixerHook contract
 /// @dev Uses CREATE2 with salt mining to deploy at a valid hook address
-contract DeployReferralHook is Script {
+///
+/// LEARNING POINT: Uniswap v4 hooks must be deployed at addresses where
+/// specific bits are set based on which hook functions are enabled.
+/// We use CREATE2 to deterministically find and deploy to such addresses.
+contract DeployFixerHook is Script {
     
     /// @notice Main deployment function
     function run() external {
@@ -33,7 +37,7 @@ contract DeployReferralHook is Script {
         // ADDRESS MINING
         // ====================================================================
         
-        // ReferralHook only needs afterSwap permission (bit 7 = 0x80)
+        // FixerHook only needs afterSwap permission (bit 7 = 0x80)
         uint160 flags = uint160(Hooks.AFTER_SWAP_FLAG);
         
         console.log("Required flags:", uint256(flags));
@@ -41,11 +45,11 @@ contract DeployReferralHook is Script {
         // Prepare constructor arguments
         bytes memory constructorArgs = abi.encode(poolManager);
         
-        // Find valid hook address
+        // Find valid hook address using CREATE2 salt mining
         (address hookAddress, bytes32 salt) = HookMiner.find(
             deployer,
             flags,
-            type(ReferralHook).creationCode,
+            type(FixerHook).creationCode,
             constructorArgs
         );
         
@@ -55,7 +59,7 @@ contract DeployReferralHook is Script {
         // Verify address has correct permission bits
         require(
             uint160(hookAddress) & flags == flags,
-            "Invalid hook address"
+            "Invalid hook address - permission bits not set"
         );
         
         // ====================================================================
@@ -65,7 +69,7 @@ contract DeployReferralHook is Script {
         vm.startBroadcast(deployerPrivateKey);
         
         // Deploy using CREATE2 with computed salt
-        ReferralHook hook = new ReferralHook{salt: salt}(
+        FixerHook hook = new FixerHook{salt: salt}(
             IPoolManager(poolManager)
         );
         
@@ -83,7 +87,7 @@ contract DeployReferralHook is Script {
         
         console.log("");
         console.log("=== Deployment Successful ===");
-        console.log("ReferralHook deployed at:", address(hook));
+        console.log("FixerHook deployed at:", address(hook));
         console.log("Token name:", hook.name());
         console.log("Token symbol:", hook.symbol());
         console.log("Reward amount:", hook.REWARD_AMOUNT());
@@ -95,14 +99,14 @@ contract DeployReferralHook is Script {
     }
 }
 
-/// @title Verify ReferralHook
+/// @title Verify FixerHook
 /// @notice Post-deployment verification script
-contract VerifyReferralHook is Script {
+contract VerifyFixerHook is Script {
     
     function run() external view {
         address hookAddress = vm.envAddress("HOOK_ADDRESS");
         
-        ReferralHook hook = ReferralHook(hookAddress);
+        FixerHook hook = FixerHook(hookAddress);
         
         console.log("=== Hook Verification ===");
         console.log("Address:", hookAddress);

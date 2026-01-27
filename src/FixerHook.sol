@@ -22,22 +22,22 @@ import {ERC20} from "solmate/src/tokens/ERC20.sol";
 // CONTRACT
 // ============================================================================
 
-/// @title ReferralHook
+/// @title FixerHook
 /// @author Aaryan Guglani
 /// @notice On-chain affiliate rewards for Uniswap v4 pools
-/// @dev Combines hook logic with ERC20 token minting for referral rewards
+/// @dev "Everybody pays the Fixer." - A learning-focused implementation.
 /// 
 /// Architecture:
 /// - Inherits BaseHook for Uniswap v4 hook functionality
-/// - Inherits ERC20 to act as the reward token itself
+/// - Inherits ERC20 to act as the reward token itself (FIX token)
 /// - Only enables afterSwap permission for minimal gas overhead
 ///
 /// Workflow:
 /// 1. User initiates swap with encoded referrer address in hookData
 /// 2. PoolManager executes swap, then calls afterSwap on this hook
 /// 3. Hook decodes referrer, validates (not zero, not self-referral)
-/// 4. If valid, mints REWARD_AMOUNT tokens to referrer
-contract ReferralHook is BaseHook, ERC20 {
+/// 4. If valid, mints REWARD_AMOUNT FIX tokens to referrer
+contract FixerHook is BaseHook, ERC20 {
     
     // ========================================================================
     // CONSTANTS
@@ -51,12 +51,12 @@ contract ReferralHook is BaseHook, ERC20 {
     // CONSTRUCTOR
     // ========================================================================
     
-    /// @notice Initializes the ReferralHook with PoolManager and token details
+    /// @notice Initializes the FixerHook with PoolManager and token details
     /// @param _manager Address of the Uniswap v4 PoolManager
     /// @dev Hook address must have correct permission bits set (afterSwap = bit 7)
     constructor(IPoolManager _manager) 
         BaseHook(_manager) 
-        ERC20("Referral Token", "REF", 18) 
+        ERC20("Fixer Token", "FIX", 18) 
     {}
     
     // ========================================================================

@@ -2,14 +2,17 @@
 pragma solidity 0.8.26;
 
 import {Test} from "forge-std/Test.sol";
-import {ReferralHook} from "../src/ReferralHook.sol";
+import {FixerHook} from "../src/FixerHook.sol";
 import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
 import {Hooks} from "v4-core/libraries/Hooks.sol";
 
-/// @title ReferralHook Unit Tests
-/// @notice Comprehensive test suite for the ReferralHook contract
+/// @title FixerHook Unit Tests
+/// @notice Comprehensive test suite for the FixerHook contract
 /// @dev Note: Full hook integration tests require a complete v4 pool setup
-contract ReferralHookTest is Test {
+///
+/// These tests focus on validating the logic patterns used in the hook
+/// without requiring full Uniswap v4 infrastructure.
+contract FixerHookTest is Test {
     
     address public alice = makeAddr("alice");
     address public bob = makeAddr("bob");
@@ -20,14 +23,14 @@ contract ReferralHookTest is Test {
     // ========================================================================
     
     function test_TokenMetadataConstants() public pure {
-        // Verify the expected constants
-        assertEq(keccak256("Referral Token"), keccak256("Referral Token"));
-        assertEq(keccak256("REF"), keccak256("REF"));
+        // Verify the expected token branding
+        assertEq(keccak256("Fixer Token"), keccak256("Fixer Token"));
+        assertEq(keccak256("FIX"), keccak256("FIX"));
     }
     
     function test_RewardAmountValue() public pure {
         uint256 expectedReward = 10 * 1e18;
-        assertEq(expectedReward, 10e18, "Reward amount should be 10 tokens");
+        assertEq(expectedReward, 10e18, "Reward amount should be 10 FIX tokens");
     }
     
     // ========================================================================
@@ -53,6 +56,7 @@ contract ReferralHookTest is Test {
 
     function test_HookPermissionsStructure() public pure {
         // Verify the permissions struct matches our expected configuration
+        // This is the exact structure used in FixerHook.getHookPermissions()
         Hooks.Permissions memory perms = Hooks.Permissions({
             beforeInitialize: false,
             afterInitialize: false,
@@ -75,9 +79,10 @@ contract ReferralHookTest is Test {
     }
 }
 
-/// @title Referral Validation Logic Tests
+/// @title Fixer Validation Logic Tests
 /// @notice Tests for the validation logic used in _afterSwap
-contract ReferralValidationTest is Test {
+/// @dev These tests validate the pure logic without deploying the hook
+contract FixerValidationTest is Test {
     
     function test_ZeroAddressRejected() public pure {
         address referrer = address(0);
@@ -117,9 +122,10 @@ contract ReferralValidationTest is Test {
     }
 }
 
-/// @title Fuzz Tests for ReferralHook
+/// @title Fuzz Tests for FixerHook
 /// @notice Property-based testing for edge cases
-contract ReferralFuzzTest is Test {
+/// @dev Fuzz tests run with random inputs to find edge cases
+contract FixerFuzzTest is Test {
     
     function testFuzz_EncodingRoundTrip(address referrer) public pure {
         bytes memory encoded = abi.encode(referrer);
@@ -159,7 +165,7 @@ contract ReferralFuzzTest is Test {
 
 /// @title Gas Benchmark Tests
 /// @notice Measure gas consumption for various scenarios
-contract ReferralGasTest is Test {
+contract FixerGasTest is Test {
     
     address referrer = makeAddr("referrer");
     
