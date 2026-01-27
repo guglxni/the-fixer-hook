@@ -1,0 +1,32 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.26"
+optimizer = true
+optimizer_runs = 200
+via_ir = false
+evm_version = "cancun"
+
+# Remappings - use v4-core from v4-periphery for version compatibility
+remappings = [
+    "@uniswap/v4-core/=lib/v4-periphery/lib/v4-core/",
+    "v4-core/=lib/v4-periphery/lib/v4-core/src/",
+    "v4-periphery/=lib/v4-periphery/",
+    "solmate/=lib/solmate/src/",
+    "forge-std/=lib/forge-std/src/"
+]
+
+# Testing configuration
+[fuzz]
+runs = 256
+
+[invariant]
+runs = 256
+depth = 15
+
+# Formatting
+[fmt]
+line_length = 100
+tab_width = 4
+bracket_spacing = true

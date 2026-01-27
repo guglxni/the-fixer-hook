@@ -1,0 +1,34 @@
+# Dependencies
+/lib/
+/node_modules/
+
+# Build outputs
+/out/
+/cache/
+/artifacts/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Coverage
+lcov.info
+coverage/
+
+# Broadcast (deployment artifacts)
+/broadcast/
+
+# Docs build
+/docs/_build/
