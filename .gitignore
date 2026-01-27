@@ -32,3 +32,6 @@ coverage/
 
 # Docs build
 /docs/_build/
+
+# Repository analysis output
+repomix-output.xml
