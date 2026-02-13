@@ -1,6 +1,51 @@
 # Testing Strategy
 
-> Comprehensive test coverage for the Referral Hook
+> Comprehensive test coverage for the FixerHook Protocol
+
+**Last Updated:** February 6, 2026  
+**Total Tests:** 191 across 19 test suites (all passing)
+
+---
+
+## Current Test Suite Summary
+
+| Test Suite | File | Tests | Category |
+|------------|------|-------|----------|
+| FixerHookTest | `test/FixerHook.t.sol` | Unit | v1.0 Hook logic |
+| FixerHookV1_1FuzzTest | `test/FixerHookV1_1.t.sol` | Fuzz | Decimal combinations |
+| FixerHookV1_2Test | `test/FixerHookV1_2.t.sol` | Unit | Advanced hook scenarios |
+| FixerRegistryTest | `test/FixerRegistry.t.sol` | Unit | v1 Registry logic |
+| FixerRegistryFuzzTest | `test/FixerRegistry.t.sol` | Fuzz | Referral + tier fuzz |
+| FixerCredentialTest | `test/FixerCredential.t.sol` | Unit | NFT credentials |
+| FixerCredentialFuzzTest | `test/FixerCredential.t.sol` | Fuzz | Mint fuzz |
+| **FixerRegistryUpgradeTest** | `test/FixerRegistryUpgrade.t.sol` | **31** | **v2.2 UUPS + proxy** |
+| **EmergencyModuleTest** | `test/EmergencyModule.t.sol` | **25** | **v2.4 Emergency module** |
+
+### v2.2 Test Coverage (FixerRegistryUpgrade.t.sol — 31 tests)
+
+| Area | Tests | Description |
+|------|-------|-------------|
+| Initialization | 5 | Owner, name, symbol, fee defaults, emergency state |
+| Referrals | 5 | Record referral, reward bounds, self-referral block, unauthorized hook |
+| Protocol Fees | 4 | Default 5%, fee deduction, max cap enforcement, accumulated fees |
+| Hooks | 3 | Authorize/deauthorize, unauthorized revert |
+| Upgrades | 4 | Owner upgrade, non-owner revert, state preservation, post-upgrade referrals |
+| Tiers | 4 | Bronze → Silver → Gold → Platinum progression, view functions |
+| Admin | 4 | Set reward params, protocol fee, fee addresses, min swap amount |
+| Fee Distribution | 2 | 50/30/20 split, zero-fee revert |
+
+### v2.4 Test Coverage (EmergencyModule.t.sol — 25 tests)
+
+| Area | Tests | Description |
+|------|-------|-------------|
+| Pause/Resume | 9 | All 3 states (referrals, agents, rewards) pause + resume |
+| Pause Guards | 3 | Paused state blocks `recordReferral()` |
+| Double-Pause | 3 | Already-paused reverts with `*AlreadyPaused` errors |
+| DAO Threshold | 2 | 7-day DAO requirement for resume, council can resume before |
+| Pause All | 2 | `pauseAll()` and `resumeAll()` |
+| Circuit Breaker | 3 | Trigger on excessive minting, hourly counter reset |
+| Admin | 2 | Set circuit breaker threshold, set security council |
+| Access Control | 1 | Non-council pause revert |
 
 ---
 
@@ -207,26 +252,40 @@ forge coverage
 
 ## Coverage Targets
 
-| Component | Target | Notes |
-|-----------|--------|-------|
-| getHookPermissions | 100% | Simple function |
-| _afterSwap | 100% | Core logic |
-| Token functions | 90%+ | Inherited from Solmate |
-| Edge cases | 100% | All validation paths |
+| Component | Target | Current | Notes |
+|-----------|--------|---------|-------|
+| FixerHook._afterSwap | 100% | ~100% | Core v1 logic |
+| FixerRegistryUpgradeable | 95%+ | ~90% | 31 tests |
+| EmergencyModule | 95%+ | ~95% | 25 tests |
+| FixerRegistry (v1) | 90%+ | ~90% | Legacy tests |
+| FixerCredential | 90%+ | ~90% | NFT tests |
+| AgentTypes | 100% | 100% | Constants only |
 
 ---
 
 ## Test File Structure
 
-```
-test/
-├── ReferralHook.t.sol        # Main test file
-│   ├── ReferralHookTest       # Unit tests
-│   ├── ReferralValidationTest # Validation logic
-│   ├── ReferralFuzzTest       # Fuzz tests
-│   └── ReferralGasTest        # Gas benchmarks
-└── utils/
-    └── TestHelper.sol         # Shared test utilities
+```mermaid
+flowchart TD
+    subgraph tests["test/"]
+        direction TB
+        T1["FixerHook.t.sol\nv1.0 Hook unit tests"]
+        T2["FixerHookV1_1.t.sol\nv1.1 Decimal fuzz tests"]
+        T3["FixerHookV1_2.t.sol\nv1.2 Advanced scenarios"]
+        T4["FixerRegistry.t.sol\nv1 Registry unit + fuzz"]
+        T5["FixerCredential.t.sol\nNFT credential tests"]
+        T6["FixerRegistryUpgrade.t.sol\nv2.2 UUPS proxy tests (31)"]
+        T7["EmergencyModule.t.sol\nv2.4 Emergency module tests (25)"]
+    end
+
+    style tests fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
+    style T1 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style T2 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style T3 fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style T4 fill:#10B981,color:#FFFFFF,stroke:#059669
+    style T5 fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style T6 fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
+    style T7 fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
 ```
 
 ---

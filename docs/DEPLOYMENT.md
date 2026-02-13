@@ -1,12 +1,29 @@
 # Deployment Guide
 
-> Deploy the Referral Hook to testnets and mainnet
+> Deploy the FixerHook Protocol — Hook, Upgradeable Registry, and Proxy Infrastructure
+
+**Last Updated:** February 6, 2026  
+**Covers:** FixerHook v1 (hook mining), FixerRegistryUpgradeable v2.2 (UUPS proxy), Upgrade process
 
 ---
 
 ## Overview
 
 Uniswap v4 hooks require deployment to addresses with specific bits set based on enabled permissions. This guide covers the address mining and deployment process.
+
+```mermaid
+flowchart LR
+    Mine["⛏️ Hook Mining\nCREATE2 address search"] --> Deploy["🚀 Deploy Contracts\nImpl + Proxy + Hook"]
+    Deploy --> Verify["✅ Verify\nBlock explorer"]
+    Verify --> Config["⚙️ Configure\nRegister hooks, set params"]
+    Config --> Test["🧪 Post-Deploy Check\nSmoke tests"]
+
+    style Mine fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style Deploy fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style Verify fill:#10B981,color:#FFFFFF,stroke:#059669
+    style Config fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style Test fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+```
 
 ---
 
@@ -193,8 +210,132 @@ cast call <HOOK_ADDRESS> "REWARD_AMOUNT()" --rpc-url $RPC_URL
 
 ---
 
+## v2.2 Proxy Deployment (FixerRegistryUpgradeable)
+
+### Overview
+
+The upgradeable registry uses the UUPS proxy pattern (ERC1967Proxy). Deployment is a two-step atomic operation:
+1. Deploy the `FixerRegistryUpgradeable` implementation contract
+2. Deploy `ERC1967Proxy` pointing to the implementation, calling `initialize()` in the same transaction
+
+### Deployment Script
+
+**File:** `script/DeployUpgradeable.s.sol`
+
+```bash
+# Dry run
+forge script script/DeployUpgradeable.s.sol --rpc-url $RPC_URL
+
+# Deploy + verify
+forge script script/DeployUpgradeable.s.sol \
+  --rpc-url $RPC_URL \
+  --broadcast \
+  --verify
+```
+
+### Required Environment Variables
+
+```bash
+PRIVATE_KEY=0x...           # Deployer (becomes owner)
+SECURITY_COUNCIL=0x...      # Multisig for emergency pause
+GOVERNANCE=0x...            # DAO governance address
+TREASURY=0x...              # Protocol fee treasury
+BUYBACK_CONTRACT=0x...      # Buyback module address
+STAKER_REWARDS=0x...        # Staker reward distributor
+```
+
+### Post-Deployment Verification
+
+```bash
+# Verify proxy points to correct implementation
+cast call <PROXY_ADDRESS> "UPGRADE_INTERFACE_VERSION()" --rpc-url $RPC_URL
+# Expected: "5.0.0"
+
+# Verify initialization
+cast call <PROXY_ADDRESS> "name()" --rpc-url $RPC_URL
+# Expected: "FixerToken"
+
+cast call <PROXY_ADDRESS> "symbol()" --rpc-url $RPC_URL
+# Expected: "FIX"
+
+cast call <PROXY_ADDRESS> "owner()" --rpc-url $RPC_URL
+# Expected: deployer address
+
+# Verify protocol fee
+cast call <PROXY_ADDRESS> "getProtocolFee()" --rpc-url $RPC_URL
+# Expected: 500 (5%)
+
+# Verify emergency state
+cast call <PROXY_ADDRESS> "getEmergencyState()" --rpc-url $RPC_URL
+```
+
+### Addresses to Record
+
+After deployment, save these addresses in your deployment log:
+- **Implementation:** The raw `FixerRegistryUpgradeable` contract
+- **Proxy:** The `ERC1967Proxy` (this is the address users interact with)
+- **Admin:** The owner address (deployer by default)
+
+> **Important:** All interactions go through the **proxy** address, never the implementation directly.
+
+---
+
+## Upgrade Process
+
+### Overview
+
+Upgrading deploys a new implementation and points the proxy to it. State is preserved in the proxy's storage.
+
+**File:** `script/Upgrade.s.sol`
+
+### Pre-Upgrade Checklist
+
+- [ ] New implementation compiled and tested locally
+- [ ] Storage layout compatibility verified (no slot conflicts)
+- [ ] All new tests passing (`forge test`)
+- [ ] Upgrade script dry-run successful
+- [ ] Governance approval obtained (if required)
+
+### Upgrade Commands
+
+```bash
+# Set the proxy address
+export PROXY_ADDRESS=0x...
+
+# Dry run
+forge script script/Upgrade.s.sol --rpc-url $RPC_URL
+
+# Execute upgrade
+forge script script/Upgrade.s.sol \
+  --rpc-url $RPC_URL \
+  --broadcast \
+  --verify
+```
+
+### Post-Upgrade Verification
+
+```bash
+# Verify version bumped
+cast call <PROXY_ADDRESS> "VERSION()" --rpc-url $RPC_URL
+
+# Verify state preserved (check a known referrer's stats)
+cast call <PROXY_ADDRESS> "referrerStats(address)" <KNOWN_REFERRER> --rpc-url $RPC_URL
+
+# Verify new functionality works (if applicable)
+```
+
+### Rollback
+
+UUPS proxies **do not support direct rollback**. If an upgrade has issues:
+1. Deploy the previous implementation version as a new contract
+2. Call `upgradeToAndCall()` to point back to the previous logic
+3. This requires the owner to still have upgrade authority
+
+---
+
 ## Deployment Checklist
 
+### v1 (FixerHook)
 - [ ] PoolManager address verified
 - [ ] Private key secured (never commit to git)
 - [ ] Hook address has correct permission bits
@@ -202,6 +343,18 @@ cast call <HOOK_ADDRESS> "REWARD_AMOUNT()" --rpc-url $RPC_URL
 - [ ] Test swap executed successfully
 - [ ] Token minting confirmed
 - [ ] Frontend updated with hook address
+
+### v2.2 (FixerRegistryUpgradeable)
+- [ ] Security council is a multisig
+- [ ] Governance address set correctly
+- [ ] Fee addresses (treasury, buyback, stakers) set
+- [ ] `initialize()` called atomically in deployment
+- [ ] Proxy verified on block explorer
+- [ ] Implementation verified on block explorer
+- [ ] `owner()` returns expected deployer
+- [ ] Emergency state is all-unpaused
+- [ ] Protocol fee is 500 bps (5%)
+- [ ] `authorizedHooks` set for FixerHook address
 
 ---
 

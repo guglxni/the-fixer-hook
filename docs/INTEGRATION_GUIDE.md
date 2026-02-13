@@ -8,6 +8,25 @@
 
 This guide shows how to encode referral data and integrate with various frontend frameworks.
 
+```mermaid
+sequenceDiagram
+    actor User
+    participant Frontend
+    participant Router as Uniswap Router
+    participant Hook as FixerHookV2
+    participant Registry as FixerRegistry
+
+    User->>Frontend: Click referral link
+    Frontend->>Frontend: Extract referrer from URL
+    Frontend->>Frontend: abi.encode(referrerAddress)
+    Frontend->>Router: swap(params, hookData)
+    Router->>Hook: afterSwap(hookData)
+    Hook->>Hook: decodeReferrer(hookData)
+    Hook->>Registry: recordReferral(referrer, swapper, volume)
+    Registry->>Registry: _mint(referrer, rewardAmount)
+    Registry-->>User: FIX tokens minted to referrer
+```
+
 ---
 
 ## Data Encoding Format

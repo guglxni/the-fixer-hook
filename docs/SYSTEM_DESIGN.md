@@ -1,6 +1,8 @@
 # System Design Document
 
-> The Referral Hook — Technical Architecture Specification
+> The FixerHook Protocol — Technical Architecture Specification (v1.0 + v2.2)
+
+**Last Updated:** February 6, 2026
 
 ---
 
@@ -58,103 +60,79 @@ The **Referral Hook** introduces an **on-chain affiliate system** for Uniswap v4
 
 ### 2. Architectural Pattern: Side-Effect Tokenization
 
-```
-                    +-------------------------+
-                    |   SWAP TRANSACTION      |
-                    |   (with hookData)       |
-                    +-----------+-------------+
-                                |
-                    +-----------v-------------+
-                    |    POOLMANAGER          |
-                    |    (Swap Execution)     |
-                    +-----------+-------------+
-                                |
-                    +-----------v-------------+
-                    |    REFERRAL HOOK        |
-                    |    (Side-Effect)        |
-                    |                         |
-                    |  +-------------------+  |
-                    |  |   afterSwap()     |  |
-                    |  |                   |  |
-                    |  | 1. Decode data    |  |
-                    |  | 2. Validate       |  |
-                    |  | 3. Mint tokens    |  |
-                    |  +-------------------+  |
-                    +-----------+-------------+
-                                |
-                    +-----------v-------------+
-                    |    REF TOKEN MINTED     |
-                    |    (to referrer)        |
-                    +-------------------------+
+```mermaid
+flowchart TD
+    A["📦 Swap Transaction\n(with hookData)"] --> B["🔄 PoolManager\n(Swap Execution)"]
+    B --> C["🪝 Referral Hook\n(Side-Effect)"]
+    C --> D["afterSwap()"]
+    D --> D1["1. Decode hookData"]
+    D1 --> D2["2. Validate referrer"]
+    D2 --> D3["3. Mint tokens"]
+    D3 --> E["🎁 FIX Token minted\nto referrer"]
+
+    style A fill:#4F46E5,color:#fff,stroke:#4338CA
+    style B fill:#7C3AED,color:#fff,stroke:#6D28D9
+    style C fill:#2563EB,color:#fff,stroke:#1D4ED8
+    style D fill:#F59E0B,color:#000,stroke:#D97706
+    style E fill:#10B981,color:#fff,stroke:#059669
 ```
 
 **Key Insight:** The hook doesn't modify swap parameters or extract fees. It simply observes the completed swap and triggers a reward if valid referral data exists.
 
 ### 3. Component Overview
 
-```
-+---------------------------------------------------------------------+
-|                     COMPONENT HIERARCHY                              |
-+---------------------------------------------------------------------+
-|                                                                      |
-|   +-----------------+                                                |
-|   |   ReferralHook  | <-- Main Contract                              |
-|   +--------+--------+                                                |
-|            |                                                         |
-|   +--------+----------------------------+                            |
-|   |                                     |                            |
-|   v                                     v                            |
-| +--------------+               +--------------+                      |
-| |   BaseHook   |               |    ERC20     |                      |
-| |  (Uniswap)   |               |  (Solmate)   |                      |
-| +--------------+               +--------------+                      |
-|        |                              |                              |
-|        |                              |                              |
-|        v                              v                              |
-| - getHookPermissions()         - _mint()                             |
-| - _afterSwap()                 - balanceOf()                         |
-| - selector validation          - transfer()                          |
-|                                                                      |
-+---------------------------------------------------------------------+
+```mermaid
+classDiagram
+    class ReferralHook {
+        <<Main Contract>>
+        +REWARD_AMOUNT : uint256
+        +constructor(IPoolManager)
+        +getHookPermissions() Permissions
+        #_afterSwap() bytes4, int128
+    }
+    class BaseHook {
+        <<Uniswap v4>>
+        +poolManager : IPoolManager
+        +validateHookAddress()
+        #_afterSwap()*
+    }
+    class ERC20 {
+        <<Solmate>>
+        +name : string
+        +symbol : string
+        #_mint(to, amount)
+        +balanceOf(owner) uint256
+        +transfer(to, amount) bool
+    }
+    BaseHook <|-- ReferralHook : inherits
+    ERC20 <|-- ReferralHook : inherits
 ```
 
 ### 4. Workflow Sequence
 
-```
-+--------+     +----------+     +-------------+     +--------------+
-|Frontend|     |SwapRouter|     |PoolManager  |     |ReferralHook  |
-+---+----+     +----+-----+     +------+------+     +------+-------+
-    |               |                  |                   |
-    | 1. User clicks                   |                   |
-    |    "Swap with                    |                   |
-    |    Referral"                     |                   |
-    |               |                  |                   |
-    +-------------->|                  |                   |
-    | encode(referrer)                 |                   |
-    | in hookData   |                  |                   |
-    |               |                  |                   |
-    |               +----------------->|                   |
-    |               | swap(key,params, |                   |
-    |               |       hookData)  |                   |
-    |               |                  |                   |
-    |               |                  +------------------>|
-    |               |                  |   afterSwap()     |
-    |               |                  |   + hookData      |
-    |               |                  |                   |
-    |               |                  |                   +----+
-    |               |                  |                   |    | decode
-    |               |                  |                   |    | validate
-    |               |                  |                   |    | mint
-    |               |                  |                   |<---+
-    |               |                  |                   |
-    |               |                  |<------------------+
-    |               |                  |   selector        |
-    |               |<-----------------+                   |
-    |<--------------+   swap complete  |                   |
-    |               |                  |                   |
-+---+----+     +----+-----+     +------+------+     +------+-------+
-|Frontend|     |SwapRouter|     |PoolManager  |     |ReferralHook  |
-+--------+     +----------+     +-------------+     +--------------+
+```mermaid
+sequenceDiagram
+    participant F as 🖥️ Frontend
+    participant R as 🔀 SwapRouter
+    participant PM as 🏊 PoolManager
+    participant H as 🪝 ReferralHook
+
+    F->>F: User clicks "Swap with Referral"
+    F->>R: encode(referrer) in hookData
+    R->>PM: swap(key, params, hookData)
+    PM->>H: afterSwap() + hookData
+    
+    rect rgb(30, 41, 59)
+        Note over H: Validation Pipeline
+        H->>H: 1. decode(hookData) → referrer
+        H->>H: 2. referrer ≠ address(0)?
+        H->>H: 3. referrer ≠ tx.origin?
+        H->>H: 4. _mint(referrer, REWARD)
+    end
+    
+    H-->>PM: return selector
+    PM-->>R: swap complete
+    R-->>F: transaction confirmed
 ```
 
 ---
@@ -306,98 +284,54 @@ const hookData = encodeAbiParameters(
 
 ### Happy Path: Successful Referral
 
-```
-+-------------------------------------------------------------------------+
-|                     HAPPY PATH: SUCCESSFUL REFERRAL                      |
-+-------------------------------------------------------------------------+
-|                                                                          |
-|   INPUT                    PROCESS                    OUTPUT             |
-|   -----                    -------                    ------             |
-|                                                                          |
-|   hookData =           +-----------------+                               |
-|   abi.encode(          | hookData.length |                               |
-|     0xReferrer         |     > 0 ?       |                               |
-|   )                    +--------+--------+                               |
-|                                 | YES                                    |
-|                                 v                                        |
-|                        +-----------------+                               |
-|                        | referrer =      |                               |
-|                        | decode(data)    |                               |
-|                        +--------+--------+                               |
-|                                 |                                        |
-|                                 v                                        |
-|                        +-----------------+                               |
-|                        | referrer !=     |                               |
-|                        | address(0) ?    |                               |
-|                        +--------+--------+                               |
-|                                 | YES                                    |
-|                                 v                                        |
-|                        +-----------------+                               |
-|                        | referrer !=     |                               |
-|                        | tx.origin ?     |                               |
-|                        +--------+--------+                               |
-|                                 | YES                                    |
-|                                 v                                        |
-|                        +-----------------+       REF Token               |
-|                        | _mint(referrer, | --->  minted to               |
-|                        |   REWARD_AMOUNT)|       referrer                |
-|                        +-----------------+                               |
-|                                                                          |
-+-------------------------------------------------------------------------+
+```mermaid
+flowchart TD
+    Start["hookData received"] --> Check1{"hookData.length > 0?"}
+    Check1 -- "YES" --> Decode["referrer = decode(hookData)"]
+    Decode --> Check2{"referrer ≠ address(0)?"}
+    Check2 -- "YES" --> Check3{"referrer ≠ tx.origin?"}
+    Check3 -- "YES" --> Mint["✅ _mint(referrer, REWARD_AMOUNT)"]
+    Mint --> Result["🎁 FIX Token minted to referrer"]
+
+    style Start fill:#4F46E5,color:#fff,stroke:#4338CA
+    style Check1 fill:#F59E0B,color:#000,stroke:#D97706
+    style Decode fill:#7C3AED,color:#fff,stroke:#6D28D9
+    style Check2 fill:#F59E0B,color:#000,stroke:#D97706
+    style Check3 fill:#F59E0B,color:#000,stroke:#D97706
+    style Mint fill:#10B981,color:#fff,stroke:#059669
+    style Result fill:#10B981,color:#fff,stroke:#059669
 ```
 
 ### Edge Case: No Referral Data
 
-```
-+-------------------------------------------------------------------------+
-|                     EDGE CASE: NO REFERRAL DATA                          |
-+-------------------------------------------------------------------------+
-|                                                                          |
-|   INPUT                    PROCESS                    OUTPUT             |
-|   -----                    -------                    ------             |
-|                                                                          |
-|   hookData =           +-----------------+                               |
-|   0x (empty)           | hookData.length |                               |
-|                        |     > 0 ?       |                               |
-|                        +--------+--------+                               |
-|                                 | NO                                     |
-|                                 v                                        |
-|                        +-----------------+                               |
-|                        | SKIP PROCESSING | --->  Normal swap             |
-|                        | Return selector |       No rewards              |
-|                        +-----------------+                               |
-|                                                                          |
-+-------------------------------------------------------------------------+
+```mermaid
+flowchart TD
+    Start["hookData received"] --> Check1{"hookData.length > 0?"}
+    Check1 -- "NO" --> Skip["⏩ Skip processing\nReturn selector"]
+    Skip --> Result["Normal swap\nNo rewards minted"]
+
+    style Start fill:#4F46E5,color:#fff,stroke:#4338CA
+    style Check1 fill:#F59E0B,color:#000,stroke:#D97706
+    style Skip fill:#6B7280,color:#fff,stroke:#4B5563
+    style Result fill:#6B7280,color:#fff,stroke:#4B5563
 ```
 
 ### Edge Case: Self-Referral Attempt
 
-```
-+-------------------------------------------------------------------------+
-|                     EDGE CASE: SELF-REFERRAL BLOCKED                     |
-+-------------------------------------------------------------------------+
-|                                                                          |
-|   INPUT                    PROCESS                    OUTPUT             |
-|   -----                    -------                    ------             |
-|                                                                          |
-|   hookData =           +-----------------+                               |
-|   abi.encode(          | hookData.length |                               |
-|     tx.origin          |     > 0 ?       |                               |
-|   )                    +--------+--------+                               |
-|                                 | YES                                    |
-|                                 v                                        |
-|   User tries to        +-----------------+                               |
-|   refer themselves     | referrer !=     |                               |
-|                        | tx.origin ?     |                               |
-|                        +--------+--------+                               |
-|                                 | NO (BLOCKED)                           |
-|                                 v                                        |
-|                        +-----------------+                               |
-|                        | SKIP MINTING    | --->  Swap completes          |
-|                        | Return selector |       No rewards              |
-|                        +-----------------+       (anti-gaming)           |
-|                                                                          |
-+-------------------------------------------------------------------------+
+```mermaid
+flowchart TD
+    Start["hookData = encode(tx.origin)"] --> Check1{"hookData.length > 0?"}
+    Check1 -- "YES" --> Decode["referrer = decode(hookData)"]
+    Decode --> Check3{"referrer ≠ tx.origin?"}
+    Check3 -- "NO (BLOCKED)" --> Skip["🚫 Skip minting\nReturn selector"]
+    Skip --> Result["Swap completes\nNo rewards (anti-gaming)"]
+
+    style Start fill:#DC2626,color:#fff,stroke:#B91C1C
+    style Check1 fill:#F59E0B,color:#000,stroke:#D97706
+    style Decode fill:#7C3AED,color:#fff,stroke:#6D28D9
+    style Check3 fill:#F59E0B,color:#000,stroke:#D97706
+    style Skip fill:#DC2626,color:#fff,stroke:#B91C1C
+    style Result fill:#6B7280,color:#fff,stroke:#4B5563
 ```
 
 ---
@@ -406,32 +340,40 @@ const hookData = encodeAbiParameters(
 
 ### Inheritance Hierarchy
 
-```
-                        +-------------------+
-                        |   IPoolManager    |
-                        |   (Interface)     |
-                        +---------+---------+
-                                  |
-                        +---------v---------+
-                        |    BaseHook       |
-                        |  (v4-periphery)   |
-                        |                   |
-                        | + poolManager     |
-                        | + validateHook()  |
-                        | + _afterSwap()    |
-                        +---------+---------+
-                                  |
-        +-------------------------+-------------------------+
-        |                         |                         |
-        v                         v                         v
-+---------------+       +-----------------+       +---------------+
-|    ERC20      |       |  ReferralHook   |       |    Hooks      |
-|  (Solmate)    |       |                 |       |  (Library)    |
-|               |<------| - REWARD_AMOUNT |------>|               |
-| + _mint()     |       | - constructor() |       | .Permissions  |
-| + balanceOf   |       | - getHookPerm() |       |               |
-| + transfer()  |       | - _afterSwap()  |       |               |
-+---------------+       +-----------------+       +---------------+
+```mermaid
+classDiagram
+    class IPoolManager {
+        <<Interface>>
+        +swap()
+        +modifyLiquidity()
+    }
+    class BaseHook {
+        <<v4-periphery>>
+        +poolManager : IPoolManager
+        +validateHookAddress()
+        #_afterSwap()*
+    }
+    class ERC20 {
+        <<Solmate>>
+        #_mint(to, amount)
+        +balanceOf(owner) uint256
+        +transfer(to, amount) bool
+    }
+    class Hooks {
+        <<Library>>
+        +Permissions struct
+        +validateHookPermissions()
+    }
+    class ReferralHook {
+        -REWARD_AMOUNT : uint256
+        +getHookPermissions() Permissions
+        #_afterSwap() bytes4, int128
+    }
+
+    IPoolManager --> BaseHook : references
+    BaseHook <|-- ReferralHook : inherits
+    ERC20 <|-- ReferralHook : inherits
+    Hooks .. ReferralHook : uses
 ```
 
 ### Dependency Matrix
@@ -493,21 +435,183 @@ if (hookData.length >= 32) {
 
 ### Comparison
 
+```mermaid
+flowchart LR
+    subgraph gas["Gas Comparison"]
+        direction TB
+        A["🔄 Vanilla Swap\n~150,000 gas"]
+        B["🎯 Swap + Referral Hook\n(with mint)\n~172,300 gas (+15%)"]
+        C["⏩ Swap + Referral Hook\n(no referral)\n~150,250 gas (+0.17%)"]
+    end
+
+    style A fill:#10B981,color:#FFFFFF,stroke:#059669
+    style B fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style C fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style gas fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
 ```
-+---------------------------------------------------------------------+
-|                     GAS COMPARISON                                   |
-+---------------------------------------------------------------------+
-|                                                                      |
-|   Vanilla Swap (no hook)      ████████████████████  ~150,000        |
-|                                                                      |
-|   Swap + Referral Hook        █████████████████████ ~172,300        |
-|   (with mint)                               +22,300 (+15%)          |
-|                                                                      |
-|   Swap + Referral Hook        ████████████████████  ~150,250        |
-|   (no referral)                                +250 (+0.17%)        |
-|                                                                      |
-+---------------------------------------------------------------------+
+
+> **Learning Note:** The referral hook adds only **~250 gas** when no referral is present (the `hookData.length == 0` early return path). The ~22,300 gas overhead for minting is dominated by the cold `SSTORE` for the ERC20 balance update.
+
+---
+
+## v2.2 Architecture: UUPS Upgradeable Registry
+
+### Component Hierarchy (v2.2)
+
+```mermaid
+flowchart TD
+    Proxy["🔒 ERC1967Proxy\n(User-facing address)"]
+    Proxy -->|delegatecall| Impl["📦 FixerRegistryUpgradeable\nv2.3.0 (Implementation)"]
+    
+    Impl --> Init["Initializable"]
+    Impl --> UUPS["UUPSUpgradeable"]
+    Impl --> Own["OwnableUpgradeable"]
+    Impl --> ERC20["ERC20Upgradeable"]
+    Impl --> Guard["ReentrancyGuard\nUpgradeable"]
+    Impl --> Emerg["EmergencyModule"]
+    Impl --> Store["FixerRegistryStorage"]
+    
+    Store -->|ERC-7201| NS["📁 Namespaced Storage\n(MainStorage struct)"]
+
+    style Proxy fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style Impl fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style Init fill:#6B7280,color:#FFFFFF,stroke:#4B5563
+    style UUPS fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style Own fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style ERC20 fill:#10B981,color:#FFFFFF,stroke:#059669
+    style Guard fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style Emerg fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
+    style Store fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style NS fill:#1E1E2E,color:#E2E8F0,stroke:#7C3AED
 ```
+
+### Storage Architecture (ERC-7201)
+
+```mermaid
+flowchart TD
+    subgraph storage["FixerRegistryStorage.MainStorage @ ERC-7201 Computed Slot"]
+        direction TB
+        subgraph packed1["Slot Group 1: Reward Parameters (1 slot packed)"]
+            P1["uint128 minSwapAmount\nuint64 rewardRateBps\nuint64 __reserved1"]
+        end
+        subgraph packed2["Slot Group 2: Reward Bounds (1 slot packed)"]
+            P2["uint128 maxRewardAmount\nuint128 minRewardAmount"]
+        end
+        subgraph packed3["Slot Group 3: Protocol Fee (1 slot packed)"]
+            P3["uint64 protocolFeeBps (500 = 5%)\nuint64 maxProtocolFeeBps (1000 = 10%)\nuint128 accumulatedFees"]
+        end
+        subgraph packed4["Slot Group 4: Tier Thresholds (1 slot packed)"]
+            P4["uint64 silverThreshold\nuint64 goldThreshold\nuint128 platinumThreshold"]
+        end
+        subgraph maps["Mappings (each gets own slot)"]
+            M1["authorizedHooks · poolInfos · referrerStats"]
+            M2["agentRegistry [v2.2] · referrerTeams [v2.6]"]
+            M3["agentEndorsements [v2.7] · agentRatings [v2.7]"]
+            M4["teamMembers [v2.6] · crossChainStats [v2.3]"]
+        end
+        subgraph emergency["Emergency State (nested struct)"]
+            E1["bool pausedReferrals · pausedAgents · pausedRewards"]
+            E2["uint256 pausedAt · circuitBreakerThreshold"]
+            E3["uint256 mintedThisHour · hourStartedAt"]
+            E4["address securityCouncil · governance"]
+        end
+        subgraph fees["Fee Addresses"]
+            F1["address treasury (50%)\naddress buybackContract (30%)\naddress stakerRewards (20%)"]
+        end
+        GAP["uint256[50] __gap — reserved for upgrades"]
+    end
+
+    style storage fill:#1E1E2E,color:#E2E8F0,stroke:#7C3AED
+    style packed1 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style packed2 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style packed3 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style packed4 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style maps fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style emergency fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
+    style fees fill:#10B981,color:#FFFFFF,stroke:#059669
+    style GAP fill:#6B7280,color:#FFFFFF,stroke:#4B5563
+```
+
+### Emergency Module Flow
+
+```mermaid
+stateDiagram-v2
+    [*] --> Normal
+    
+    Normal --> Paused : Security Council\ncalls pauseReferrals()
+    Normal --> CircuitBreaker : mintedThisHour\n> threshold
+    
+    CircuitBreaker --> Paused : Auto-pauses\nrewards only
+    
+    Paused --> Normal : Security Council resume()\n(within 7 days)
+    Paused --> DAORequired : 7 days elapsed
+    DAORequired --> Normal : DAO governance\ncalls resume()
+    
+    state Normal {
+        [*] --> AllActive
+        AllActive : ✅ All operations active
+        AllActive : 📊 Circuit breaker monitors minting hourly
+    }
+    
+    state Paused {
+        [*] --> Restricted
+        Restricted : ❌ Affected ops revert with SystemPaused()
+        Restricted : ✅ Other operations continue normally
+    }
+    
+    state DAORequired {
+        [*] --> Locked
+        Locked : 🔒 Security council CANNOT resume
+        Locked : 🏛️ Only DAO governance can resume
+    }
+    
+    state CircuitBreaker {
+        [*] --> Triggered
+        Triggered : ⚡ mintedThisHour > threshold
+        Triggered : 🛑 Auto-pauses rewards
+        Triggered : 🔧 Requires manual resume
+    }
+```
+
+### Protocol Fee Flow (v2.2)
+
+```mermaid
+flowchart TD
+    Swap["🔄 Swap with Referral"] --> Compute["_computeNetReward()"]
+    Compute --> Base["baseReward = swapAmount × rewardRateBps / 10000"]
+    Base --> Fee["_applyProtocolFee()"]
+    Fee --> CalcFee["protocolFee = baseReward × 500 / 10000 (5%)"]
+    CalcFee --> Net["netReward = baseReward − protocolFee"]
+    CalcFee --> Accum["accumulatedFees += protocolFee"]
+    Accum --> Dist["distributeFees()\n(callable by anyone)"]
+    Dist --> Treasury["🏦 Treasury\n50%"]
+    Dist --> Buyback["🔄 Buyback Contract\n30%"]
+    Dist --> Stakers["💎 Staker Rewards\n20%"]
+
+    style Swap fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style Compute fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style Base fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style Fee fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style CalcFee fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style Net fill:#10B981,color:#FFFFFF,stroke:#059669
+    style Accum fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
+    style Dist fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style Treasury fill:#10B981,color:#FFFFFF,stroke:#059669
+    style Buyback fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style Stakers fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+```
+
+### Dependency Matrix (v2.2)
+
+| Dependency | Source | Version | Purpose |
+|------------|--------|---------|---------|
+| `v4-core` | Uniswap | latest | PoolManager, types, libraries |
+| `v4-periphery` | Uniswap | latest | BaseHook abstract contract |
+| `solmate` | Transmissions11 | latest | Legacy ERC20 (v1 only) |
+| `solady` | Vectorized | latest | FixedPointMathLib, Ownable (v1) |
+| `openzeppelin-contracts-upgradeable` | OpenZeppelin | v5.0.0 | UUPSUpgradeable, OwnableUpgradeable, ERC20Upgradeable, Initializable, ReentrancyGuardUpgradeable |
+| `openzeppelin-contracts` | OpenZeppelin | v5.0.0 | ERC1967Proxy |
+| `openzeppelin-foundry-upgrades` | OpenZeppelin | latest | Forge upgrade safety checks |
 
 ---
 
@@ -517,11 +621,18 @@ if (hookData.length >= 32) {
 
 | Version | Feature | Status |
 |---------|---------|--------|
-| v1.0 | Fixed rewards | Current |
-| v1.1 | Dynamic rewards (volume-based) | Planned |
-| v1.2 | Tiered referral system | Planned |
-| v2.0 | Cross-pool referral tracking | Proposed |
-| v2.1 | NFT-based referral credentials | Proposed |
+| v1.0 | Fixed rewards | Complete |
+| v1.1 | Dynamic rewards (volume-based) | Complete |
+| v1.2 | Tiered referral system | Complete |
+| v2.0 | Cross-pool referral tracking | Complete |
+| v2.1 | NFT-based referral credentials | Complete |
+| v2.2 | UUPS Upgradeable Registry | **Complete** |
+| v2.4 | Emergency Module | **Complete** |
+| v2.3 | Reactive Network + Hyperlane cross-chain | Planned |
+| v2.5 | Staking (veFIX) + Governance + Protocol Fees | Planned |
+| v2.6 | Referrer Teams | Planned |
+| v2.7 | AI Agent Marketplace | Planned |
+| v2.8 | LayerZero OFT Bridge | Planned |
 
 ### Extensibility Points
 
@@ -543,5 +654,5 @@ function getMultiplier(address referrer) internal view returns (uint256) {
 ---
 
 <p align="center">
-  <em>Document Version: 1.0.0 | Last Updated: January 2026</em>
+  <em>Document Version: 2.0.0 | Last Updated: February 2026</em>
 </p>

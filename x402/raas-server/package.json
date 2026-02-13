@@ -1,0 +1,31 @@
+{
+  "name": "@fixerhook/raas-server",
+  "version": "1.0.0",
+  "description": "FixerHook Referral-as-a-Service API server with x402 micropayments",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "^4.7.0",
+    "@hono/node-server": "^1.13.0",
+    "@x402/server": "^0.1.0",
+    "@x402/crypto": "^0.1.0",
+    "viem": "^2.22.0",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "eslint": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

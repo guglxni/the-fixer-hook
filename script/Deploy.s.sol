@@ -42,8 +42,8 @@ contract DeployFixerHook is Script {
         
         console.log("Required flags:", uint256(flags));
         
-        // Prepare constructor arguments
-        bytes memory constructorArgs = abi.encode(poolManager);
+        // Prepare constructor arguments (poolManager, owner)
+        bytes memory constructorArgs = abi.encode(poolManager, deployer);
         
         // Find valid hook address using CREATE2 salt mining
         (address hookAddress, bytes32 salt) = HookMiner.find(
@@ -70,7 +70,8 @@ contract DeployFixerHook is Script {
         
         // Deploy using CREATE2 with computed salt
         FixerHook hook = new FixerHook{salt: salt}(
-            IPoolManager(poolManager)
+            IPoolManager(poolManager),
+            deployer  // Owner address for parameter management
         );
         
         // Verify deployment address matches
@@ -90,11 +91,20 @@ contract DeployFixerHook is Script {
         console.log("FixerHook deployed at:", address(hook));
         console.log("Token name:", hook.name());
         console.log("Token symbol:", hook.symbol());
-        console.log("Reward amount:", hook.REWARD_AMOUNT());
+        console.log("Owner:", hook.owner());
+        
+        // Log v1.1 Dynamic Reward parameters
+        console.log("");
+        console.log("=== v1.1 Dynamic Reward Parameters ===");
+        console.log("Min swap amount:", hook.minSwapAmount());
+        console.log("Reward rate (bps):", hook.rewardRateBps());
+        console.log("Max reward:", hook.maxRewardAmount());
+        console.log("Min reward:", hook.minRewardAmount());
         
         // Verify permissions
         Hooks.Permissions memory perms = hook.getHookPermissions();
         require(perms.afterSwap, "afterSwap permission not set");
+        console.log("");
         console.log("afterSwap permission: enabled");
     }
 }

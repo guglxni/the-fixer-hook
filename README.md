@@ -39,20 +39,24 @@ This repository documents my journey building my first Uniswap v4 hook. If you'r
 
 **The Solution:** The Fixer Hook creates an on-chain affiliate system. When someone swaps, they can include a referrer's address. The hook automatically mints reward tokens to that referrer.
 
-```
-User swaps with hookData = encode(referrer_address)
-                    |
-                    v
-            Pool executes swap
-                    |
-                    v
-         Fixer Hook's afterSwap() runs
-                    |
-                    v
-    Decodes referrer -> Validates -> Mints 10 FIX tokens
-                    |
-                    v
-             Referrer earns rewards
+```mermaid
+flowchart TD
+    A["🧑‍💻 User initiates swap\nwith hookData = encode(referrer)"] --> B["🔄 Pool executes swap\nvia PoolManager"]
+    B --> C["🪝 FixerHook's afterSwap() runs"]
+    C --> D{"Decode & Validate\nhookData"}
+    D -- "Valid referrer" --> E["🏭 Mint FIX tokens\nto referrer"]
+    D -- "No data / Invalid" --> F["⏩ Skip — no reward"]
+    E --> G["✅ Referrer earns rewards"]
+    F --> H["✅ Swap completes normally"]
+
+    style A fill:#4F46E5,color:#fff,stroke:#4338CA
+    style B fill:#7C3AED,color:#fff,stroke:#6D28D9
+    style C fill:#2563EB,color:#fff,stroke:#1D4ED8
+    style D fill:#F59E0B,color:#000,stroke:#D97706
+    style E fill:#10B981,color:#fff,stroke:#059669
+    style F fill:#6B7280,color:#fff,stroke:#4B5563
+    style G fill:#10B981,color:#fff,stroke:#059669
+    style H fill:#6B7280,color:#fff,stroke:#4B5563
 ```
 
 ---
@@ -80,18 +84,23 @@ Before diving in, you should understand:
 
 Hooks are **smart contracts that extend pool behavior**. They're called at specific points during pool operations:
 
-```
-Pool Lifecycle Points Where Hooks Can Run:
-                                                
-  Initialize Pool ─────► beforeInitialize / afterInitialize
-                                                
-  Add Liquidity ──────► beforeAddLiquidity / afterAddLiquidity
-                                                
-  Remove Liquidity ───► beforeRemoveLiquidity / afterRemoveLiquidity
-                                                
-  Swap ───────────────► beforeSwap / afterSwap    <-- We use this one
-                                                
-  Donate ─────────────► beforeDonate / afterDonate
+```mermaid
+flowchart LR
+    subgraph lifecycle["⚡ Uniswap v4 Pool Lifecycle"]
+        direction TB
+        I["Initialize Pool"] --> IL["beforeInitialize / afterInitialize"]
+        AL["Add Liquidity"] --> ALL["beforeAddLiquidity / afterAddLiquidity"]
+        RL["Remove Liquidity"] --> RLL["beforeRemoveLiquidity / afterRemoveLiquidity"]
+        S["Swap"] --> SL["beforeSwap / afterSwap ✅"]
+        D["Donate"] --> DL["beforeDonate / afterDonate"]
+    end
+
+    SL -. "We use this!" .-> Hook["🪝 FixerHook\nafterSwap()"]
+
+    style lifecycle fill:#1E1E2E,color:#CDD6F4,stroke:#89B4FA
+    style S fill:#4F46E5,color:#fff,stroke:#4338CA
+    style SL fill:#7C3AED,color:#fff,stroke:#6D28D9
+    style Hook fill:#10B981,color:#fff,stroke:#059669
 ```
 
 ### The Hook Address System
@@ -135,19 +144,28 @@ function afterSwap(..., bytes calldata hookData) {
 
 The Fixer Hook uses what I call the **"Side-Effect Pattern"**:
 
-```
-Traditional Fee Hook:         Side-Effect Hook (The Fixer):
-                              
-User swaps 100 USDC           User swaps 100 USDC
-    |                             |
-    v                             v
-Hook takes 1 USDC fee         Swap executes normally (100 USDC)
-    |                             |
-    v                             v
-User receives 99 USDC         User receives expected amount
-                                  |
-                                  v
-                              Hook mints NEW tokens to referrer
+```mermaid
+flowchart TD
+    subgraph traditional["❌ Traditional Fee Hook"]
+        direction TB
+        T1["User swaps 100 USDC"] --> T2["Hook takes 1 USDC fee"]
+        T2 --> T3["User receives 99 USDC"]
+    end
+
+    subgraph sideeffect["✅ Side-Effect Hook · The Fixer"]
+        direction TB
+        S1["User swaps 100 USDC"] --> S2["Swap executes normally\n(full 100 USDC)"]
+        S2 --> S3["User receives expected amount"]
+        S3 --> S4["Hook mints NEW FIX tokens\nto referrer"]
+    end
+
+    style traditional fill:#1E1E2E,color:#F87171,stroke:#EF4444
+    style sideeffect fill:#1E1E2E,color:#34D399,stroke:#10B981
+    style T2 fill:#DC2626,color:#fff,stroke:#B91C1C
+    style T3 fill:#F87171,color:#000,stroke:#EF4444
+    style S2 fill:#4F46E5,color:#fff,stroke:#4338CA
+    style S3 fill:#10B981,color:#fff,stroke:#059669
+    style S4 fill:#F59E0B,color:#000,stroke:#D97706
 ```
 
 **Why this approach?**
@@ -163,6 +181,32 @@ The hook inherits from two parents:
 ```solidity
 contract ReferralHook is BaseHook, ERC20 {
 ```
+
+```mermaid
+classDiagram
+    class BaseHook {
+        <<abstract>>
+        #poolManager : IPoolManager
+        +getHookPermissions()*
+        #_afterSwap()*
+    }
+    class ERC20 {
+        <<Solmate>>
+        +name : string
+        +symbol : string
+        #_mint(to, amount)
+        +transfer(to, amount)
+    }
+    class ReferralHook {
+        +REWARD_AMOUNT : uint256
+        +getHookPermissions()
+        #_afterSwap()
+    }
+    BaseHook <|-- ReferralHook : Hook logic
+    ERC20 <|-- ReferralHook : Token capability
+```
+
+> **Learning Point:** Single contract = Hook + Token. Deploy once, get both capabilities.
 
 | Parent | Purpose |
 |--------|---------|
@@ -264,25 +308,43 @@ function getHookPermissions() public pure override
 ```
 the-fixer-hook/
 ├── src/
-│   └── ReferralHook.sol      # The main hook contract
+│   ├── FixerHook.sol                  # v1 — Original hook (BaseHook + ERC20)
+│   ├── FixerHookV2.sol                # v2 — Lightweight hook (delegates to registry)
+│   ├── FixerRegistry.sol              # v1 — Non-upgradeable central registry
+│   ├── FixerRegistryUpgradeable.sol   # v2.3 — UUPS proxy registry + EIP-3009
+│   ├── FixerCredential.sol            # v2.1 — Soulbound NFT credentials
+│   ├── storage/
+│   │   └── FixerRegistryStorage.sol   # ERC-7201 namespaced storage
+│   ├── modules/
+│   │   └── EmergencyModule.sol        # Circuit breaker + pause system
+│   ├── libraries/
+│   │   └── BPSMath.sol                # Basis-point math helpers
+│   ├── interfaces/                    # IFixerRegistry, IAgentRegistry, etc.
+│   └── types/
+│       └── AgentTypes.sol             # Tier constants, fee constants
 │
-├── test/
-│   └── ReferralHook.t.sol    # Test suite (15 tests)
+├── test/                              # 314 tests across 28 suites
+│   ├── FixerHook.t.sol                # v1 hook tests
+│   ├── FixerRegistry.t.sol            # v1 registry tests
+│   ├── FixerRegistryUpgrade.t.sol     # Proxy + upgrade tests
+│   ├── FixerCredential.t.sol          # NFT credential tests
+│   ├── Hardening.t.sol                # Supply cap, timelock, invariants
+│   ├── EmergencyModule.t.sol          # Emergency / circuit breaker tests
+│   └── X402.t.sol                     # x402 agent & EIP-3009 tests
 │
 ├── script/
-│   ├── Deploy.s.sol          # Deployment script
-│   └── HookMiner.sol         # Address mining for correct permission bits
+│   ├── Deploy.s.sol                   # v1 deployment
+│   ├── DeployUpgradeable.s.sol        # UUPS proxy deployment
+│   ├── DeployV2.s.sol                 # v2 hook + registry deployment
+│   ├── DeployX402.s.sol               # v2.3 x402 upgrade / fresh deploy
+│   └── HookMiner.sol                  # CREATE2 address mining
 │
-├── docs/
-│   ├── SYSTEM_DESIGN.md      # Architecture deep-dive
-│   ├── IMPLEMENTATION_GUIDE.md
-│   ├── INTEGRATION_GUIDE.md  # Frontend integration
-│   ├── SECURITY.md           # Threat model
-│   ├── TESTING.md
-│   └── DEPLOYMENT.md
+├── x402/                              # Off-chain x402 services
+│   ├── raas-server/                   # RaaS API (Hono + x402 paywall)
+│   └── mcp-server/                    # MCP server for AI agents
 │
-├── foundry.toml              # Foundry configuration
-└── remappings.txt            # Import path mappings
+├── docs/                              # Comprehensive documentation
+└── foundry.toml                       # Foundry configuration
 ```
 
 ---
@@ -318,7 +380,7 @@ forge test -vvv
 
 Expected output:
 ```
-Ran 4 test suites: 15 tests passed, 0 failed
+Ran 28 test suites: 314 tests passed, 0 failed
 ```
 
 ### 5. Run Tests with Gas Report
@@ -367,6 +429,48 @@ forge test --gas-report
 ### Related Concepts
 - [EIP-1014: CREATE2](https://eips.ethereum.org/EIPS/eip-1014) - How address mining works
 - [Solmate ERC20](https://github.com/transmissions11/solmate) - Gas-optimized token implementation
+
+---
+
+## v2 Architecture: UUPS Upgradeable Registry
+
+As the project evolved beyond v1, we built a **UUPS proxy-based upgradeable architecture** with a central registry, emergency controls, and x402 AI agent support:
+
+```mermaid
+flowchart TD
+    subgraph onchain["🔗 On-Chain (Base L2)"]
+        direction TB
+        PM["Uniswap v4\nPoolManager"] --> HookV2["FixerHookV2\n(Lightweight)"]
+        HookV2 --> Proxy["ERC1967 Proxy"]
+        Proxy --> Registry["FixerRegistryUpgradeable v2.3\n• ERC-20 FIX Token\n• Referral tracking\n• Tiered rewards\n• Agent registry\n• EIP-3009"]
+        Registry --> Storage["ERC-7201\nNamespaced Storage"]
+        Registry --> Emergency["EmergencyModule\n• Circuit breaker\n• Pause system"]
+        Registry --> Cred["FixerCredential\nSoulbound NFT"]
+    end
+
+    subgraph offchain["☁️ Off-Chain (x402)"]
+        direction TB
+        RaaS["RaaS API Server\n(Hono + x402 paywall)"]
+        MCP["MCP Server\n(AI Agent Tools)"]
+    end
+
+    Agent["🤖 AI Agent"] --> MCP
+    Agent --> RaaS
+    RaaS --> Proxy
+    MCP --> Proxy
+    User["🧑‍💻 User"] --> PM
+
+    style onchain fill:#0F172A,color:#E2E8F0,stroke:#3B82F6
+    style offchain fill:#1E1B4B,color:#E2E8F0,stroke:#8B5CF6
+    style PM fill:#4F46E5,color:#fff,stroke:#4338CA
+    style HookV2 fill:#7C3AED,color:#fff,stroke:#6D28D9
+    style Proxy fill:#2563EB,color:#fff,stroke:#1D4ED8
+    style Registry fill:#10B981,color:#fff,stroke:#059669
+    style Agent fill:#F59E0B,color:#000,stroke:#D97706
+    style User fill:#4F46E5,color:#fff,stroke:#4338CA
+```
+
+> **Learning Point:** The v2 architecture separates concerns — the hook stays lightweight (just routing), while the registry handles all business logic behind a UUPS proxy for upgradeability.
 
 ---
 
