@@ -64,7 +64,7 @@ forge build
 Create `src/ReferralHook.sol`:
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 import {BaseHook} from "v4-periphery/src/utils/BaseHook.sol";
@@ -176,7 +176,7 @@ constructor(IPoolManager _manager)
 Create `test/ReferralHook.t.sol`:
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 import "forge-std/Test.sol";

@@ -220,7 +220,7 @@ flowchart TD
 ### Phase 1: Storage Layout Design
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 /// @custom:storage-location erc7201:fixer.registry.storage.main
@@ -333,7 +333,7 @@ library AgentStakingConstants {
 ### Phase 2: Contract Structure
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 // OpenZeppelin Upgradeable Contracts
@@ -436,7 +436,7 @@ contract FixerRegistryUpgradeable is
 
 ```solidity
 // script/DeployRegistryUpgradeable.s.sol
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 import {Script} from "forge-std/Script.sol";

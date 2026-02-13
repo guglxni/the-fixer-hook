@@ -531,7 +531,7 @@ function setCircuitBreakerThreshold(uint256 newThreshold) external onlySecurityC
 **Contract:** `src/libraries/BPSMath.sol`
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";

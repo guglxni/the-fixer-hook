@@ -501,7 +501,10 @@ This is a learning project, and I'm still learning too. If you spot issues or ha
 
 ## License
 
-MIT License - See [LICENSE](./LICENSE)
+Business Source License 1.1 (BSL-1.1) - See [LICENSE](./LICENSE).
+- Educational and non-commercial use is permitted.
+- Commercial production use requires prior consent from the Licensor (Aaryan Guglani).
+- Transitions to MIT License on 2030-01-01.
 
 ---
 

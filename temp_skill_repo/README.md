@@ -96,7 +96,7 @@ uniswapV4-hooks-skill/
 ├── SKILL.md          # The skill definition (loaded by Claude Code)
 ├── README.md         # This file
 ├── CONTRIBUTING.md   # Contribution guidelines
-├── LICENSE           # MIT License
+├── LICENSE           # BSL 1.1 License
 └── examples/         # Example hooks (coming soon)
 ```
 
@@ -144,7 +144,7 @@ This skill distills knowledge from:
 
 ## License
 
-MIT License - see [LICENSE](LICENSE)
+BSL 1.1 License - see [LICENSE](LICENSE)
 
 ## Disclaimer
 

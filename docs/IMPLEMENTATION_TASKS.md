@@ -99,7 +99,7 @@ forge install OpenZeppelin/openzeppelin-foundry-upgrades --no-git
 **File:** `src/storage/FixerRegistryStorage.sol`
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 /// @custom:storage-location erc7201:fixer.registry.storage.main
@@ -250,7 +250,7 @@ Implement AI agent registration with tiered staking requirements based on finali
 **File:** `src/types/AgentTypes.sol`
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 /// @notice Agent verification tier based on stake amount
@@ -397,7 +397,7 @@ Implement circuit breakers and emergency pause functionality.
 **File:** `src/modules/EmergencyModule.sol`
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 /// @title EmergencyModule

@@ -549,7 +549,7 @@ flowchart TD
 ### FixerReactiveOrchestrator.sol
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 import {IReactive} from "./interfaces/IReactive.sol";
@@ -922,7 +922,7 @@ contract FixerReactiveOrchestrator is AbstractReactive {
 ### FixerRegistryReactive.sol (Extended Registry)
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 import {FixerRegistry} from "../FixerRegistry.sol";
@@ -1215,7 +1215,7 @@ flowchart TD
 
 ```solidity
 // script/DeployReactive.s.sol
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 import "forge-std/Script.sol";

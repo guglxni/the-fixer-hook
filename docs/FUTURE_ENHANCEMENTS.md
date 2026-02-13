@@ -472,7 +472,7 @@ flowchart TD
 #### FixerRegistry Contract
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 import {ERC20} from "solmate/src/tokens/ERC20.sol";
@@ -610,7 +610,7 @@ Issue soulbound NFTs (ERC-5192) representing referrer status. NFTs encode tier, 
 #### NFT Contract
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.26;
 
 import {ERC721} from "solmate/src/tokens/ERC721.sol";

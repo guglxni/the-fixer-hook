@@ -1,21 +1,19 @@
-MIT License
+Business Source License 1.1
 
-Copyright (c) 2025 Uniswap V4 Hooks Skill Contributors
+Parameters:
+  - Licensor: Aaryan Guglani
+  - Licensed Work: FixerHook Agent Skill and associated assets
+  - Change Date: 2030-01-01
+  - Change License: MIT
+  - Additional Use Grant: 
+      1. Educational and non-commercial use is permitted without restriction.
+      2. Usage by individual developers for personal projects and learning is permitted.
+      3. The Licensor (Aaryan Guglani) reserves the exclusive right to use, modify, and commercialize the Licensed Work for any purpose.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Terms:
+1. The Licensor hereby grants you the right to copy, modify, create derivative works, redistribute, and make non-production use of the Licensed Work.
+2. Production use of the Licensed Work for any commercial purpose is prohibited without prior written consent from the Licensor, except as provided in the Additional Use Grant.
+3. On the Change Date, this license shall transition to the Change License (MIT).
+4. All copies of the Licensed Work or its derivative works must include this license text and the original copyright notice.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Copyright (c) 2026 Aaryan Guglani. All rights reserved.
