@@ -35,3 +35,7 @@ coverage/
 
 # Repository analysis output
 repomix-output.xml
+
+# Internal documentation (audits, reports, code reviews)
+# These contain sensitive internal analysis and are not for public release
+/internal/

@@ -13,10 +13,10 @@ Uniswap v4 hooks require deployment to addresses with specific bits set based on
 
 ```mermaid
 flowchart LR
-    Mine["⛏️ Hook Mining\nCREATE2 address search"] --> Deploy["🚀 Deploy Contracts\nImpl + Proxy + Hook"]
-    Deploy --> Verify["✅ Verify\nBlock explorer"]
+    Mine["⛏️ Hook Mining\nCREATE2 address search"] --> Deploy["Deploy Contracts\nImpl + Proxy + Hook"]
+    Deploy --> Verify["[PASS] Verify\nBlock explorer"]
     Verify --> Config["⚙️ Configure\nRegister hooks, set params"]
-    Config --> Test["🧪 Post-Deploy Check\nSmoke tests"]
+    Config --> Test["Post-Deploy Check\nSmoke tests"]
 
     style Mine fill:#F59E0B,color:#1E1E2E,stroke:#D97706
     style Deploy fill:#4F46E5,color:#FFFFFF,stroke:#4338CA

@@ -89,11 +89,11 @@ flowchart TD
 
 ## Version 1.1: Dynamic Rewards
 
-### 📋 Overview
+### Overview
 
 Replace fixed 10 FIX reward with volume-proportional rewards. Larger swaps = larger rewards, with minimum thresholds to prevent Sybil farming.
 
-### 🎯 Goals
+### Goals
 
 - [ ] Proportional rewards based on swap volume
 - [x] Minimum volume threshold (~$100)
@@ -113,12 +113,12 @@ Replace fixed 10 FIX reward with volume-proportional rewards. Larger swaps = lar
 
 ### 📝 Task List
 
-> **Status: ✅ COMPLETED** (January 30, 2026)
+> **Status: [PASS] COMPLETED** (January 30, 2026)
 > 
 > The v1.1 implementation exceeds the original specification by adding per-pool configuration
 > and quote token normalization to solve the multi-asset volume calculation problem.
 
-#### Phase 1: Setup (Day 1-2) ✅
+#### Phase 1: Setup (Day 1-2) [PASS]
 
 - [x] **Task 1.1.1**: Install Solady library
   ```bash
@@ -137,7 +137,7 @@ Replace fixed 10 FIX reward with volume-proportional rewards. Larger swaps = lar
   forge build
   ```
 
-#### Phase 2: Core Implementation (Day 3-7) ✅
+#### Phase 2: Core Implementation (Day 3-7) [PASS]
 
 - [ ] **Task 1.2.1**: Add new state variables to `FixerHook.sol`
   ```solidity
@@ -217,7 +217,7 @@ Replace fixed 10 FIX reward with volume-proportional rewards. Larger swaps = lar
   event PoolConfigRemoved(PoolId indexed poolId);
   ```
 
-#### Phase 3: Testing (Day 8-10) ✅
+#### Phase 3: Testing (Day 8-10) [PASS]
 
 - [x] **Task 1.3.1**: Create test file `test/FixerHookV1_1.t.sol`
 
@@ -276,7 +276,7 @@ Replace fixed 10 FIX reward with volume-proportional rewards. Larger swaps = lar
   # Results: 40 tests passing (16 unit + 24 fuzz iterations)
   ```
 
-#### Phase 4: Documentation & Review (Day 11-12) ✅
+#### Phase 4: Documentation & Review (Day 11-12) [PASS]
 
 - [x] **Task 1.4.1**: Update NatSpec comments in contract
 - [x] **Task 1.4.2**: Update README.md with v1.1 features
@@ -286,7 +286,7 @@ Replace fixed 10 FIX reward with volume-proportional rewards. Larger swaps = lar
 
 ---
 
-### 📋 Implementation Notes
+### Implementation Notes
 
 > **v1.1 completed January 30, 2026**
 
@@ -323,7 +323,7 @@ Replace fixed 10 FIX reward with volume-proportional rewards. Larger swaps = lar
 | Parameter griefing | Low | Medium | Ownable2Step + timelock |
 | Overflow | Very Low | High | Solidity 0.8+ + Solady SafeMath |
 
-### ✅ Acceptance Criteria
+### [PASS] Acceptance Criteria
 
 - [ ] All 15+ tests pass
 - [ ] Gas overhead < 500 vs v1.0
@@ -333,15 +333,15 @@ Replace fixed 10 FIX reward with volume-proportional rewards. Larger swaps = lar
 
 ---
 
-## Version 1.2: Tiered Referral System ✅
+## Version 1.2: Tiered Referral System [PASS]
 
 > **Completed: January 31, 2026**
 
-### 📋 Overview
+### Overview
 
 Introduce Bronze/Silver/Gold/Platinum tiers with 1.0x/1.25x/1.5x/2.0x reward multipliers based on cumulative volume and referral count.
 
-### 🎯 Goals
+### Goals
 
 - [x] Four-tier system with clear thresholds
 - [x] Automatic tier upgrades on-chain
@@ -404,7 +404,7 @@ Key concepts to adapt:
   mapping(ReferrerTier => TierThresholds) public tierThresholds;
   ```
 
-#### Phase 2: Tier Configuration (Day 4-5) ✅
+#### Phase 2: Tier Configuration (Day 4-5) [PASS]
 
 - [x] **Task 1.2.5**: Initialize tier thresholds in constructor
   ```solidity
@@ -424,7 +424,7 @@ Key concepts to adapt:
 
 - [x] **Task 1.2.7**: Implement `_calculateTier()` function with event emission
 
-#### Phase 3: Core Logic Update (Day 6-8) ✅
+#### Phase 3: Core Logic Update (Day 6-8) [PASS]
 
 - [x] **Task 1.2.8**: Update `_afterSwap()` to:
   - Update referrer stats (volume, count, earned, timestamp)
@@ -440,7 +440,7 @@ Key concepts to adapt:
   event TierUpgrade(address indexed referrer, ReferrerTier indexed from, ReferrerTier indexed to);
   ```
 
-#### Phase 4: Testing (Day 9-12) ✅
+#### Phase 4: Testing (Day 9-12) [PASS]
 
 - [x] **Task 1.2.12**: Test tier qualification logic (18 unit tests)
 - [x] **Task 1.2.13**: Test tier upgrade triggers
@@ -449,7 +449,7 @@ Key concepts to adapt:
 - [x] **Task 1.2.16**: Test stats accumulation
 - [x] **Task 1.2.17**: Gas benchmark comparison (3 gas tests)
 
-#### Phase 5: Optimization (Day 13-14) ✅
+#### Phase 5: Optimization (Day 13-14) [PASS]
 
 - [x] **Task 1.2.18**: Optimize struct packing (2 slots for ReferrerStats)
 - [x] **Task 1.2.19**: Review SSTORE patterns (storage slot reuse)
@@ -475,15 +475,15 @@ Slot 1: referrerStats[addr].totalEarned (uint128) + tier (uint8) + padding
 
 ---
 
-## Version 2.0: Cross-Pool Registry ✅
+## Version 2.0: Cross-Pool Registry [PASS]
 
-### 📋 Overview
+### Overview
 
 Separate token/stats management into a central `FixerRegistry` contract. Multiple lightweight hooks call the registry, enabling unified rewards across all pools.
 
-> **Status: ✅ COMPLETED** (January 30, 2026)
+> **Status: [PASS] COMPLETED** (January 30, 2026)
 
-### 🎯 Goals
+### Goals
 
 - [x] Single FIX token across all pools
 - [x] Unified referrer statistics
@@ -506,7 +506,7 @@ forge install OpenZeppelin/openzeppelin-contracts-upgradeable --no-commit
 
 ### 📝 Task List
 
-#### Phase 1: Registry Contract (Week 1) ✅
+#### Phase 1: Registry Contract (Week 1) [PASS]
 
 - [x] **Task 2.0.1**: Create `src/FixerRegistry.sol`
 - [x] **Task 2.0.2**: Implement Ownable pattern (simplified from UUPS for MVP)
@@ -515,7 +515,7 @@ forge install OpenZeppelin/openzeppelin-contracts-upgradeable --no-commit
 - [x] **Task 2.0.5**: Implement `registerHook()` / `deregisterHook()` functions
 - [x] **Task 2.0.6**: Add per-pool statistics tracking
 
-#### Phase 2: Lightweight Hook (Week 2) ✅
+#### Phase 2: Lightweight Hook (Week 2) [PASS]
 
 - [x] **Task 2.0.7**: Create `src/FixerHookV2.sol`
 - [x] **Task 2.0.8**: Remove ERC20 inheritance (token now in registry)
@@ -523,11 +523,11 @@ forge install OpenZeppelin/openzeppelin-contracts-upgradeable --no-commit
 - [x] **Task 2.0.10**: Update `_afterSwap()` to call registry
 - [x] **Task 2.0.11**: Handle registry errors gracefully
 
-#### Phase 3: Interface Definition (Week 2) ✅
+#### Phase 3: Interface Definition (Week 2) [PASS]
 
 - [x] **Task 2.0.12**: Create `src/interfaces/IFixerRegistry.sol`
 
-#### Phase 4: Testing (Week 3) ✅
+#### Phase 4: Testing (Week 3) [PASS]
 
 - [x] **Task 2.0.13**: Test registry initialization (26 unit tests)
 - [x] **Task 2.0.14**: Test hook authorization
@@ -552,8 +552,8 @@ flowchart TD
         subgraph components[" "]
             direction LR
             ERC["💰 ERC20 (FIX)\nmint() · transfer()"]
-            Stats["📊 ReferrerStats\nvolume · count · tier"]
-            Auth["🔐 AuthorizedHooks\nhook1 ✅ · hook2 ✅"]
+            Stats["ReferrerStats\nvolume · count · tier"]
+            Auth["🔐 AuthorizedHooks\nhook1 [PASS] · hook2 [PASS]"]
         end
         Record["recordReferral(referrer, swapper, volume, pool)"]
     end
@@ -583,15 +583,15 @@ flowchart TD
 
 ---
 
-## Version 2.1: NFT Credentials ✅
+## Version 2.1: NFT Credentials [PASS]
 
-### 📋 Overview
+### Overview
 
 Issue ERC-5192 soulbound NFTs representing referrer credentials. NFTs display tier, stats, and unlock ecosystem benefits.
 
-> **Status: ✅ COMPLETED** (January 30, 2026)
+> **Status: [PASS] COMPLETED** (January 30, 2026)
 
-### 🎯 Goals
+### Goals
 
 - [x] Soulbound (non-transferable) credentials
 - [x] On-chain SVG generation
@@ -614,14 +614,14 @@ forge install attestate/ERC5192 --no-commit
 
 ### 📝 Task List
 
-#### Phase 1: Contract Setup (Week 1) ✅
+#### Phase 1: Contract Setup (Week 1) [PASS]
 
 - [x] **Task 2.1.1**: Create `src/FixerCredential.sol`
 - [x] **Task 2.1.2**: Implement ERC-5192 interface using ERC721 (Solmate) with custom locking
 - [x] **Task 2.1.3**: Add registry integration
 - [x] **Task 2.1.4**: Define Credential struct
 
-#### Phase 2: Minting Logic (Week 1) ✅
+#### Phase 2: Minting Logic (Week 1) [PASS]
 
 - [x] **Task 2.1.5**: Implement `mint()` function
   - Verify referrer has activity
@@ -635,19 +635,19 @@ forge install attestate/ERC5192 --no-commit
 
 - [x] **Task 2.1.7**: Add one-credential-per-address check
 
-#### Phase 3: On-Chain SVG (Week 2) ✅
+#### Phase 3: On-Chain SVG (Week 2) [PASS]
 
 - [x] **Task 2.1.8**: Import Solady utilities (Base64, LibString)
 - [x] **Task 2.1.9**: Implement `_generateSVG()` function with tier-based styling
 - [x] **Task 2.1.10**: Implement `tokenURI()` function with full JSON metadata
 
-#### Phase 4: Soulbound Enforcement (Week 2) ✅
+#### Phase 4: Soulbound Enforcement (Week 2) [PASS]
 
 - [x] **Task 2.1.11**: Override transfer functions to enforce soulbound
 - [x] **Task 2.1.12**: Implement ERC-5192 `locked()` function
 - [x] **Task 2.1.13**: Add unlock/lock capability for governance
 
-#### Phase 5: Testing (Week 3) ✅
+#### Phase 5: Testing (Week 3) [PASS]
 
 - [x] **Task 2.1.14**: Test minting flow (25 unit tests)
 - [x] **Task 2.1.15**: Test soulbound enforcement

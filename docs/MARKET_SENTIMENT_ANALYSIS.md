@@ -54,7 +54,7 @@ This document provides market sentiment analysis and data-driven recommendations
 
 ```mermaid
 flowchart LR
-    subgraph pros["✅ PROS"]
+    subgraph pros["[PASS] PROS"]
         P1["Gas efficient\nlightweight proxy"]
         P2["Bug fixes without migration"]
         P3["Address continuity preserved"]
@@ -63,7 +63,7 @@ flowchart LR
         P6["Feature additions post-launch"]
     end
 
-    subgraph cons["❌ CONS"]
+    subgraph cons["[FAIL] CONS"]
         C1["Upgrade logic in\nimplementation"]
         C2["Single mistake can\nbrick contract"]
         C3["Centralization risk"]
@@ -161,9 +161,9 @@ flowchart TD
 
 | Issue | Impact | Stake Would Have Helped? |
 |-------|--------|-------------------------|
-| Misconfigured instances exposed | High | ✅ Yes (skin in the game) |
-| Malicious "skills" targeting DeFi | High | ✅ Yes (slashable stake) |
-| Account hijacking for scam promotions | Critical | ✅ Yes (identity verification) |
+| Misconfigured instances exposed | High | [PASS] Yes (skin in the game) |
+| Malicious "skills" targeting DeFi | High | [PASS] Yes (slashable stake) |
+| Account hijacking for scam promotions | Critical | [PASS] Yes (identity verification) |
 | API tokens leaked | Critical | Partial |
 
 ### Recommendation
@@ -224,23 +224,23 @@ flowchart TD
     COMP --> M4
 
     subgraph M1["MODEL 1: UNLIMITED (Pi Network)"]
-        M1P["✅ Max growth potential\n✅ No artificial limits\n✅ Simple to understand"]
-        M1C["❌ Whale teams dominate\n❌ Hard to maintain quality\n❌ Diluted rewards"]
+        M1P["[PASS] Max growth potential\n[PASS] No artificial limits\n[PASS] Simple to understand"]
+        M1C["[FAIL] Whale teams dominate\n[FAIL] Hard to maintain quality\n[FAIL] Diluted rewards"]
     end
 
     subgraph M2["MODEL 2: CAPPED (Crypto.com)"]
-        M2P["✅ Prevents exploitation\n✅ Sustainable economics\n✅ Predictable costs"]
-        M2C["❌ Limits high-performers\n❌ May create alt teams\n❌ Feels restrictive"]
+        M2P["[PASS] Prevents exploitation\n[PASS] Sustainable economics\n[PASS] Predictable costs"]
+        M2C["[FAIL] Limits high-performers\n[FAIL] May create alt teams\n[FAIL] Feels restrictive"]
     end
 
     subgraph M3["MODEL 3: MATRIX (MLM)"]
-        M3P["✅ Encourages breadth\n✅ Spillover effects\n✅ Team building focus"]
-        M3C["❌ Complex to explain\n❌ Regulatory concerns\n❌ Perceived as pyramid"]
+        M3P["[PASS] Encourages breadth\n[PASS] Spillover effects\n[PASS] Team building focus"]
+        M3C["[FAIL] Complex to explain\n[FAIL] Regulatory concerns\n[FAIL] Perceived as pyramid"]
     end
 
     subgraph M4["MODEL 4: TIERED (Hybrid) ⭐"]
-        M4P["✅ Scales with commitment\n✅ Rewards active leaders\n✅ Balanced growth"]
-        M4C["❌ More complex impl\n❌ Needs clear docs\n❌ May game tiers"]
+        M4P["[PASS] Scales with commitment\n[PASS] Rewards active leaders\n[PASS] Balanced growth"]
+        M4C["[FAIL] More complex impl\n[FAIL] Needs clear docs\n[FAIL] May game tiers"]
     end
 
     style COMP fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
@@ -469,9 +469,9 @@ flowchart TD
 |--------|---------------|-----------|---------------------|
 | **Token Transfer** | ⭐⭐⭐⭐⭐ Native OFT | ⭐⭐⭐⭐ Warp Routes | LayerZero |
 | **Customization** | ⭐⭐⭐ DVN selection | ⭐⭐⭐⭐⭐ Full ISM control | Hyperlane |
-| **Unichain Support** | ✅ Yes | ❓ TBD | LayerZero |
+| **Unichain Support** | [PASS] Yes | ❓ TBD | LayerZero |
 | **Adoption/Trust** | Higher (more deployed) | Growing rapidly | LayerZero |
-| **Integration w/ Reactive** | Not native | ✅ Native integration | Hyperlane |
+| **Integration w/ Reactive** | Not native | [PASS] Native integration | Hyperlane |
 | **Cost** | Higher (DVN fees) | Lower (PoS) | Hyperlane |
 
 ### Recommendation
@@ -533,10 +533,10 @@ flowchart TD
 flowchart LR
     subgraph summary["FINAL RECOMMENDATIONS"]
         direction TB
-        D1["🔒 TOKEN: FIX = Immutable\nRegistry = UUPS"]
+        D1["TOKEN: FIX = Immutable\nRegistry = UUPS"]
         D2["💰 AGENT STAKE: 100 FIX (Starter)\n→ 10,000 FIX (Enterprise)"]
         D3["👥 TEAM MEMBERS: 5 (Bronze)\n→ 50 (Platinum)"]
-        D4["📊 PROTOCOL FEE: 5% launch\nDAO-controlled (max 10%)"]
+        D4["PROTOCOL FEE: 5% launch\nDAO-controlled (max 10%)"]
         D5["🌉 BRIDGE: Reactive + Hyperlane\n+ LayerZero OFT"]
     end
 

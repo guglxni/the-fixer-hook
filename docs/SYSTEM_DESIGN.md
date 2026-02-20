@@ -62,7 +62,7 @@ The **Referral Hook** introduces an **on-chain affiliate system** for Uniswap v4
 
 ```mermaid
 flowchart TD
-    A["📦 Swap Transaction\n(with hookData)"] --> B["🔄 PoolManager\n(Swap Execution)"]
+    A["📦 Swap Transaction\n(with hookData)"] --> B["[IN PROGRESS] PoolManager\n(Swap Execution)"]
     B --> C["🪝 Referral Hook\n(Side-Effect)"]
     C --> D["afterSwap()"]
     D --> D1["1. Decode hookData"]
@@ -290,7 +290,7 @@ flowchart TD
     Check1 -- "YES" --> Decode["referrer = decode(hookData)"]
     Decode --> Check2{"referrer ≠ address(0)?"}
     Check2 -- "YES" --> Check3{"referrer ≠ tx.origin?"}
-    Check3 -- "YES" --> Mint["✅ _mint(referrer, REWARD_AMOUNT)"]
+    Check3 -- "YES" --> Mint["[PASS] _mint(referrer, REWARD_AMOUNT)"]
     Mint --> Result["🎁 FIX Token minted to referrer"]
 
     style Start fill:#4F46E5,color:#fff,stroke:#4338CA
@@ -439,8 +439,8 @@ if (hookData.length >= 32) {
 flowchart LR
     subgraph gas["Gas Comparison"]
         direction TB
-        A["🔄 Vanilla Swap\n~150,000 gas"]
-        B["🎯 Swap + Referral Hook\n(with mint)\n~172,300 gas (+15%)"]
+        A["[IN PROGRESS] Vanilla Swap\n~150,000 gas"]
+        B["Swap + Referral Hook\n(with mint)\n~172,300 gas (+15%)"]
         C["⏩ Swap + Referral Hook\n(no referral)\n~150,250 gas (+0.17%)"]
     end
 
@@ -460,7 +460,7 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    Proxy["🔒 ERC1967Proxy\n(User-facing address)"]
+    Proxy["ERC1967Proxy\n(User-facing address)"]
     Proxy -->|delegatecall| Impl["📦 FixerRegistryUpgradeable\nv2.3.0 (Implementation)"]
     
     Impl --> Init["Initializable"]
@@ -549,19 +549,19 @@ stateDiagram-v2
     
     state Normal {
         [*] --> AllActive
-        AllActive : ✅ All operations active
-        AllActive : 📊 Circuit breaker monitors minting hourly
+        AllActive : [PASS] All operations active
+        AllActive : Circuit breaker monitors minting hourly
     }
     
     state Paused {
         [*] --> Restricted
-        Restricted : ❌ Affected ops revert with SystemPaused()
-        Restricted : ✅ Other operations continue normally
+        Restricted : [FAIL] Affected ops revert with SystemPaused()
+        Restricted : [PASS] Other operations continue normally
     }
     
     state DAORequired {
         [*] --> Locked
-        Locked : 🔒 Security council CANNOT resume
+        Locked : Security council CANNOT resume
         Locked : 🏛️ Only DAO governance can resume
     }
     
@@ -577,7 +577,7 @@ stateDiagram-v2
 
 ```mermaid
 flowchart TD
-    Swap["🔄 Swap with Referral"] --> Compute["_computeNetReward()"]
+    Swap["[IN PROGRESS] Swap with Referral"] --> Compute["_computeNetReward()"]
     Compute --> Base["baseReward = swapAmount × rewardRateBps / 10000"]
     Base --> Fee["_applyProtocolFee()"]
     Fee --> CalcFee["protocolFee = baseReward × 500 / 10000 (5%)"]
@@ -585,7 +585,7 @@ flowchart TD
     CalcFee --> Accum["accumulatedFees += protocolFee"]
     Accum --> Dist["distributeFees()\n(callable by anyone)"]
     Dist --> Treasury["🏦 Treasury\n50%"]
-    Dist --> Buyback["🔄 Buyback Contract\n30%"]
+    Dist --> Buyback["[IN PROGRESS] Buyback Contract\n30%"]
     Dist --> Stakers["💎 Staker Rewards\n20%"]
 
     style Swap fill:#4F46E5,color:#FFFFFF,stroke:#4338CA

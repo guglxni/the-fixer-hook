@@ -297,7 +297,7 @@ For the central registry, use upgradeable patterns:
 
 | Pattern | Repository | Recommendation |
 |---------|------------|----------------|
-| **UUPS Proxy** | OpenZeppelin | ✅ Recommended (gas efficient) |
+| **UUPS Proxy** | OpenZeppelin | [PASS] Recommended (gas efficient) |
 | **Transparent Proxy** | OpenZeppelin | Good for admin separation |
 | **Beacon Proxy** | OpenZeppelin | Multiple hooks, single upgrade |
 

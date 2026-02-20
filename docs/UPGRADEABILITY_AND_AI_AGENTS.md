@@ -5,17 +5,17 @@
 **Document Version:** 1.1.0  
 **Created:** February 5, 2026  
 **Last Updated:** February 5, 2026  
-**Status:** ✅ Decisions Finalized - Ready for Implementation
+**Status:** [PASS] Decisions Finalized - Ready for Implementation
 
 ---
 
-## ✅ Finalized Decisions
+## [PASS] Finalized Decisions
 
 > Based on [Market Sentiment Analysis](./MARKET_SENTIMENT_ANALYSIS.md) research
 
 | Decision | Finalized Value | Rationale |
 |----------|-----------------|-----------|
-| **FIX Token** | 🔒 Non-Upgradeable | User trust, "code is law", industry standard |
+| **FIX Token** | Non-Upgradeable | User trust, "code is law", industry standard |
 | **FixerRegistry** | ⚙️ UUPS Upgradeable | Logic layer flexibility, hot-fixes, AI evolution |
 | **Agent Min Stake** | 100 FIX (Starter) | ERC-8004 aligned, low barrier to experiment |
 | **Agent Max Stake** | 10,000 FIX (Enterprise) | Meaningful skin in game for high-volume agents |
@@ -70,7 +70,7 @@ flowchart TD
         direction LR
         Trading["🤖 Trading Agent\n• Auto-swaps\n• Arbitrage\n• MEV capture"]
         Social["📱 Social Agent\n• Recommends\n• Influencer\n• Education"]
-        Portfolio["📊 Portfolio Agent\n• Rebalances\n• DCA strategies\n• Yield farming"]
+        Portfolio["Portfolio Agent\n• Rebalances\n• DCA strategies\n• Yield farming"]
     end
 
     Trading --> Wallet
@@ -84,16 +84,16 @@ flowchart TD
     subgraph registry["FixerRegistry (UUPS Proxy)"]
         direction LR
         AgentMod["🧩 Agent Module\n• Agent auth\n• Agent tiers\n• Reputation"]
-        V2Logic["🚀 V2 Logic (future)\n• New features\n• Bug fixes\n• Integrations"]
+        V2Logic["V2 Logic (future)\n• New features\n• Bug fixes\n• Integrations"]
     end
 
     Registry[""] ~~~ AgentMod
 
     subgraph state["Preserved State (Proxy Storage)"]
         S1["💰 FIX token balances"]
-        S2["📊 Referrer statistics"]
+        S2["Referrer statistics"]
         S3["⭐ Tier progressions"]
-        S4["🔗 Hook authorizations"]
+        S4["Hook authorizations"]
     end
 
     AgentMod --> state
@@ -183,7 +183,7 @@ flowchart TD
         end
 
         storage -->|delegatecall| ImplV1["📦 Implementation V1\nCurrent logic"]
-        ImplV1 -.->|after upgrade| ImplV2["🚀 Implementation V2 (Future)\n• Agent modules\n• New reward algorithms\n• Bug fixes"]
+        ImplV1 -.->|after upgrade| ImplV2["Implementation V2 (Future)\n• Agent modules\n• New reward algorithms\n• Bug fixes"]
     end
 
     Proxy[" "] ~~~ storage
@@ -209,7 +209,7 @@ flowchart TD
 | **Upgrade Logic** | In implementation | In proxy |
 | **Security** | Slightly higher risk (disable initializers) | Admin-separated |
 | **Complexity** | Simpler proxy | More complex proxy |
-| **Recommendation** | ✅ For FixerHook | For highly critical DAOs |
+| **Recommendation** | [PASS] For FixerHook | For highly critical DAOs |
 
 **Decision:** UUPS is more gas-efficient, which is critical for a hook that's called on every swap.
 
@@ -484,7 +484,7 @@ flowchart TD
     subgraph onboard["AI Agent Onboarding Flow"]
         direction LR
         AW["🔐 Agent Wallet"] --> Reg["📝 Register Agent"]
-        Reg --> Ver["✅ Verify Agent"]
+        Reg --> Ver["[PASS] Verify Agent"]
         AW --> ERC4337["ERC-4337\nAccount Abstraction"]
         Reg --> Stake["💰 Stake FIX\n(Optional)"]
         Ver --> Attest["📜 Operator Attestation\n(EAS / WorldCoin)"]
@@ -492,7 +492,7 @@ flowchart TD
 
     subgraph operate["Agent Operating Flow"]
         direction LR
-        Logic["🧠 Agent Logic"] --> Swap["🔄 Execute Swaps"]
+        Logic["🧠 Agent Logic"] --> Swap["[IN PROGRESS] Execute Swaps"]
         Swap --> Earn["🏆 Earn Rewards"]
         Logic --> Model["🤖 On-Chain AI\n(Galadriel / NEAR AI)"]
         Swap --> Hook["hookData:\nagentAddr + userAddr"]
@@ -579,11 +579,11 @@ function _calculateAgentAwareReward(
 
 | Method | Trust Level | Gas Cost | Decentralization |
 |--------|-------------|----------|------------------|
-| **Owner Whitelist** | High (centralized) | Low | ❌ Centralized |
-| **Stake-based** | Medium | Medium | ✅ Decentralized |
-| **Attestation (EAS)** | High | Medium | ✅ Decentralized |
-| **WorldCoin Orb** | Very High (human check) | Low | ⚠️ Semi-centralized |
-| **Multi-sig Approval** | High | High | ✅ Decentralized |
+| **Owner Whitelist** | High (centralized) | Low | [FAIL] Centralized |
+| **Stake-based** | Medium | Medium | [PASS] Decentralized |
+| **Attestation (EAS)** | High | Medium | [PASS] Decentralized |
+| **WorldCoin Orb** | Very High (human check) | Low | [WARNING] Semi-centralized |
+| **Multi-sig Approval** | High | High | [PASS] Decentralized |
 
 ### Recommended: Hybrid Approach
 

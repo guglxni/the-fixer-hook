@@ -19,7 +19,7 @@ flowchart TD
         A4["Flash Loan MEV"]
     end
 
-    subgraph surface["🎯 Attack Surfaces"]
+    subgraph surface["Attack Surfaces"]
         direction LR
         S1["Self-referral"]
         S2["Mint inflation"]
@@ -27,7 +27,7 @@ flowchart TD
         S4["Emergency bypass"]
     end
 
-    subgraph mitigations["🛡️ Mitigations"]
+    subgraph mitigations["️ Mitigations"]
         direction LR
         M1["tx.origin != referrer"]
         M2["Daily mint ceiling\nCircuit breaker"]
@@ -351,14 +351,14 @@ function setProtocolFee(uint64 newFeeBps) external onlyOwner {
 3. Document Sybil risk to users
 
 ### For Production (v2.2 — Implemented)
-1. ~~Add minimum swap volume threshold~~ ✅ Implemented (configurable `minSwapAmount`)
+1. ~~Add minimum swap volume threshold~~ [PASS] Implemented (configurable `minSwapAmount`)
 2. ~~Consider per-referrer cooldowns~~ Deferred to v2.6 (team module)
-3. ~~Implement governance for parameter changes~~ ✅ Emergency module + owner governance
-4. ~~Add emergency pause functionality~~ ✅ EmergencyModule with 3 independent states
-5. UUPS proxy with ERC-7201 storage ✅
-6. ReentrancyGuard on all state-changing functions ✅
-7. Circuit breaker for anomalous minting ✅
-8. Protocol fee hardcap ✅
+3. ~~Implement governance for parameter changes~~ [PASS] Emergency module + owner governance
+4. ~~Add emergency pause functionality~~ [PASS] EmergencyModule with 3 independent states
+5. UUPS proxy with ERC-7201 storage [PASS]
+6. ReentrancyGuard on all state-changing functions [PASS]
+7. Circuit breaker for anomalous minting [PASS]
+8. Protocol fee hardcap [PASS]
 
 ---
 

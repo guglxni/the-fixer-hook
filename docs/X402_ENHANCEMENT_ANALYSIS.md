@@ -394,7 +394,7 @@ flowchart TD
     Facilitator --> RaaS
 
     subgraph raas["FixerHook RaaS Server\n(Express/Hono + x402 paymentMiddleware)"]
-        API1["📊 Pool analytics API"]
+        API1["Pool analytics API"]
         API2["🔍 Referrer discovery"]
         API3["🛤️ Route optimization"]
         API4["📝 Agent registration"]
@@ -403,7 +403,7 @@ flowchart TD
 
     raas -->|"Reads on-chain data"| Chain
 
-    Chain["🔗 FixerRegistryUpgradeable\n+ FixerHookV2\n(On-Chain, Unchanged)"]
+    Chain["FixerRegistryUpgradeable\n+ FixerHookV2\n(On-Chain, Unchanged)"]
 
     style Facilitator fill:#F59E0B,color:#1E1E2E,stroke:#D97706
     style Agent fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
@@ -471,7 +471,7 @@ flowchart TD
     subgraph revenue["Revenue Flows"]
         direction LR
         Rev1["💵 Agents pay USDC (x402) for data → Protocol treasury"]
-        Rev2["🪙 Agents earn FIX for referral volume → Agent wallets"]
+        Rev2["Agents earn FIX for referral volume → Agent wallets"]
         Rev3["🔥 Agents pay FIX/USDC for premium tiers → Token burn"]
         Rev4["🏪 Agents trade referral rights (x402) → Marketplace fees"]
     end
