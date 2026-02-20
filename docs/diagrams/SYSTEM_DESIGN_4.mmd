@@ -1,0 +1,14 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+    Check1 -- "YES" --> Decode["referrer = decode(hookData)"]
+    Decode --> Check2{"referrer ≠ address(0)?"}
+    Check2 -- "YES" --> Check3{"referrer ≠ tx.origin?"}
+    Check3 -- "YES" --> Mint["[PASS] _mint(referrer, REWARD_AMOUNT)"]
+    Mint --> Result[" FIX Token minted to referrer"]
+    style Start fill:#4F46E5,color:#fff,stroke:#4338CA
+    style Check1 fill:#F59E0B,color:#000,stroke:#D97706
+    style Decode fill:#7C3AED,color:#fff,stroke:#6D28D9
+    style Check2 fill:#F59E0B,color:#000,stroke:#D97706
+    style Check3 fill:#F59E0B,color:#000,stroke:#D97706
+    style Mint fill:#10B981,color:#fff,stroke:#059669
+    style Result fill:#10B981,color:#fff,stroke:#059669

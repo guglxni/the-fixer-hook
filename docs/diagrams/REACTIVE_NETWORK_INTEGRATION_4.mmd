@@ -1,11 +1,9 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    Reg["📦 FixerRegistry\n(Single Chain)"]
-    Reg --> HookA["🪝 FixerHookV2\n(Pool A)"]
-    Reg --> HookB["🪝 FixerHookV2\n(Pool B)"]
-    Reg --> Cred["🎖️ FixerCredential\n(NFT)"]
-
+    Reg --> HookA[" FixerHookV2\n(Pool A)"]
+    Reg --> HookB[" FixerHookV2\n(Pool B)"]
+    Reg --> Cred[" FixerCredential\n(NFT)"]
     Limits["[WARNING] LIMITATIONS\n• Single chain only\n• No automatic notifications\n• Manual claim required\n• No cross-protocol awareness"]
-
     style Reg fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
     style HookA fill:#6B7280,color:#FFFFFF,stroke:#4B5563
     style HookB fill:#6B7280,color:#FFFFFF,stroke:#4B5563

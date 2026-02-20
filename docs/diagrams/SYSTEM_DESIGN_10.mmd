@@ -1,0 +1,41 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+        direction TB
+        subgraph packed1["Slot Group 1: Reward Parameters (1 slot packed)"]
+            P1["uint128 minSwapAmount\nuint64 rewardRateBps\nuint64 __reserved1"]
+        end
+        subgraph packed2["Slot Group 2: Reward Bounds (1 slot packed)"]
+            P2["uint128 maxRewardAmount\nuint128 minRewardAmount"]
+        end
+        subgraph packed3["Slot Group 3: Protocol Fee (1 slot packed)"]
+            P3["uint64 protocolFeeBps (500 = 5%)\nuint64 maxProtocolFeeBps (1000 = 10%)\nuint128 accumulatedFees"]
+        end
+        subgraph packed4["Slot Group 4: Tier Thresholds (1 slot packed)"]
+            P4["uint64 silverThreshold\nuint64 goldThreshold\nuint128 platinumThreshold"]
+        end
+        subgraph maps["Mappings (each gets own slot)"]
+            M1["authorizedHooks · poolInfos · referrerStats"]
+            M2["agentRegistry [v2.2] · referrerTeams [v2.6]"]
+            M3["agentEndorsements [v2.7] · agentRatings [v2.7]"]
+            M4["teamMembers [v2.6] · crossChainStats [v2.3]"]
+        end
+        subgraph emergency["Emergency State (nested struct)"]
+            E1["bool pausedReferrals · pausedAgents · pausedRewards"]
+            E2["uint256 pausedAt · circuitBreakerThreshold"]
+            E3["uint256 mintedThisHour · hourStartedAt"]
+            E4["address securityCouncil · governance"]
+        end
+        subgraph fees["Fee Addresses"]
+            F1["address treasury (50%)\naddress buybackContract (30%)\naddress stakerRewards (20%)"]
+        end
+        GAP["uint256[50] __gap — reserved for upgrades"]
+    end
+    style storage fill:#1E1E2E,color:#E2E8F0,stroke:#7C3AED
+    style packed1 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style packed2 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style packed3 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style packed4 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style maps fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style emergency fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
+    style fees fill:#10B981,color:#FFFFFF,stroke:#059669
+    style GAP fill:#6B7280,color:#FFFFFF,stroke:#4B5563

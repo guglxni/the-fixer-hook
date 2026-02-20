@@ -1,0 +1,19 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+sequenceDiagram
+    participant R as  SwapRouter
+    participant PM as  PoolManager
+    participant H as  ReferralHook
+    F->>F: User clicks "Swap with Referral"
+    F->>R: encode(referrer) in hookData
+    R->>PM: swap(key, params, hookData)
+    PM->>H: afterSwap() + hookData
+    rect rgb(30, 41, 59)
+        Note over H: Validation Pipeline
+        H->>H: 1. decode(hookData) → referrer
+        H->>H: 2. referrer ≠ address(0)?
+        H->>H: 3. referrer ≠ tx.origin?
+        H->>H: 4. _mint(referrer, REWARD)
+    end
+    H-->>PM: return selector
+    PM-->>R: swap complete
+    R-->>F: transaction confirmed

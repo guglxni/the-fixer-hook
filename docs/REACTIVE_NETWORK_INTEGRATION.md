@@ -21,8 +21,8 @@
 | **LayerZero OFT** | FIX token bridging only | Industry standard, 300+ dApps, trusted |
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart LR
-    subgraph arch["Finalized Cross-Chain Architecture"]
         direction LR
         subgraph rn["REACTIVE NETWORK\nFREE (gas only)"]
             R1["Event monitoring"]
@@ -43,7 +43,6 @@ flowchart LR
             L4["Industry standard"]
         end
     end
-
     style arch fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style rn fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style hl fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
@@ -88,13 +87,13 @@ Reactive Network is an **event-driven execution layer** for EVM ecosystems that 
 ### Key Benefits
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph benefits["FixerHook + Reactive Network Benefits"]
         direction TB
         subgraph row1[" "]
             direction LR
             B1["CROSS-CHAIN REFERRALS\n• Unified referrer stats\n• Track swaps on any chain\n• Single FIX token across L1/L2s"]
-            B2["⚡ REAL-TIME AUTOMATION\n• Automatic tier upgrades\n• Event-driven reward distribution\n• No keeper bots needed"]
+            B2[" REAL-TIME AUTOMATION\n• Automatic tier upgrades\n• Event-driven reward distribution\n• No keeper bots needed"]
         end
         subgraph row2[" "]
             direction LR
@@ -103,11 +102,10 @@ flowchart TD
         end
         subgraph row3[" "]
             direction LR
-            B5["💰 NEW REVENUE STREAMS\n• Cross-protocol referrals\n• MEV-aware distributions\n• AI agent coordination"]
+            B5[" NEW REVENUE STREAMS\n• Cross-protocol referrals\n• MEV-aware distributions\n• AI agent coordination"]
             B6["SECURITY\n• Decentralized automation\n• No off-chain dependencies\n• Trustless cross-chain ops"]
         end
     end
-
     style benefits fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style B1 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style B2 fill:#F59E0B,color:#1E1E2E,stroke:#D97706
@@ -131,25 +129,22 @@ flowchart TD
 4. **Operate within ReactVM** - isolated execution environments
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart LR
-    subgraph origins["ORIGIN CHAINS\n(Event Sources)"]
         Eth1["Ethereum"]
         Base1["Base"]
         Arb1["Arbitrum"]
         Uni1["Unichain"]
     end
-
     subgraph reactive["REACTIVE NETWORK\n(Processing)"]
-        RVM["🧠 ReactVM\nReactive Contract\n• subscribe()\n• react()\n• emit Callback()"]
+        RVM[" ReactVM\nReactive Contract\n• subscribe()\n• react()\n• emit Callback()"]
     end
-
     subgraph destinations["DESTINATIONS\n(Actions)"]
         Eth2["Ethereum"]
         Base2["Base"]
         Arb2["Arbitrum"]
         Uni2["Unichain"]
     end
-
     Eth1 -->|events| RVM
     Base1 -->|events| RVM
     Arb1 -->|events| RVM
@@ -158,7 +153,6 @@ flowchart LR
     RVM -->|callback| Base2
     RVM -->|callback| Arb2
     RVM -->|callback| Uni2
-
     style origins fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style reactive fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
     style destinations fill:#1E1E2E,color:#E2E8F0,stroke:#7C3AED
@@ -206,14 +200,12 @@ flowchart LR
 #### Before: Current Architecture (Single-Chain)
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    Reg["📦 FixerRegistry\n(Single Chain)"]
-    Reg --> HookA["🪝 FixerHookV2\n(Pool A)"]
-    Reg --> HookB["🪝 FixerHookV2\n(Pool B)"]
-    Reg --> Cred["🎖️ FixerCredential\n(NFT)"]
-
+    Reg --> HookA[" FixerHookV2\n(Pool A)"]
+    Reg --> HookB[" FixerHookV2\n(Pool B)"]
+    Reg --> Cred[" FixerCredential\n(NFT)"]
     Limits["[WARNING] LIMITATIONS\n• Single chain only\n• No automatic notifications\n• Manual claim required\n• No cross-protocol awareness"]
-
     style Reg fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
     style HookA fill:#6B7280,color:#FFFFFF,stroke:#4B5563
     style HookB fill:#6B7280,color:#FFFFFF,stroke:#4B5563
@@ -224,28 +216,24 @@ flowchart TD
 #### After: Enhanced with Reactive Network (Multi-Chain)
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart LR
-    subgraph chain1["CHAIN 1 (Ethereum)"]
-        Reg1["📦 FixerRegistry\n(Primary)"]
-        Reg1 --> H1A["🪝 FixerHookV2\n(Pool A)"]
-        Reg1 --> H1B["🪝 FixerHookV2\n(Pool B)"]
+        Reg1[" FixerRegistry\n(Primary)"]
+        Reg1 --> H1A[" FixerHookV2\n(Pool A)"]
+        Reg1 --> H1B[" FixerHookV2\n(Pool B)"]
     end
-
     subgraph reactive["REACTIVE NETWORK"]
-        RC["🧠 FixerReactive Contract\n• Monitor swaps\n• Aggregate stats\n• Trigger callbacks\n• Sync tiers"]
+        RC[" FixerReactive Contract\n• Monitor swaps\n• Aggregate stats\n• Trigger callbacks\n• Sync tiers"]
     end
-
     subgraph chain2["CHAIN 2 (Base)"]
-        Reg2["📦 FixerRegistry\n(Secondary)"]
-        Reg2 --> H2C["🪝 FixerHookV2\n(Pool C)"]
-        Reg2 --> Cred2["🎖️ FixerCredential\n(sync)"]
+        Reg2[" FixerRegistry\n(Secondary)"]
+        Reg2 --> H2C[" FixerHookV2\n(Pool C)"]
+        Reg2 --> Cred2[" FixerCredential\n(sync)"]
     end
-
     H1A -->|events| RC
     H1B -->|events| RC
     RC -->|callback| Reg1
     RC -->|callback| Reg2
-
     style chain1 fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style reactive fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
     style chain2 fill:#1E1E2E,color:#E2E8F0,stroke:#2563EB
@@ -269,14 +257,14 @@ flowchart LR
 
 | Use Case | Priority | Complexity | Value | Dependencies |
 |----------|----------|------------|-------|--------------|
-| **Cross-Chain Referral Sync** | 🔴 High | Medium | ⭐⭐⭐⭐⭐ | v2.0 Registry |
-| **Automatic Tier Upgrades** | 🔴 High | Low | ⭐⭐⭐⭐ | v1.2 Tiers |
-| **Stop-Loss for Referrers** | 🟡 Medium | Medium | ⭐⭐⭐⭐ | New |
-| **Auto-Compound Rewards** | 🟡 Medium | Medium | ⭐⭐⭐ | New |
-| **Cross-Protocol Tracking** | 🟡 Medium | High | ⭐⭐⭐⭐⭐ | New |
-| **NFT Credential Sync** | 🟢 Low | Low | ⭐⭐⭐ | v2.1 NFT |
-| **Leaderboard Updates** | 🟢 Low | Low | ⭐⭐ | Frontend |
-| **AI Agent Coordination** | 🟢 Low | High | ⭐⭐⭐⭐⭐ | v2.2 AI |
+| **Cross-Chain Referral Sync** |  High | Medium |  | v2.0 Registry |
+| **Automatic Tier Upgrades** |  High | Low |  | v1.2 Tiers |
+| **Stop-Loss for Referrers** |  Medium | Medium |  | New |
+| **Auto-Compound Rewards** |  Medium | Medium |  | New |
+| **Cross-Protocol Tracking** |  Medium | High |  | New |
+| **NFT Credential Sync** |  Low | Low |  | v2.1 NFT |
+| **Leaderboard Updates** |  Low | Low |  | Frontend |
+| **AI Agent Coordination** |  Low | High |  | v2.2 AI |
 
 ### Detailed Use Cases
 
@@ -433,8 +421,8 @@ function react(LogRecord calldata log) external vmOnly {
 ### Version 2.3: Reactive Integration
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph reactive["REACTIVE NETWORK"]
         subgraph orch["FixerReactiveOrchestrator.sol"]
             direction TB
             subgraph subs["SUBSCRIPTIONS"]
@@ -458,9 +446,7 @@ flowchart TD
             end
         end
     end
-
     reactive -->|Callbacks| dest
-
     subgraph dest["DESTINATION CHAINS"]
         direction LR
         subgraph eth["ETHEREUM"]
@@ -476,15 +462,12 @@ flowchart TD
             AR --> AH["FixerHookV2[]"]
         end
     end
-
     subgraph cbs["CALLBACK CONTRACTS"]
         direction LR
         SL["StopLossCallback\nexecuteSwap()"]
         AC["AutoCompoundCb\nstake()"]
     end
-
     dest --> cbs
-
     style reactive fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
     style orch fill:#10B981,color:#FFFFFF,stroke:#059669
     style subs fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
@@ -502,14 +485,13 @@ flowchart TD
 ### Contract Hierarchy
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph src["src/"]
         direction TB
         Existing["Existing Contracts"]
         FR["FixerRegistry.sol"]
         FH["FixerHookV2.sol"]
         FC["FixerCredential.sol"]
-
         subgraph reactive["reactive/ (NEW)"]
             direction TB
             subgraph ifaces["interfaces/"]
@@ -522,19 +504,16 @@ flowchart TD
             FSL["FixerStopLossReactive.sol"]
             FAC2["FixerAutoCompound.sol"]
         end
-
         subgraph callbacks["callbacks/ (NEW)"]
             SLC["FixerStopLossCallback.sol"]
             ACC["FixerAutoCompoundCallback.sol"]
             TSC["FixerTierSyncCallback.sol"]
         end
-
         subgraph extensions["extensions/ (NEW)"]
             FRR["FixerRegistryReactive.sol"]
             IFRR["IFixerRegistryReactive.sol"]
         end
     end
-
     style src fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style reactive fill:#10B981,color:#FFFFFF,stroke:#059669
     style ifaces fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
@@ -1193,16 +1172,14 @@ export DESTINATION_PRIVATE_KEY="..."
 ### Deployment Order
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    Step1["1️⃣ Deploy FixerRegistryReactive\non Primary Chain (Ethereum)\n└─ Set callback proxy address"]
-    Step2["2️⃣ Deploy FixerRegistryReactive\non Secondary Chains (Base, Arbitrum)\n└─ Set callback proxy address"]
-    Step3["3️⃣ Deploy FixerReactiveOrchestrator\non Reactive Network\n└─ Configure chain IDs + registries\n└─ Fund with REACT tokens"]
-    Step4["4️⃣ Authorize Reactive Contract\non all Registries"]
-    Step5["5️⃣ Deploy FixerHookV2 instances\non each chain"]
-    Step6["6️⃣ (Optional) Deploy callback contracts\n└─ StopLossCallback\n└─ AutoCompoundCallback"]
-
+    Step2["2⃣ Deploy FixerRegistryReactive\non Secondary Chains (Base, Arbitrum)\n Set callback proxy address"]
+    Step3["3⃣ Deploy FixerReactiveOrchestrator\non Reactive Network\n Configure chain IDs + registries\n Fund with REACT tokens"]
+    Step4["4⃣ Authorize Reactive Contract\non all Registries"]
+    Step5["5⃣ Deploy FixerHookV2 instances\non each chain"]
+    Step6["6⃣ (Optional) Deploy callback contracts\n StopLossCallback\n AutoCompoundCallback"]
     Step1 --> Step2 --> Step3 --> Step4 --> Step5 --> Step6
-
     style Step1 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style Step2 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
     style Step3 fill:#10B981,color:#FFFFFF,stroke:#059669
@@ -1447,4 +1424,4 @@ contract FixerReactiveOrchestratorTest is Test {
 
 ---
 
-> **Build once — react everywhere!** 🚀
+> **Build once — react everywhere!** 

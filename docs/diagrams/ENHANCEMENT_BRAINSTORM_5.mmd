@@ -1,0 +1,34 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+    ACH --> VOL
+    ACH --> REF
+    ACH --> STR
+    ACH --> SPC
+    subgraph VOL["VOLUME ACHIEVEMENTS"]
+        V1["$1K → Starter + 10 FIX"]
+        V2["$10K → Growing + 50 FIX"]
+        V3["$100K → Whale Maker + 200 FIX"]
+        V4["$1M → Legend + 1,000 FIX + NFT"]
+    end
+    subgraph REF[" REFERRAL ACHIEVEMENTS"]
+        R1["1 Referral → Fixer + 5 FIX"]
+        R2["10 Referrals → Connector + 25 FIX"]
+        R3["50 Referrals → Influencer + 100 FIX"]
+        R4["200 Referrals → Community Leader + 500 FIX"]
+    end
+    subgraph STR[" STREAK ACHIEVEMENTS"]
+        S1["7-Day Streak → Consistent + 2x weekend"]
+        S2["30-Day Streak → Dedicated + 1.1x permanent"]
+        S3["100-Day Streak → Unstoppable + 1.2x permanent"]
+    end
+    subgraph SPC[" SPECIAL ACHIEVEMENTS"]
+        SP1["Early Adopter → First 1K users (1.5x)"]
+        SP2["Cross-Chain Pioneer → 3+ chains (NFT)"]
+        SP3["AI Collaborator → First AI referrals"]
+        SP4["Bug Hunter → Valid security issue (bounty)"]
+    end
+    style ACH fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style VOL fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
+    style REF fill:#1E1E2E,color:#E2E8F0,stroke:#2563EB
+    style STR fill:#1E1E2E,color:#E2E8F0,stroke:#DC2626
+    style SPC fill:#1E1E2E,color:#E2E8F0,stroke:#7C3AED

@@ -27,7 +27,7 @@ This document catalogs Free and Open Source Software (FOSS) repositories and res
 - **Maintain consistency** with ecosystem standards
 - **Focus on business logic** rather than infrastructure
 
-> 📚 **See Also:** [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for step-by-step task lists combining these resources into actionable development phases.
+>  **See Also:** [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for step-by-step task lists combining these resources into actionable development phases.
 
 ---
 

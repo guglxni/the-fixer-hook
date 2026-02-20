@@ -1,0 +1,35 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+    PM --> Hook
+    subgraph hook["FixerHookV2 (Lightweight, per-pool)"]
+        H1["_resolveSwapper() — Trusted Router Pattern"]
+        H2["_calculateSwapVolume() — quote token math"]
+        H3["decodeReferrer() — hookData → address"]
+        H4["Graceful error handling (never reverts)"]
+        H5["trustedRouters mapping for ERC-4337"]
+    end
+    Hook[""] ~~~ H1
+    hook -->|"registry.recordReferral(referrer, swapper, vol)"| Reg
+    subgraph reg["FixerRegistryUpgradeable (UUPS, Central)"]
+        R1["ERC20 FIX Token (MAX_SUPPLY = 1B)"]
+        R2["Tiered rewards (Bronze → Platinum)"]
+        R3["BPS math · Protocol fee · Reward scaling"]
+        R4["48h upgrade timelock"]
+        R5["Daily mint ceiling (10M FIX/day)"]
+        R6["Emergency Module (circuit breakers, pause)"]
+    end
+    Reg[""] ~~~ R1
+    style PM fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style hook fill:#1E1E2E,color:#E2E8F0,stroke:#2563EB
+    style H1 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style H2 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style H3 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style H4 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style H5 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style reg fill:#1E1E2E,color:#E2E8F0,stroke:#7C3AED
+    style R1 fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style R2 fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style R3 fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style R4 fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style R5 fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style R6 fill:#DC2626,color:#FFFFFF,stroke:#B91C1C

@@ -1,0 +1,15 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+    ERC --> ID
+    ERC --> REP
+    ERC --> VAL
+    ID["IDENTITY REGISTRY\n• ERC-721 NFT\n• Portable ID\n• Verifiable"]
+    REP["REPUTATION REGISTRY\n• Feedback\n• Ratings\n• History"]
+    VAL["VALIDATION REGISTRY\n• Staking mechanisms\n• Slashing for dishonesty\n• Proportional to task value"]
+    INSIGHT["KEY INSIGHT:\nStake should be PROPORTIONAL TO\nVALUE AT RISK — tiered, not fixed"]
+    VAL --> INSIGHT
+    style ERC fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style ID fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style REP fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style VAL fill:#10B981,color:#FFFFFF,stroke:#059669
+    style INSIGHT fill:#F59E0B,color:#1E1E2E,stroke:#D97706

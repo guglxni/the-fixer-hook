@@ -55,8 +55,8 @@ The FixerHook is an on-chain affiliate rewards system for Uniswap v4 pools. This
 ### v1.0 Architecture (Current)
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph hook["FixerHook"]
         direction TB
         subgraph inherited[" "]
             direction LR
@@ -66,9 +66,7 @@ flowchart TD
         end
         AS["_afterSwap()\n1. Decode referrer from hookData\n2. Validate (not zero, not self)\n3. _mint(referrer, REWARD_AMOUNT)"]
     end
-
     inherited --> AS
-
     style hook fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style BH fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style ERC fill:#10B981,color:#FFFFFF,stroke:#059669
@@ -103,7 +101,7 @@ Replace fixed 10 FIX reward with volume-proportional rewards. Larger swaps = lar
 - [x] **Per-pool configuration** (added beyond original scope)
 - [x] **Quote token normalization** (solves multi-asset decimal issue)
 
-### 📦 Required FOSS Libraries
+###  Required FOSS Libraries
 
 | Library | Package | Install Command |
 |---------|---------|-----------------|
@@ -111,7 +109,7 @@ Replace fixed 10 FIX reward with volume-proportional rewards. Larger swaps = lar
 | **Solady** | Ownable | (included) |
 | **OpenZeppelin** | Ownable2Step (optional) | `forge install OpenZeppelin/openzeppelin-contracts` |
 
-### 📝 Task List
+###  Task List
 
 > **Status: [PASS] COMPLETED** (January 30, 2026)
 > 
@@ -303,7 +301,7 @@ Replace fixed 10 FIX reward with volume-proportional rewards. Larger swaps = lar
 
 4. **Solady over OpenZeppelin**: Chosen for gas efficiency (simpler Ownable, optimized math)
 
-### 🔧 Technical Specifications
+###  Technical Specifications
 
 #### Gas Analysis
 
@@ -349,7 +347,7 @@ Introduce Bronze/Silver/Gold/Platinum tiers with 1.0x/1.25x/1.5x/2.0x reward mul
 - [x] View functions for frontend integration
 - [x] TierUpgrade events for indexing
 
-### 📦 Required FOSS Libraries
+###  Required FOSS Libraries
 
 | Library | Component | Purpose |
 |---------|-----------|---------|
@@ -369,7 +367,7 @@ Key concepts to adapt:
 - `secondsUntilInactive` → our `lastUpdated` timestamp
 - Bonus formula → our multiplier calculation
 
-### 📝 Task List
+###  Task List
 
 #### Phase 1: Data Structures (Day 1-3)
 
@@ -455,7 +453,7 @@ Key concepts to adapt:
 - [x] **Task 1.2.19**: Review SSTORE patterns (storage slot reuse)
 - [x] **Task 1.2.20**: Tier updates are checked on each swap (not lazy)
 
-### 🔧 Technical Specifications
+###  Technical Specifications
 
 #### Storage Layout (Gas Optimized)
 
@@ -491,7 +489,7 @@ Separate token/stats management into a central `FixerRegistry` contract. Multipl
 - [x] Per-pool analytics
 - [x] Authorized hook system (simplified from UUPS)
 
-### 📦 Required FOSS Libraries
+###  Required FOSS Libraries
 
 | Library | Component | Purpose |
 |---------|-----------|---------|
@@ -504,7 +502,7 @@ Separate token/stats management into a central `FixerRegistry` contract. Multipl
 forge install OpenZeppelin/openzeppelin-contracts-upgradeable --no-commit
 ```
 
-### 📝 Task List
+###  Task List
 
 #### Phase 1: Registry Contract (Week 1) [PASS]
 
@@ -541,27 +539,25 @@ forge install OpenZeppelin/openzeppelin-contracts-upgradeable --no-commit
 - [ ] **Task 2.0.19**: Create hook deployment script
 - [ ] **Task 2.0.20**: Create hook registration script
 
-### 🔧 Technical Specifications
+###  Technical Specifications
 
 #### Architecture Diagram
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph reg["FixerRegistry"]
         direction TB
         subgraph components[" "]
             direction LR
-            ERC["💰 ERC20 (FIX)\nmint() · transfer()"]
+            ERC[" ERC20 (FIX)\nmint() · transfer()"]
             Stats["ReferrerStats\nvolume · count · tier"]
-            Auth["🔐 AuthorizedHooks\nhook1 [PASS] · hook2 [PASS]"]
+            Auth[" AuthorizedHooks\nhook1 [PASS] · hook2 [PASS]"]
         end
         Record["recordReferral(referrer, swapper, volume, pool)"]
     end
-
-    reg --> HA["🪝 FixerHookV2\n(ETH/USDC)\nregistry.call()"]
-    reg --> HB["🪝 FixerHookV2\n(WBTC/ETH)\nregistry.call()"]
-    reg --> HC["🪝 FixerHookV2\n(ARB/USDC)\nregistry.call()"]
-
+    reg --> HA[" FixerHookV2\n(ETH/USDC)\nregistry.call()"]
+    reg --> HB[" FixerHookV2\n(WBTC/ETH)\nregistry.call()"]
+    reg --> HC[" FixerHookV2\n(ARB/USDC)\nregistry.call()"]
     style reg fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style ERC fill:#10B981,color:#FFFFFF,stroke:#059669
     style Stats fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
@@ -599,7 +595,7 @@ Issue ERC-5192 soulbound NFTs representing referrer credentials. NFTs display ti
 - [x] Integration with registry stats
 - [ ] Composable benefits system (future)
 
-### 📦 Required FOSS Libraries
+###  Required FOSS Libraries
 
 | Library | Component | Purpose |
 |---------|-----------|---------|
@@ -612,7 +608,7 @@ Issue ERC-5192 soulbound NFTs representing referrer credentials. NFTs display ti
 forge install attestate/ERC5192 --no-commit
 ```
 
-### 📝 Task List
+###  Task List
 
 #### Phase 1: Contract Setup (Week 1) [PASS]
 
@@ -657,7 +653,7 @@ forge install attestate/ERC5192 --no-commit
 - [x] **Task 2.1.19**: Fuzz tests (2 fuzz tests)
 - [x] **Task 2.1.20**: Gas benchmark tests (3 tests)
 
-### 🔧 Technical Specifications
+###  Technical Specifications
 
 #### ERC-5192 Compliance
 

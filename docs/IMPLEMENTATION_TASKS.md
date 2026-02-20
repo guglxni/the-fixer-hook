@@ -27,17 +27,17 @@ Based on [Market Sentiment Analysis](./MARKET_SENTIMENT_ANALYSIS.md), the follow
 
 | Epic ID | Epic Name | Version | Priority | Estimated Effort |
 |---------|-----------|---------|----------|------------------|
-| **E-01** | UUPS Infrastructure | v2.2.1 | 🔴 Critical | 3 weeks |
-| **E-02** | AI Agent Registration & Staking | v2.2.2-v2.2.3 | 🔴 Critical | 2 weeks |
-| **E-03** | Emergency Module | v2.4 | 🔴 Critical | 1 week |
-| **E-04** | Reactive Network Core | v2.3.1 | 🟡 High | 2 weeks |
-| **E-05** | Hyperlane Integration | v2.3.2 | 🟡 High | 2 weeks |
-| **E-06** | LayerZero OFT Bridge | v2.8 | 🟡 High | 2 weeks |
-| **E-07** | Staking (veFIX) | v2.5.1 | 🟡 High | 3 weeks |
-| **E-08** | Governance Module | v2.5.2 | 🟡 High | 2 weeks |
-| **E-09** | Protocol Fee System | v2.5.3 | 🟡 High | 1 week |
-| **E-10** | Referrer Teams | v2.6 | 🟢 Medium | 2 weeks |
-| **E-11** | AI Agent Marketplace | v2.7 | 🟢 Medium | 3 weeks |
+| **E-01** | UUPS Infrastructure | v2.2.1 |  Critical | 3 weeks |
+| **E-02** | AI Agent Registration & Staking | v2.2.2-v2.2.3 |  Critical | 2 weeks |
+| **E-03** | Emergency Module | v2.4 |  Critical | 1 week |
+| **E-04** | Reactive Network Core | v2.3.1 |  High | 2 weeks |
+| **E-05** | Hyperlane Integration | v2.3.2 |  High | 2 weeks |
+| **E-06** | LayerZero OFT Bridge | v2.8 |  High | 2 weeks |
+| **E-07** | Staking (veFIX) | v2.5.1 |  High | 3 weeks |
+| **E-08** | Governance Module | v2.5.2 |  High | 2 weeks |
+| **E-09** | Protocol Fee System | v2.5.3 |  High | 1 week |
+| **E-10** | Referrer Teams | v2.6 |  Medium | 2 weeks |
+| **E-11** | AI Agent Marketplace | v2.7 |  Medium | 3 weeks |
 
 ---
 
@@ -73,7 +73,7 @@ Convert FixerRegistry to UUPS upgradeable pattern while keeping FIX token non-up
 
 #### T-01.1: Install OpenZeppelin Upgradeable Dependencies
 - **Type:** Setup
-- **Priority:** 🔴 Critical
+- **Priority:**  Critical
 - **Estimate:** 2 hours
 - **Status:** [PASS] Complete
 
@@ -92,7 +92,7 @@ forge install OpenZeppelin/openzeppelin-foundry-upgrades --no-git
 
 #### T-01.2: Create ERC-7201 Storage Layout
 - **Type:** Implementation
-- **Priority:** 🔴 Critical
+- **Priority:**  Critical
 - **Estimate:** 4 hours
 - **Status:** [PASS] Complete
 
@@ -109,38 +109,38 @@ library FixerRegistryStorage {
         keccak256(abi.encode(uint256(keccak256("fixer.registry.storage.main")) - 1)) & ~bytes32(uint256(0xff));
 
     struct MainStorage {
-        // ═══════════════════════════════════════════════════════════════
+        // 
         // SLOT GROUP 1: Reward Parameters (1 slot packed)
-        // ═══════════════════════════════════════════════════════════════
+        // 
         uint128 minSwapAmount;
         uint64 rewardRateBps;
         uint64 __reserved1;
         
-        // ═══════════════════════════════════════════════════════════════
+        // 
         // SLOT GROUP 2: Reward Bounds (1 slot packed)
-        // ═══════════════════════════════════════════════════════════════
+        // 
         uint128 maxRewardAmount;
         uint128 minRewardAmount;
         
-        // ═══════════════════════════════════════════════════════════════
+        // 
         // SLOT GROUP 3: Protocol Fee Parameters (FINALIZED: 5% start)
-        // ═══════════════════════════════════════════════════════════════
+        // 
         uint64 protocolFeeBps;      // 500 = 5%, max 1000 = 10%
         uint64 maxProtocolFeeBps;   // 1000 = 10% hard cap
         uint128 accumulatedFees;    // Unclaimed protocol fees
         
-        // ═══════════════════════════════════════════════════════════════
+        // 
         // MAPPINGS
-        // ═══════════════════════════════════════════════════════════════
+        // 
         mapping(address => bool) authorizedHooks;
         mapping(bytes32 => PoolInfo) poolInfos;
         mapping(address => ReferrerStats) referrerStats;
         mapping(address => AgentInfo) agentRegistry;        // v2.2
         mapping(address => TeamInfo) referrerTeams;         // v2.6
         
-        // ═══════════════════════════════════════════════════════════════
+        // 
         // GAP: Reserve slots for future upgrades
-        // ═══════════════════════════════════════════════════════════════
+        // 
         uint256[50] __gap;  // 50 slots standard
     }
 
@@ -164,7 +164,7 @@ library FixerRegistryStorage {
 
 #### T-01.3: Create FixerRegistryUpgradeable Contract
 - **Type:** Implementation
-- **Priority:** 🔴 Critical
+- **Priority:**  Critical
 - **Estimate:** 8 hours
 - **Status:** [PASS] Complete
 
@@ -182,7 +182,7 @@ library FixerRegistryStorage {
 
 #### T-01.4: Create Proxy Deployment Script
 - **Type:** Implementation
-- **Priority:** 🔴 Critical
+- **Priority:**  Critical
 - **Estimate:** 4 hours
 - **Status:** [PASS] Complete
 
@@ -199,7 +199,7 @@ library FixerRegistryStorage {
 
 #### T-01.5: Create Upgrade Script
 - **Type:** Implementation
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 3 hours
 - **Status:** [PASS] Complete
 
@@ -215,7 +215,7 @@ library FixerRegistryStorage {
 
 #### T-01.6: Migration Tests
 - **Type:** Testing
-- **Priority:** 🔴 Critical
+- **Priority:**  Critical
 - **Estimate:** 6 hours
 - **Status:** [PASS] Complete
 
@@ -243,7 +243,7 @@ Implement AI agent registration with tiered staking requirements based on finali
 
 #### T-02.1: Define Agent Tier Structs
 - **Type:** Implementation
-- **Priority:** 🔴 Critical
+- **Priority:**  Critical
 - **Estimate:** 3 hours
 - **Status:** [PASS] Complete
 
@@ -319,9 +319,9 @@ library AgentTierConstants {
 
 #### T-02.2: Implement Agent Registration Module
 - **Type:** Implementation
-- **Priority:** 🔴 Critical
+- **Priority:**  Critical
 - **Estimate:** 6 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 **File:** `src/modules/AgentModule.sol`
 
@@ -345,9 +345,9 @@ function getAgentTier(address agent) external view returns (AgentTier);
 
 #### T-02.3: Agent Reward Integration
 - **Type:** Implementation
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 4 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 **Integration Points:**
 - Modify `_calculateReward()` to apply agent multiplier
@@ -363,9 +363,9 @@ function getAgentTier(address agent) external view returns (AgentTier);
 
 #### T-02.4: Agent Tests
 - **Type:** Testing
-- **Priority:** 🔴 Critical
+- **Priority:**  Critical
 - **Estimate:** 4 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 **File:** `test/AgentModule.t.sol`
 
@@ -390,7 +390,7 @@ Implement circuit breakers and emergency pause functionality.
 
 #### T-03.1: Emergency Module Contract
 - **Type:** Implementation
-- **Priority:** 🔴 Critical
+- **Priority:**  Critical
 - **Estimate:** 4 hours
 - **Status:** [PASS] Complete
 
@@ -404,9 +404,9 @@ pragma solidity 0.8.26;
 /// @notice Circuit breakers and emergency pause for FixerRegistry
 abstract contract EmergencyModule {
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // STORAGE
-    // ═══════════════════════════════════════════════════════════════
+    // 
     
     address public securityCouncil;     // Multisig for emergencies
     
@@ -422,18 +422,18 @@ abstract contract EmergencyModule {
     uint256 public mintedThisHour;
     uint256 public hourStartedAt;
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // EVENTS
-    // ═══════════════════════════════════════════════════════════════
+    // 
     
     event ReferralsPaused(address indexed by, uint256 timestamp);
     event ReferralsResumed(address indexed by, uint256 timestamp);
     event CircuitBreakerTriggered(string reason, uint256 amount);
     event SecurityCouncilUpdated(address oldCouncil, address newCouncil);
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // MODIFIERS
-    // ═══════════════════════════════════════════════════════════════
+    // 
     
     modifier whenNotPausedReferrals() {
         require(!pausedReferrals, "Referrals paused");
@@ -445,9 +445,9 @@ abstract contract EmergencyModule {
         _;
     }
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // FUNCTIONS
-    // ═══════════════════════════════════════════════════════════════
+    // 
     
     function pauseReferrals() external onlySecurityCouncil {
         pausedReferrals = true;
@@ -496,7 +496,7 @@ abstract contract EmergencyModule {
 
 #### T-03.2: Emergency Tests
 - **Type:** Testing
-- **Priority:** 🔴 Critical
+- **Priority:**  Critical
 - **Estimate:** 3 hours
 - **Status:** [PASS] Complete
 
@@ -520,9 +520,9 @@ Implement Reactive Network integration for cross-chain automation.
 
 #### T-04.1: Install Reactive Libraries
 - **Type:** Setup
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 1 hour
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 ```bash
 forge install pocketsGnoblin/reactive-lib --no-commit
@@ -532,9 +532,9 @@ forge install pocketsGnoblin/reactive-lib --no-commit
 
 #### T-04.2: Create FixerReactiveOrchestrator
 - **Type:** Implementation
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 8 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 **File:** `src/reactive/FixerReactiveOrchestrator.sol`
 
@@ -554,9 +554,9 @@ forge install pocketsGnoblin/reactive-lib --no-commit
 
 #### T-04.3: Create Callback Receiver
 - **Type:** Implementation
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 4 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 **File:** `src/callbacks/ReactiveCallbackReceiver.sol`
 
@@ -579,9 +579,9 @@ Integrate Hyperlane for callback delivery and registry synchronization.
 
 #### T-05.1: Install Hyperlane Dependencies
 - **Type:** Setup
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 1 hour
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 ```bash
 forge install hyperlane-xyz/hyperlane-monorepo --no-commit
@@ -591,9 +591,9 @@ forge install hyperlane-xyz/hyperlane-monorepo --no-commit
 
 #### T-05.2: Create ISM Configuration
 - **Type:** Implementation
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 4 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 **File:** `src/hyperlane/FixerISM.sol`
 
@@ -606,9 +606,9 @@ forge install hyperlane-xyz/hyperlane-monorepo --no-commit
 
 #### T-05.3: Create Hyperlane Message Router
 - **Type:** Implementation
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 6 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 **File:** `src/hyperlane/FixerMessageRouter.sol`
 
@@ -638,9 +638,9 @@ Implement LayerZero OFT for FIX token bridging.
 
 #### T-06.1: Install LayerZero Dependencies
 - **Type:** Setup
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 1 hour
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 ```bash
 forge install LayerZero-Labs/LayerZero-v2 --no-commit
@@ -650,9 +650,9 @@ forge install LayerZero-Labs/LayerZero-v2 --no-commit
 
 #### T-06.2: Create FIX OFT Adapter
 - **Type:** Implementation
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 6 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 **File:** `src/bridge/FixOFT.sol`
 
@@ -685,9 +685,9 @@ Implement vote-escrowed FIX staking with tiered benefits.
 
 #### T-07.1: Create veFIX Contract
 - **Type:** Implementation
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 10 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 **File:** `src/staking/veFIX.sol`
 
@@ -714,9 +714,9 @@ Implement DAO governance for protocol parameters.
 
 #### T-08.1: Create FixerGovernor Contract
 - **Type:** Implementation
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 8 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 **File:** `src/governance/FixerGovernor.sol`
 
@@ -748,9 +748,9 @@ Implement protocol fee collection at 5% (DAO-controlled, max 10%).
 
 #### T-09.1: Fee Collection Logic
 - **Type:** Implementation
-- **Priority:** 🟡 High
+- **Priority:**  High
 - **Estimate:** 4 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 ```solidity
 /// @notice Calculate protocol fee from reward
@@ -809,9 +809,9 @@ Implement team structure for referrers with tiered limits.
 
 #### T-10.1: Team Types Definition
 - **Type:** Implementation
-- **Priority:** 🟢 Medium
+- **Priority:**  Medium
 - **Estimate:** 2 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 ```solidity
 /// @notice Team information
@@ -846,9 +846,9 @@ library TeamLimits {
 
 #### T-10.2: Team Module Implementation
 - **Type:** Implementation
-- **Priority:** 🟢 Medium
+- **Priority:**  Medium
 - **Estimate:** 6 hours
-- **Status:** ⬜ Not Started
+- **Status:**  Not Started
 
 **Key Functions:**
 ```solidity
@@ -883,41 +883,37 @@ function distributeTeamBonus(address leader) external;
 | Epic | Tasks | Completed | Progress |
 |------|-------|-----------|----------|
 | E-01: UUPS | 6 | 6 | [PASS] 100% |
-| E-02: AI Agents | 4 | 1 | 🟡 25% |
+| E-02: AI Agents | 4 | 1 |  25% |
 | E-03: Emergency | 2 | 2 | [PASS] 100% |
-| E-04: Reactive | 3 | 0 | ⬜ 0% |
-| E-05: Hyperlane | 3 | 0 | ⬜ 0% |
-| E-06: LayerZero | 2 | 0 | ⬜ 0% |
-| E-07: Staking | 1 | 0 | ⬜ 0% |
-| E-08: Governance | 1 | 0 | ⬜ 0% |
-| E-09: Protocol Fee | 1 | 0 | ⬜ 0% |
-| E-10: Teams | 2 | 0 | ⬜ 0% |
+| E-04: Reactive | 3 | 0 |  0% |
+| E-05: Hyperlane | 3 | 0 |  0% |
+| E-06: LayerZero | 2 | 0 |  0% |
+| E-07: Staking | 1 | 0 |  0% |
+| E-08: Governance | 1 | 0 |  0% |
+| E-09: Protocol Fee | 1 | 0 |  0% |
+| E-10: Teams | 2 | 0 |  0% |
 
 ---
 
-## 📅 Timeline
+##  Timeline
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 gantt
-    title Implementation Timeline
     dateFormat YYYY-MM-DD
     axisFormat %b W%W
-
     section February 2026
     E-01 UUPS Infrastructure    :active, e01, 2026-02-01, 2w
     E-03 Emergency Module       :e03, 2026-02-08, 1w
     E-02 AI Agent Staking       :e02, 2026-02-15, 2w
-
     section March 2026
     E-04 Reactive Network       :e04, 2026-03-01, 2w
     E-05 Hyperlane              :e05, 2026-03-08, 2w
     E-06 LayerZero OFT          :e06, 2026-03-22, 1w
-
     section April 2026
     E-07 Staking (veFIX)        :e07, 2026-04-01, 3w
     E-08 Governance             :e08, 2026-04-15, 2w
     E-09 Protocol Fee           :e09, 2026-04-22, 1w
-
     section May 2026
     E-10 Referrer Teams         :e10, 2026-05-01, 2w
     E-11 AI Marketplace         :e11, 2026-05-08, 3w

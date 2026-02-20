@@ -16,7 +16,7 @@
 | Decision | Finalized Value | Rationale |
 |----------|-----------------|-----------|
 | **FIX Token** | Non-Upgradeable | User trust, "code is law", industry standard |
-| **FixerRegistry** | ⚙️ UUPS Upgradeable | Logic layer flexibility, hot-fixes, AI evolution |
+| **FixerRegistry** |  UUPS Upgradeable | Logic layer flexibility, hot-fixes, AI evolution |
 | **Agent Min Stake** | 100 FIX (Starter) | ERC-8004 aligned, low barrier to experiment |
 | **Agent Max Stake** | 10,000 FIX (Enterprise) | Meaningful skin in game for high-volume agents |
 | **Slashing Rates** | 10-20% by tier | Aligned with Virtuals Protocol, AgentLayer |
@@ -65,40 +65,32 @@ This document outlines the implementation plan for making the `FixerRegistry` co
 ### AI Agent Use Cases in FixerHook
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph agents["AI Agent Ecosystem"]
         direction LR
-        Trading["🤖 Trading Agent\n• Auto-swaps\n• Arbitrage\n• MEV capture"]
-        Social["📱 Social Agent\n• Recommends\n• Influencer\n• Education"]
+        Trading[" Trading Agent\n• Auto-swaps\n• Arbitrage\n• MEV capture"]
+        Social[" Social Agent\n• Recommends\n• Influencer\n• Education"]
         Portfolio["Portfolio Agent\n• Rebalances\n• DCA strategies\n• Yield farming"]
     end
-
     Trading --> Wallet
     Social --> Wallet
     Portfolio --> Wallet
-
-    Wallet["🔐 Agent Wallet (Smart Account)\nERC-4337 · Multi-sig · Session Keys"]
-    
+    Wallet[" Agent Wallet (Smart Account)\nERC-4337 · Multi-sig · Session Keys"]
     Wallet --> Registry
-
     subgraph registry["FixerRegistry (UUPS Proxy)"]
         direction LR
-        AgentMod["🧩 Agent Module\n• Agent auth\n• Agent tiers\n• Reputation"]
+        AgentMod[" Agent Module\n• Agent auth\n• Agent tiers\n• Reputation"]
         V2Logic["V2 Logic (future)\n• New features\n• Bug fixes\n• Integrations"]
     end
-
     Registry[""] ~~~ AgentMod
-
     subgraph state["Preserved State (Proxy Storage)"]
-        S1["💰 FIX token balances"]
+        S1[" FIX token balances"]
         S2["Referrer statistics"]
-        S3["⭐ Tier progressions"]
+        S3[" Tier progressions"]
         S4["Hook authorizations"]
     end
-
     AgentMod --> state
     V2Logic --> state
-
     style agents fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style Trading fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style Social fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
@@ -134,8 +126,8 @@ flowchart TD
 ### Current Architecture (Non-Upgradeable)
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph current["FixerRegistry.sol (Current — Non-Upgradeable)"]
         direction TB
         subgraph stor["Storage (Fixed)"]
             S1["ERC20 balances (inherited)"]
@@ -150,7 +142,6 @@ flowchart TD
             L3["_calculateTier()"]
         end
     end
-
     style current fill:#1E1E2E,color:#E2E8F0,stroke:#DC2626
     style stor fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
     style logic fill:#6B7280,color:#FFFFFF,stroke:#4B5563
@@ -167,10 +158,9 @@ flowchart TD
 ### Proposed Architecture (UUPS Upgradeable)
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    Users["👤 Users / Hooks / AI Agents"]
     Users --> Proxy
-
     subgraph proxy["ERC1967 Proxy (Immutable Address)"]
         direction TB
         subgraph storage["Proxy Storage (ERC-7201 Namespaced)\n@custom:storage-location erc7201:fixer.registry.storage"]
@@ -181,13 +171,10 @@ flowchart TD
             D5["rewardParameters struct"]
             D6["_gap[50] — upgrade safety"]
         end
-
-        storage -->|delegatecall| ImplV1["📦 Implementation V1\nCurrent logic"]
+        storage -->|delegatecall| ImplV1[" Implementation V1\nCurrent logic"]
         ImplV1 -.->|after upgrade| ImplV2["Implementation V2 (Future)\n• Agent modules\n• New reward algorithms\n• Bug fixes"]
     end
-
     Proxy[" "] ~~~ storage
-
     style Users fill:#F59E0B,color:#1E1E2E,stroke:#D97706
     style proxy fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style storage fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
@@ -225,45 +212,45 @@ pragma solidity 0.8.26;
 
 /// @custom:storage-location erc7201:fixer.registry.storage.main
 struct FixerRegistryStorage {
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // SLOT GROUP 1: Reward Parameters (1 slot packed)
-    // ═══════════════════════════════════════════════════════════════
+    // 
     uint128 minSwapAmount;          // 16 bytes
     uint64 rewardRateBps;           // 8 bytes 
     uint64 __reserved1;             // 8 bytes (future use)
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // SLOT GROUP 2: Reward Bounds (1 slot packed)
-    // ═══════════════════════════════════════════════════════════════
+    // 
     uint128 maxRewardAmount;        // 16 bytes
     uint128 minRewardAmount;        // 16 bytes
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // SLOT GROUP 3: Counters (1 slot packed)
-    // ═══════════════════════════════════════════════════════════════
+    // 
     uint64 hookCount;               // 8 bytes
     uint64 totalReferrals;          // 8 bytes
     uint128 totalVolume;            // 16 bytes
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // MAPPINGS (each starts new slot)
-    // ═══════════════════════════════════════════════════════════════
+    // 
     mapping(address => bool) authorizedHooks;
     mapping(bytes32 => PoolInfo) poolInfos;
     mapping(address => ReferrerStats) referrerStats;
     mapping(address => mapping(bytes32 => uint256)) referrerPoolVolume;
     mapping(ReferrerTier => TierThresholds) tierThresholds;
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // FUTURE EXPANSION: AI Agent Support (V2+)
-    // ═══════════════════════════════════════════════════════════════
+    // 
     mapping(address => AgentInfo) agentRegistry;            // V2
     mapping(address => AgentStats) agentStats;              // V2
     mapping(AgentTier => AgentTierThresholds) agentTiers;   // V2
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // GAP: Reserve slots for future upgrades
-    // ═══════════════════════════════════════════════════════════════
+    // 
     uint256[40] __gap;
 }
 
@@ -354,9 +341,9 @@ contract FixerRegistryUpgradeable is
     OwnableUpgradeable, 
     UUPSUpgradeable 
 {
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // STORAGE (ERC-7201)
-    // ═══════════════════════════════════════════════════════════════
+    // 
     
     /// @custom:storage-location erc7201:fixer.registry.storage
     bytes32 private constant STORAGE_LOCATION = 
@@ -369,18 +356,18 @@ contract FixerRegistryUpgradeable is
         }
     }
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // CONSTRUCTOR (disable initializers in implementation)
-    // ═══════════════════════════════════════════════════════════════
+    // 
     
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // INITIALIZER (replaces constructor for proxy)
-    // ═══════════════════════════════════════════════════════════════
+    // 
     
     function initialize(address initialOwner) public initializer {
         __ERC20_init("Fixer Token", "FIX");
@@ -408,9 +395,9 @@ contract FixerRegistryUpgradeable is
         $.tierThresholds[ReferrerTier.Platinum] = TierThresholds(1_000_000e18, 200, 20000);
     }
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // UPGRADE AUTHORIZATION
-    // ═══════════════════════════════════════════════════════════════
+    // 
     
     /// @notice Authorizes an upgrade to a new implementation
     /// @dev Only callable by owner; consider adding timelock in production
@@ -419,9 +406,9 @@ contract FixerRegistryUpgradeable is
         // Future: Add governance vote requirement
     }
     
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // VERSIONING
-    // ═══════════════════════════════════════════════════════════════
+    // 
     
     /// @notice Returns the current implementation version
     function version() public pure virtual returns (string memory) {
@@ -480,27 +467,24 @@ contract DeployRegistryUpgradeable is Script {
 ### Agent Registration Flow
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph onboard["AI Agent Onboarding Flow"]
         direction LR
-        AW["🔐 Agent Wallet"] --> Reg["📝 Register Agent"]
+        AW[" Agent Wallet"] --> Reg[" Register Agent"]
         Reg --> Ver["[PASS] Verify Agent"]
         AW --> ERC4337["ERC-4337\nAccount Abstraction"]
-        Reg --> Stake["💰 Stake FIX\n(Optional)"]
-        Ver --> Attest["📜 Operator Attestation\n(EAS / WorldCoin)"]
+        Reg --> Stake[" Stake FIX\n(Optional)"]
+        Ver --> Attest[" Operator Attestation\n(EAS / WorldCoin)"]
     end
-
     subgraph operate["Agent Operating Flow"]
         direction LR
-        Logic["🧠 Agent Logic"] --> Swap["[IN PROGRESS] Execute Swaps"]
-        Swap --> Earn["🏆 Earn Rewards"]
-        Logic --> Model["🤖 On-Chain AI\n(Galadriel / NEAR AI)"]
+        Logic[" Agent Logic"] --> Swap["[IN PROGRESS] Execute Swaps"]
+        Swap --> Earn[" Earn Rewards"]
+        Logic --> Model[" On-Chain AI\n(Galadriel / NEAR AI)"]
         Swap --> Hook["hookData:\nagentAddr + userAddr"]
-        Earn --> Bonus["⭐ Agent tier bonus\n+ user discount"]
+        Earn --> Bonus[" Agent tier bonus\n+ user discount"]
     end
-
     onboard --> operate
-
     style onboard fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style AW fill:#F59E0B,color:#1E1E2E,stroke:#D97706
     style Reg fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
@@ -716,38 +700,32 @@ function cancelUpgrade(address newImplementation) external onlyOwner {
 ### From Current FixerRegistry to Upgradeable Version
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph p1["Phase 1: Deploy New System"]
         P1A["Deploy FixerRegistryUpgradeable impl"] --> P1B["Deploy ERC1967 proxy"]
         P1B --> P1C["Initialize with current parameters"]
         P1C --> P1D["Verify on block explorer"]
     end
-
     subgraph p2["Phase 2: Migrate Data"]
         P2A["Deploy MigrationHelper"] --> P2B["Snapshot referrer stats"]
         P2B --> P2C["Batch import to new registry"]
         P2C --> P2D["Verify data integrity"]
     end
-
     subgraph p3["Phase 3: Migrate Hooks"]
         P3A["Deploy FixerHookV2\nwith new registry"] --> P3B["Register hooks"]
         P3B --> P3C["Test in staging"]
         P3C --> P3D["Coordinate with pool operators"]
     end
-
     subgraph p4["Phase 4: Token Migration"]
         P4A["Deploy token bridge\nor mint new tokens"] --> P4B["Sunset old registry"]
         P4B --> P4C["Communicate timeline"]
     end
-
     subgraph p5["Phase 5: Go Live"]
         P5A["Switch frontend"] --> P5B["Monitor for issues"]
         P5B --> P5C["Keep old contracts readable"]
         P5C --> P5D["Complete migration"]
     end
-
     p1 --> p2 --> p3 --> p4 --> p5
-
     style p1 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style p2 fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
     style p3 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8

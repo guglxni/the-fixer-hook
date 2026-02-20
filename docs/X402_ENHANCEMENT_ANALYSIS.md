@@ -153,10 +153,9 @@ FixerHook sits at the intersection: **DeFi infrastructure that rewards the entit
 ### 4.1 Current Architecture (v2.2.2)
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    PM["🏊 Uniswap v4 PoolManager\nswap() → afterSwap callback"]
     PM --> Hook
-
     subgraph hook["FixerHookV2 (Lightweight, per-pool)"]
         H1["_resolveSwapper() — Trusted Router Pattern"]
         H2["_calculateSwapVolume() — quote token math"]
@@ -164,10 +163,8 @@ flowchart TD
         H4["Graceful error handling (never reverts)"]
         H5["trustedRouters mapping for ERC-4337"]
     end
-
     Hook[""] ~~~ H1
     hook -->|"registry.recordReferral(referrer, swapper, vol)"| Reg
-
     subgraph reg["FixerRegistryUpgradeable (UUPS, Central)"]
         R1["ERC20 FIX Token (MAX_SUPPLY = 1B)"]
         R2["Tiered rewards (Bronze → Platinum)"]
@@ -176,9 +173,7 @@ flowchart TD
         R5["Daily mint ceiling (10M FIX/day)"]
         R6["Emergency Module (circuit breakers, pause)"]
     end
-
     Reg[""] ~~~ R1
-
     style PM fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style hook fill:#1E1E2E,color:#E2E8F0,stroke:#2563EB
     style H1 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
@@ -385,26 +380,20 @@ function delegateReferral(address delegate) external {
 ### 6.1 Phase 1: Off-Chain RaaS Layer (Post-Deployment)
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    Facilitator["💳 x402 Facilitator (CDP/etc)\nVerify & Settle Payments"]
-
-    Agent["🤖 AI Agent\n(OpenClaw / Moltbook / Custom)"]
+    Agent[" AI Agent\n(OpenClaw / Moltbook / Custom)"]
     Agent <-->|"x402 HTTP 402 flow"| RaaS
-
     Facilitator --> RaaS
-
     subgraph raas["FixerHook RaaS Server\n(Express/Hono + x402 paymentMiddleware)"]
         API1["Pool analytics API"]
-        API2["🔍 Referrer discovery"]
-        API3["🛤️ Route optimization"]
-        API4["📝 Agent registration"]
-        API5["🏪 Marketplace listings"]
+        API2[" Referrer discovery"]
+        API3[" Route optimization"]
+        API4[" Agent registration"]
+        API5[" Marketplace listings"]
     end
-
     raas -->|"Reads on-chain data"| Chain
-
     Chain["FixerRegistryUpgradeable\n+ FixerHookV2\n(On-Chain, Unchanged)"]
-
     style Facilitator fill:#F59E0B,color:#1E1E2E,stroke:#D97706
     style Agent fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style raas fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
@@ -447,35 +436,30 @@ function agentMultiplierBonus(address referrer) external view returns (uint256);
 ### 6.3 Phase 3: Full Agent Economy (v2.5+)
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph economy["FIXER AGENT ECONOMY"]
         direction TB
         subgraph buyer["Agent Buyer (Pays USDC)"]
-            AB["💳 AI Agent Buyer"]
+            AB[" AI Agent Buyer"]
         end
         subgraph seller["Agent Seller (Earns FIX + USDC)"]
-            AS["💰 AI Agent Seller"]
+            AS[" AI Agent Seller"]
         end
-
-        AB -->|"x402 payment"| RaaS["🌐 FixerHook RaaS + MCP Server"]
+        AB -->|"x402 payment"| RaaS[" FixerHook RaaS + MCP Server"]
         RaaS -->|"data/tools"| AB
-
-        AB -->|"Swap with hookData=referrer"| PM["🏊 Uniswap v4 PoolManager"]
-        PM -->|"afterSwap"| Hook["🪝 FixerHookV2 → FixerRegistry\n→ Mint FIX to referrer"]
+        AB -->|"Swap with hookData=referrer"| PM[" Uniswap v4 PoolManager"]
+        PM -->|"afterSwap"| Hook[" FixerHookV2 → FixerRegistry\n→ Mint FIX to referrer"]
         RaaS -->|"Reads/Writes"| Hook
-
-        AS -->|"listing"| Market["🏪 Referral Marketplace\n(Buy/sell referral placement rights)"]
+        AS -->|"listing"| Market[" Referral Marketplace\n(Buy/sell referral placement rights)"]
         Market -->|"x402 payment"| AS
     end
-
     subgraph revenue["Revenue Flows"]
         direction LR
-        Rev1["💵 Agents pay USDC (x402) for data → Protocol treasury"]
+        Rev1[" Agents pay USDC (x402) for data → Protocol treasury"]
         Rev2["Agents earn FIX for referral volume → Agent wallets"]
-        Rev3["🔥 Agents pay FIX/USDC for premium tiers → Token burn"]
-        Rev4["🏪 Agents trade referral rights (x402) → Marketplace fees"]
+        Rev3[" Agents pay FIX/USDC for premium tiers → Token burn"]
+        Rev4[" Agents trade referral rights (x402) → Marketplace fees"]
     end
-
     style economy fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style buyer fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style seller fill:#10B981,color:#FFFFFF,stroke:#059669

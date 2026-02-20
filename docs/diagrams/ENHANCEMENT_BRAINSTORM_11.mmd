@@ -1,0 +1,31 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+    MON --> R1
+    MON --> R2
+    MON --> R3
+    MON --> R4
+    subgraph R1["REVENUE 1: PROTOCOL FEE"]
+        R1A["5-10% of all FIX rewards minted"]
+        R1B["→ Dev funding, audits, buyback, stakers"]
+        R1C["Example: 1M swaps × $100 × 10 FIX × 5% = 50K FIX/mo"]
+    end
+    subgraph R2["REVENUE 2: AGENT MARKETPLACE"]
+        R2A["10% of agent subscription/performance fees"]
+        R2B["Premium listing fees"]
+        R2C["Certification fees for verified badge"]
+    end
+    subgraph R3["REVENUE 3: PREMIUM FEATURES"]
+        R3A["Priority gas (Flashbots)"]
+        R3B["Advanced analytics dashboard"]
+        R3C["Custom branding on NFT credentials"]
+        R3D["White-label SDK for protocols"]
+    end
+    subgraph R4["REVENUE 4: BRIDGE FEES"]
+        R4A["0.1% fee on FIX bridging"]
+        R4B["Compensates Reactive Network gas costs"]
+    end
+    style MON fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style R1 fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
+    style R2 fill:#1E1E2E,color:#E2E8F0,stroke:#2563EB
+    style R3 fill:#1E1E2E,color:#E2E8F0,stroke:#7C3AED
+    style R4 fill:#1E1E2E,color:#E2E8F0,stroke:#F59E0B

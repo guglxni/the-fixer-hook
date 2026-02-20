@@ -1,0 +1,17 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+        direction TB
+        subgraph inherited[" "]
+            direction LR
+            BH["BaseHook\n(Uniswap)"]
+            ERC["ERC20\n(Solmate)"]
+            RA["REWARD_AMOUNT\n= 10 FIX"]
+        end
+        AS["_afterSwap()\n1. Decode referrer from hookData\n2. Validate (not zero, not self)\n3. _mint(referrer, REWARD_AMOUNT)"]
+    end
+    inherited --> AS
+    style hook fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
+    style BH fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style ERC fill:#10B981,color:#FFFFFF,stroke:#059669
+    style RA fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style AS fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9

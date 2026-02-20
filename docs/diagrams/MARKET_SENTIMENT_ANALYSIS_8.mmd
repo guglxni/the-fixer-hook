@@ -1,0 +1,29 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+        P1F["Protocol Fee: 5%"]
+        P1A["2.5% → Treasury (dev, audits)"]
+        P1B["1.5% → FIX buyback & burn"]
+        P1C["1.0% → Staker rewards"]
+    end
+    subgraph P2["PHASE 2: GROWTH (6-12 months)"]
+        P2F["Protocol Fee: 5-7.5% (governance vote)"]
+        P2A["Increase only if PMF proven"]
+        P2B["DAO decides allocation %"]
+    end
+    subgraph P3["PHASE 3: MATURITY (12+ months)"]
+        P3F["Protocol Fee: DAO-governed (max 10% cap)"]
+        P3A["Hardcoded max prevents governance attacks"]
+        P3B["Community consensus required"]
+    end
+    P1 --> P2 --> P3
+    subgraph example["EXAMPLE (5% fee)"]
+        E1["Monthly volume: $10M"]
+        E2["FIX minted: 10,000 FIX"]
+        E3["Protocol fee: 500 FIX"]
+        E4["Treasury: 250 | Buyback: 150 | Stakers: 100"]
+    end
+    P1 --> example
+    style P1 fill:#10B981,color:#FFFFFF,stroke:#059669
+    style P2 fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style P3 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style example fill:#1E1E2E,color:#E2E8F0,stroke:#7C3AED

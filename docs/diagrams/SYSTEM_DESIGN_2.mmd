@@ -1,0 +1,24 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+classDiagram
+        <<Main Contract>>
+        +REWARD_AMOUNT : uint256
+        +constructor(IPoolManager)
+        +getHookPermissions() Permissions
+        #_afterSwap() bytes4, int128
+    }
+    class BaseHook {
+        <<Uniswap v4>>
+        +poolManager : IPoolManager
+        +validateHookAddress()
+        #_afterSwap()*
+    }
+    class ERC20 {
+        <<Solmate>>
+        +name : string
+        +symbol : string
+        #_mint(to, amount)
+        +balanceOf(owner) uint256
+        +transfer(to, amount) bool
+    }
+    BaseHook <|-- ReferralHook : inherits
+    ERC20 <|-- ReferralHook : inherits

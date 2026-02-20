@@ -1,25 +1,21 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart LR
-    subgraph chain1["CHAIN 1 (Ethereum)"]
-        Reg1["📦 FixerRegistry\n(Primary)"]
-        Reg1 --> H1A["🪝 FixerHookV2\n(Pool A)"]
-        Reg1 --> H1B["🪝 FixerHookV2\n(Pool B)"]
+        Reg1[" FixerRegistry\n(Primary)"]
+        Reg1 --> H1A[" FixerHookV2\n(Pool A)"]
+        Reg1 --> H1B[" FixerHookV2\n(Pool B)"]
     end
-
     subgraph reactive["REACTIVE NETWORK"]
-        RC["🧠 FixerReactive Contract\n• Monitor swaps\n• Aggregate stats\n• Trigger callbacks\n• Sync tiers"]
+        RC[" FixerReactive Contract\n• Monitor swaps\n• Aggregate stats\n• Trigger callbacks\n• Sync tiers"]
     end
-
     subgraph chain2["CHAIN 2 (Base)"]
-        Reg2["📦 FixerRegistry\n(Secondary)"]
-        Reg2 --> H2C["🪝 FixerHookV2\n(Pool C)"]
-        Reg2 --> Cred2["🎖️ FixerCredential\n(sync)"]
+        Reg2[" FixerRegistry\n(Secondary)"]
+        Reg2 --> H2C[" FixerHookV2\n(Pool C)"]
+        Reg2 --> Cred2[" FixerCredential\n(sync)"]
     end
-
     H1A -->|events| RC
     H1B -->|events| RC
     RC -->|callback| Reg1
     RC -->|callback| Reg2
-
     style chain1 fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style reactive fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
     style chain2 fill:#1E1E2E,color:#E2E8F0,stroke:#2563EB

@@ -1,0 +1,13 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+    TIERS --> T0[" Unverified\n0 FIX | No rewards | Testing mode\nSlashing: None"]
+    TIERS --> T1[" Starter\n100 FIX | Basic rewards | 1 chain\nSlashing: 10% (10 FIX)"]
+    TIERS --> T2[" Professional\n1,000 FIX | 1.25x multiplier | Multi-chain\nSlashing: 15% (150 FIX)"]
+    TIERS --> T3[" Enterprise\n10,000 FIX | 1.5x multiplier | All chains\nSlashing: 20% (2,000 FIX)"]
+    TIERS --> T4[" Audited*\n10,000 FIX + Audit | 2.0x multiplier\nVerified badge | Governance\nSlashing: 5% (500 FIX)"]
+    style TIERS fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style T0 fill:#6B7280,color:#FFFFFF,stroke:#4B5563
+    style T1 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style T2 fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style T3 fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style T4 fill:#10B981,color:#FFFFFF,stroke:#059669

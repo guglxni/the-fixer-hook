@@ -266,8 +266,8 @@ forge coverage
 ## Test File Structure
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph tests["test/"]
         direction TB
         T1["FixerHook.t.sol\nv1.0 Hook unit tests"]
         T2["FixerHookV1_1.t.sol\nv1.1 Decimal fuzz tests"]
@@ -277,7 +277,6 @@ flowchart TD
         T6["FixerRegistryUpgrade.t.sol\nv2.2 UUPS proxy tests (31)"]
         T7["EmergencyModule.t.sol\nv2.4 Emergency module tests (25)"]
     end
-
     style tests fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style T1 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style T2 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8

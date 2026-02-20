@@ -1,0 +1,32 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+        direction LR
+        AW[" Agent Wallet"] --> Reg[" Register Agent"]
+        Reg --> Ver["[PASS] Verify Agent"]
+        AW --> ERC4337["ERC-4337\nAccount Abstraction"]
+        Reg --> Stake[" Stake FIX\n(Optional)"]
+        Ver --> Attest[" Operator Attestation\n(EAS / WorldCoin)"]
+    end
+    subgraph operate["Agent Operating Flow"]
+        direction LR
+        Logic[" Agent Logic"] --> Swap["[IN PROGRESS] Execute Swaps"]
+        Swap --> Earn[" Earn Rewards"]
+        Logic --> Model[" On-Chain AI\n(Galadriel / NEAR AI)"]
+        Swap --> Hook["hookData:\nagentAddr + userAddr"]
+        Earn --> Bonus[" Agent tier bonus\n+ user discount"]
+    end
+    onboard --> operate
+    style onboard fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
+    style AW fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style Reg fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style Ver fill:#10B981,color:#FFFFFF,stroke:#059669
+    style ERC4337 fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style Stake fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style Attest fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style operate fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
+    style Logic fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style Swap fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style Earn fill:#10B981,color:#FFFFFF,stroke:#059669
+    style Model fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style Hook fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style Bonus fill:#10B981,color:#FFFFFF,stroke:#059669

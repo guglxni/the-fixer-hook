@@ -52,8 +52,8 @@
 ### How Current Plans Work Together
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    V22["v2.2: UUPS + AI Agents"]
     V22 --> SA["Synergy A\nHot-fix AI agent reward\nalgorithms without migration"]
     V22 --> SB["Synergy B\nAI agents can be upgraded\nwith new types"]
     V22 --> SC["Synergy C\nFuture-proof storage\nfor cross-chain"]
@@ -63,7 +63,6 @@ flowchart TD
     V23 --> SD["Synergy D\nAI agents get\ncross-chain visibility"]
     V23 --> SE["Synergy E\nUnified stats for\nUUPS-based tier upgrades"]
     V23 --> SF["Synergy F\nCross-chain NFT\ncredential sync"]
-
     style V22 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style V23 fill:#10B981,color:#FFFFFF,stroke:#059669
     style SA fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
@@ -78,12 +77,12 @@ flowchart TD
 
 | Synergy | Description | Value |
 |---------|-------------|-------|
-| **A: Hot-fix AI** | UUPS allows updating AI agent reward algorithms without migration | ⭐⭐⭐⭐⭐ |
-| **B: Agent Upgrades** | New agent types (GPT-5, Claude-Next) can be supported via upgrade | ⭐⭐⭐⭐ |
-| **C: Future Storage** | ERC-7201 storage provides space for cross-chain sync data | ⭐⭐⭐⭐ |
-| **D: AI + Cross-Chain** | AI agents can see unified cross-chain data for better decisions | ⭐⭐⭐⭐⭐ |
-| **E: Unified Tiers** | Reactive Network syncs tiers, UUPS can upgrade tier logic | ⭐⭐⭐⭐ |
-| **F: NFT Sync** | FixerCredential NFTs can be updated via Reactive callbacks | ⭐⭐⭐ |
+| **A: Hot-fix AI** | UUPS allows updating AI agent reward algorithms without migration |  |
+| **B: Agent Upgrades** | New agent types (GPT-5, Claude-Next) can be supported via upgrade |  |
+| **C: Future Storage** | ERC-7201 storage provides space for cross-chain sync data |  |
+| **D: AI + Cross-Chain** | AI agents can see unified cross-chain data for better decisions |  |
+| **E: Unified Tiers** | Reactive Network syncs tiers, UUPS can upgrade tier logic |  |
+| **F: NFT Sync** | FixerCredential NFTs can be updated via Reactive callbacks |  |
 
 ---
 
@@ -92,8 +91,8 @@ flowchart TD
 ### What's Missing from Current Plans?
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart LR
-    subgraph covered["CURRENT COVERAGE"]
         C1["[PASS] Referral Tracking"]
         C2["[PASS] Tier System"]
         C3["[PASS] Cross-Pool Stats"]
@@ -120,7 +119,6 @@ flowchart LR
         G15["[FAIL] Fee Collection"]
         G16["[FAIL] SDK/Library"]
     end
-
     style covered fill:#10B981,color:#FFFFFF,stroke:#059669
     style gaps fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
 ```
@@ -129,15 +127,15 @@ flowchart LR
 
 | Gap | Business Value | Technical Effort | Priority |
 |-----|----------------|------------------|----------|
-| **Token Staking** | ⭐⭐⭐⭐⭐ | Medium | 🔴 HIGH |
-| **Governance Module** | ⭐⭐⭐⭐ | Medium | 🔴 HIGH |
-| **MEV Protection** | ⭐⭐⭐⭐ | High | 🟡 MEDIUM |
-| **Emergency Pause** | ⭐⭐⭐⭐⭐ | Low | 🔴 HIGH |
-| **Referrer Teams** | ⭐⭐⭐⭐ | Medium | 🟡 MEDIUM |
-| **Gamification** | ⭐⭐⭐ | Medium | 🟢 LOW |
-| **SDK/Library** | ⭐⭐⭐⭐ | Medium | 🟡 MEDIUM |
-| **Time-Based Decay** | ⭐⭐ | Low | 🟢 LOW |
-| **Oracle Integration** | ⭐⭐⭐ | High | 🟡 MEDIUM |
+| **Token Staking** |  | Medium |  HIGH |
+| **Governance Module** |  | Medium |  HIGH |
+| **MEV Protection** |  | High |  MEDIUM |
+| **Emergency Pause** |  | Low |  HIGH |
+| **Referrer Teams** |  | Medium |  MEDIUM |
+| **Gamification** |  | Medium |  LOW |
+| **SDK/Library** |  | Medium |  MEDIUM |
+| **Time-Based Decay** |  | Low |  LOW |
+| **Oracle Integration** |  | High |  MEDIUM |
 
 ---
 
@@ -148,18 +146,16 @@ flowchart LR
 #### 1.1 FIX Token Staking
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart LR
-    STAKE["STAKE\nFIX"] -->|Lock| LOCK["LOCK\nveFIX"] -->|Earn| EARN["EARN\nREWARDS"]
     LOCK --> BENEFITS
-
     subgraph BENEFITS["BENEFITS"]
         B1["Tier Boost: 1.5x multiplier"]
-        B2["🗳️ Governance: Vote on params"]
-        B3["💰 Revenue Share: % of fees"]
-        B4["🔓 Early Access: New features"]
-        B5["🎁 Airdrops: Partner tokens"]
+        B2[" Governance: Vote on params"]
+        B3[" Revenue Share: % of fees"]
+        B4[" Early Access: New features"]
+        B5[" Airdrops: Partner tokens"]
     end
-
     subgraph TIERS["STAKING TIERS"]
         direction LR
         T1["Holder\n100 FIX | No Lock | 1.0x | 0%"]
@@ -168,9 +164,7 @@ flowchart LR
         T4["Core\n50K FIX | 180d | 1.5x | 5%"]
         T5["Founder\n100K FIX | 365d | 2.0x | 10%"]
     end
-
     EARN --> TIERS
-
     style STAKE fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style LOCK fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
     style EARN fill:#10B981,color:#FFFFFF,stroke:#059669
@@ -221,22 +215,19 @@ contract FixerLPStaking {
 #### 2.1 Referrer Teams / Affiliates
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    LEADER["TEAM LEADER\n(Address A)\n50% of team bonus pool"]
     LEADER --> M1["MEMBER 1\n16.67% of bonus"]
     LEADER --> M2["MEMBER 2\n16.67% of bonus"]
     LEADER --> M3["MEMBER 3\n16.67% of bonus"]
-
     subgraph bonuses["TEAM BONUSES"]
         B1["Team Volume > 1M → extra 5% for all"]
         B2["Leader gets 5% of recruited member rewards"]
         B3["Top 10 teams get monthly FIX distribution"]
     end
-
     M1 --> bonuses
     M2 --> bonuses
     M3 --> bonuses
-
     style LEADER fill:#F59E0B,color:#1E1E2E,stroke:#D97706
     style M1 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style M2 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
@@ -296,40 +287,35 @@ function _calculateReputation(address referrer) internal view returns (uint32) {
 #### 3.1 Achievement System
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    ACH["ACHIEVEMENT SYSTEM"]
     ACH --> VOL
     ACH --> REF
     ACH --> STR
     ACH --> SPC
-
     subgraph VOL["VOLUME ACHIEVEMENTS"]
         V1["$1K → Starter + 10 FIX"]
         V2["$10K → Growing + 50 FIX"]
         V3["$100K → Whale Maker + 200 FIX"]
         V4["$1M → Legend + 1,000 FIX + NFT"]
     end
-
-    subgraph REF["👥 REFERRAL ACHIEVEMENTS"]
+    subgraph REF[" REFERRAL ACHIEVEMENTS"]
         R1["1 Referral → Fixer + 5 FIX"]
         R2["10 Referrals → Connector + 25 FIX"]
         R3["50 Referrals → Influencer + 100 FIX"]
         R4["200 Referrals → Community Leader + 500 FIX"]
     end
-
-    subgraph STR["🔥 STREAK ACHIEVEMENTS"]
+    subgraph STR[" STREAK ACHIEVEMENTS"]
         S1["7-Day Streak → Consistent + 2x weekend"]
         S2["30-Day Streak → Dedicated + 1.1x permanent"]
         S3["100-Day Streak → Unstoppable + 1.2x permanent"]
     end
-
-    subgraph SPC["🌊 SPECIAL ACHIEVEMENTS"]
+    subgraph SPC[" SPECIAL ACHIEVEMENTS"]
         SP1["Early Adopter → First 1K users (1.5x)"]
         SP2["Cross-Chain Pioneer → 3+ chains (NFT)"]
         SP3["AI Collaborator → First AI referrals"]
         SP4["Bug Hunter → Valid security issue (bounty)"]
     end
-
     style ACH fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style VOL fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
     style REF fill:#1E1E2E,color:#E2E8F0,stroke:#2563EB
@@ -379,24 +365,21 @@ function completeQuest(
 #### 4.1 AI Agent Marketplace
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    MP["AI AGENT MARKETPLACE"]
     MP --> FEATURED
     MP --> VERIFY
-
     subgraph FEATURED["FEATURED AGENTS"]
         direction LR
-        A1["🤖 SwapBot Pro\n⭐⭐⭐⭐⭐ (847)\nVol: $12.5M | Users: 1,245\nAuto-swaps with referral credits\nFee: 0.1% vol"]
-        A2["🧠 AlphaTrader\n⭐⭐⭐⭐½ (312)\nVol: $8.2M | Users: 523\nMEV-aware trades + referrals\nFee: 0.2% vol"]
-        A3["PortfolioAI\n⭐⭐⭐⭐ (156)\nVol: $4.1M | Users: 289\nDCA strategies with referrals\nFee: 1 FIX/mo"]
+        A1[" SwapBot Pro\n (847)\nVol: $12.5M | Users: 1,245\nAuto-swaps with referral credits\nFee: 0.1% vol"]
+        A2[" AlphaTrader\n½ (312)\nVol: $8.2M | Users: 523\nMEV-aware trades + referrals\nFee: 0.2% vol"]
+        A3["PortfolioAI\n (156)\nVol: $4.1M | Users: 289\nDCA strategies with referrals\nFee: 1 FIX/mo"]
     end
-
     subgraph VERIFY["VERIFICATION LEVELS"]
-        V1["🟢 Verified — Audited code + stake"]
-        V2["🟡 Registered — Staked FIX tokens"]
-        V3["⚪ Unverified — Just registered"]
+        V1[" Verified — Audited code + stake"]
+        V2[" Registered — Staked FIX tokens"]
+        V3[" Unverified — Just registered"]
     end
-
     style MP fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style FEATURED fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
     style VERIFY fill:#1E1E2E,color:#E2E8F0,stroke:#F59E0B
@@ -408,8 +391,8 @@ flowchart TD
 #### 4.2 Multi-Agent Referral Chains
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    HR["HUMAN REFERRER\n(Gets 10%)"] -->|registered| AA["AI AGENT A\nPortfolio AI\n(Gets 30%)"]
     AA -->|delegated to| AB["AI AGENT B\nSwapBot\n(Gets 20%)"]
     AB -->|serves| USER["END USER C\n(Swaps)"]
     USER -->|swap volume| DIST["FIX REWARDS\nDISTRIBUTION"]
@@ -417,16 +400,13 @@ flowchart TD
     DIST -->|30%| AA
     DIST -->|20%| AB
     DIST -->|40%| TREASURY["Protocol Treasury"]
-
     subgraph example["REWARD SPLIT EXAMPLE"]
         direction LR
         E1["User C swaps $1,000 → 10 FIX total"]
         E2["Human: 1 FIX | Agent A: 3 FIX"]
         E3["Agent B: 2 FIX | Treasury: 4 FIX"]
     end
-
     DIST --> example
-
     style HR fill:#10B981,color:#FFFFFF,stroke:#059669
     style AA fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style AB fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
@@ -441,23 +421,19 @@ flowchart TD
 #### 5.1 Single Token Bridging
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph optA["OPTION A: Reactive Network + Hyperlane"]
         ETH["ETHEREUM\nFIX Token"] -->|Lock/Unlock| BRIDGE["REACTIVE NETWORK\nFixerBridge\n• Lock/Mint\n• Burn/Unlock\n• Balance sync"]
         BASE["BASE\nFIX Token"] -->|Mint/Burn| BRIDGE
     end
-
     subgraph optB["OPTION B: OFT via LayerZero"]
         OFT1["Built-in cross-chain transfers"]
         OFT2["Unified total supply"]
         OFT3["Widely adopted"]
     end
-
     REC["RECOMMENDATION:\nImplement Option A first (free)\nthen add Option B"]
-
     optA --> REC
     optB --> REC
-
     style optA fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
     style optB fill:#1E1E2E,color:#E2E8F0,stroke:#2563EB
     style ETH fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
@@ -502,12 +478,11 @@ function updateLeaderboard(
 #### 6.1 Governance Module
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    GOV["GOVERNANCE MODULE\nFIX DAO"]
     GOV --> SCOPE
     GOV --> VOTE
     GOV --> LIFECYCLE
-
     subgraph SCOPE["GOVERNANCE SCOPE"]
         subgraph params["Parameter Changes"]
             P1["Reward rate"]
@@ -527,19 +502,16 @@ flowchart TD
             T3["Buyback programs"]
         end
     end
-
     subgraph VOTE["VOTING POWER"]
         VP["Power = FIX × (1 + Duration Multiplier)"]
         VE1["1K unstaked = 1,000 votes"]
         VE2["1K staked 30d = 1,100 votes (1.1x)"]
         VE3["1K staked 1yr = 2,000 votes (2.0x)"]
     end
-
     subgraph LIFECYCLE["PROPOSAL LIFECYCLE"]
         direction LR
         L1["PROPOSE\n7 days"] --> L2["REVIEW\n3 days"] --> L3["VOTE\n7 days"] --> L4["TIMELOCK\n48 hrs"] --> L5["EXECUTE"]
     end
-
     style GOV fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style SCOPE fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
     style params fill:#10B981,color:#FFFFFF,stroke:#059669
@@ -606,35 +578,30 @@ contract FixerEmergency {
 #### 7.2 MEV Protection
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    MEV["MEV PROTECTION"]
     MEV --> CR
     MEV --> FB
     MEV --> EH
-
     subgraph CR["1. COMMIT-REVEAL REFERRALS"]
         CR1["Phase 1: User commits hash(referrer + salt)"]
         CR2["Phase 2: User swaps (referrer unknown to MEV)"]
         CR3["Phase 3: User reveals referrer + salt"]
     end
-
     subgraph FB["2. FLASHBOTS INTEGRATION"]
         FB1["Route referral-sensitive txs via Flashbots RPC"]
         FB2["No mempool exposure"]
         FB3["Referrer info protected until inclusion"]
     end
-
     subgraph EH["3. ENCRYPTED HOOK DATA"]
         EH1["Encrypt hookData with registry ephemeral key"]
         EH2["Decrypt in afterSwap (visible post-block)"]
         EH3["More complex, higher gas"]
     end
-
     REC["RECOMMENDATION:\nStart with Flashbots (easiest)\nadd commit-reveal for high-value"]
     CR --> REC
     FB --> REC
     EH --> REC
-
     style MEV fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
     style CR fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style FB fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
@@ -663,12 +630,12 @@ flowchart TD
 
 | Chain | Priority | Uniswap v4 Status | Notes |
 |-------|----------|-------------------|-------|
-| **Base** | 🔴 HIGH | Coming soon | Coinbase ecosystem |
-| **Arbitrum** | 🔴 HIGH | Live | Largest L2 |
-| **Optimism** | 🟡 MEDIUM | Coming soon | OP Stack |
-| **Unichain** | 🔴 HIGH | Native | Uniswap native |
-| **zkSync** | 🟢 LOW | Exploration | Different EVM |
-| **Scroll** | 🟢 LOW | Coming | EVM-equivalent |
+| **Base** |  HIGH | Coming soon | Coinbase ecosystem |
+| **Arbitrum** |  HIGH | Live | Largest L2 |
+| **Optimism** |  MEDIUM | Coming soon | OP Stack |
+| **Unichain** |  HIGH | Native | Uniswap native |
+| **zkSync** |  LOW | Exploration | Different EVM |
+| **Scroll** |  LOW | Coming | EVM-equivalent |
 
 ---
 
@@ -677,37 +644,32 @@ flowchart TD
 ### Revenue Model Options
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    MON["MONETIZATION STRATEGIES"]
     MON --> R1
     MON --> R2
     MON --> R3
     MON --> R4
-
     subgraph R1["REVENUE 1: PROTOCOL FEE"]
         R1A["5-10% of all FIX rewards minted"]
         R1B["→ Dev funding, audits, buyback, stakers"]
         R1C["Example: 1M swaps × $100 × 10 FIX × 5% = 50K FIX/mo"]
     end
-
     subgraph R2["REVENUE 2: AGENT MARKETPLACE"]
         R2A["10% of agent subscription/performance fees"]
         R2B["Premium listing fees"]
         R2C["Certification fees for verified badge"]
     end
-
     subgraph R3["REVENUE 3: PREMIUM FEATURES"]
         R3A["Priority gas (Flashbots)"]
         R3B["Advanced analytics dashboard"]
         R3C["Custom branding on NFT credentials"]
         R3D["White-label SDK for protocols"]
     end
-
     subgraph R4["REVENUE 4: BRIDGE FEES"]
         R4A["0.1% fee on FIX bridging"]
         R4B["Compensates Reactive Network gas costs"]
     end
-
     style MON fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style R1 fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
     style R2 fill:#1E1E2E,color:#E2E8F0,stroke:#2563EB
@@ -722,35 +684,30 @@ flowchart TD
 ### Updated Roadmap with New Ideas
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 gantt
-    title Comprehensive Roadmap
     dateFormat YYYY-MM
     axisFormat %Y Q%q
-
     section Q1 2026
     v2.0 Cross-Pool Tracking        :done, 2026-01, 2026-02
     v2.1 NFT Credentials            :done, 2026-01, 2026-02
     v2.2.1 UUPS Infrastructure      :active, 2026-02, 2026-03
     v2.2.2 AI Agent Registration    :active, 2026-02, 2026-03
-
     section Q2 2026
     v2.2.3 Agent Verify & Rewards   :2026-04, 2026-05
     v2.3.1 Reactive Core            :2026-04, 2026-06
     v2.3.2 Auto-Compound & StopLoss :2026-05, 2026-06
     v2.4.0 Emergency & Governance   :crit, 2026-05, 2026-06
-
     section Q3 2026
     v2.5.0 FIX Staking (veFIX)      :2026-07, 2026-08
     v2.5.1 Governance Module        :2026-07, 2026-08
     v2.6.0 Teams & Reputation       :2026-08, 2026-09
     v2.6.1 Achievement System       :2026-08, 2026-09
-
     section Q4 2026
     v2.7.0 AI Agent Marketplace     :2026-10, 2026-11
     v2.7.1 Multi-Agent Chains       :2026-10, 2026-11
     v2.8.0 Cross-Chain Bridge       :2026-11, 2026-12
     v2.8.1 Global Leaderboards      :2026-11, 2026-12
-
     section 2027+
     v3.0 Full DAO Transition        :2027-01, 2027-03
     v3.1 MEV Protection Suite       :2027-02, 2027-04
@@ -765,8 +722,8 @@ gantt
 ### Dependency Graph
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    V12["v1.2\nTiers"] --> V20["v2.0\nCross-Pool Stats"]
     V20 --> V21["v2.1\nNFT Credentials"]
     V20 --> V22["v2.2\nUUPS + AI"]
     V20 --> V24["v2.4\nEmergency"]
@@ -776,7 +733,6 @@ flowchart TD
     V23 --> V27["v2.7\nAI Marketplace"]
     V25 --> V27
     V27 --> V28["v2.8\nCross-Chain Bridge"]
-
     style V12 fill:#6B7280,color:#FFFFFF,stroke:#4B5563
     style V20 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style V21 fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
@@ -859,7 +815,7 @@ flowchart TD
 
 ---
 
-## 📚 Related Documents
+##  Related Documents
 
 | Document | Purpose |
 |----------|---------|
@@ -867,7 +823,7 @@ flowchart TD
 | [MARKET_SENTIMENT_ANALYSIS.md](./MARKET_SENTIMENT_ANALYSIS.md) | Research backing decisions |
 | [UPGRADEABILITY_AND_AI_AGENTS.md](./UPGRADEABILITY_AND_AI_AGENTS.md) | v2.2 technical specs |
 | [REACTIVE_NETWORK_INTEGRATION.md](./REACTIVE_NETWORK_INTEGRATION.md) | v2.3 cross-chain specs |
-| [FUTURE_ENHANCEMENTS.md](./FUTURE_ENHANCEMENTS.md) | 🗺️ Full roadmap |
+| [FUTURE_ENHANCEMENTS.md](./FUTURE_ENHANCEMENTS.md) |  Full roadmap |
 
 ---
 

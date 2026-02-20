@@ -1,0 +1,27 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+    TEAM --> B[" Bronze\n5 members | 2.5% bonus | 50% leader"]
+    TEAM --> S[" Silver\n10 members | 5% bonus | 45% leader"]
+    TEAM --> G[" Gold\n25 members | 7.5% bonus | 42.5% leader"]
+    TEAM --> P[" Platinum\n50 members | 10% bonus | 40% leader"]
+    subgraph example["CALCULATION EXAMPLE (Platinum)"]
+        E1["Team generates $500K volume → 500 FIX base"]
+        E2["Bonus Pool: 500 × 10% = 50 FIX"]
+        E3["Leader: 50 × 40% = 20 FIX"]
+        E4["50 Members: 50 × 60% ÷ 50 = 0.6 FIX each"]
+    end
+    subgraph rules["TEAM RULES"]
+        R1["No multi-team membership"]
+        R2["Leader must be active (≥1 referral/mo)"]
+        R3["Inactive teams dissolve after 90 days"]
+        R4["Members can leave with 7-day notice"]
+    end
+    P --> example
+    TEAM --> rules
+    style TEAM fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style B fill:#CD7F32,color:#FFFFFF,stroke:#A0522D
+    style S fill:#C0C0C0,color:#1E1E2E,stroke:#808080
+    style G fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style P fill:#10B981,color:#FFFFFF,stroke:#059669
+    style example fill:#1E1E2E,color:#E2E8F0,stroke:#7C3AED
+    style rules fill:#1E1E2E,color:#E2E8F0,stroke:#6B7280

@@ -1,0 +1,22 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+    Compute --> Base["baseReward = swapAmount × rewardRateBps / 10000"]
+    Base --> Fee["_applyProtocolFee()"]
+    Fee --> CalcFee["protocolFee = baseReward × 500 / 10000 (5%)"]
+    CalcFee --> Net["netReward = baseReward − protocolFee"]
+    CalcFee --> Accum["accumulatedFees += protocolFee"]
+    Accum --> Dist["distributeFees()\n(callable by anyone)"]
+    Dist --> Treasury[" Treasury\n50%"]
+    Dist --> Buyback["[IN PROGRESS] Buyback Contract\n30%"]
+    Dist --> Stakers[" Staker Rewards\n20%"]
+    style Swap fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style Compute fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style Base fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style Fee fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style CalcFee fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style Net fill:#10B981,color:#FFFFFF,stroke:#059669
+    style Accum fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
+    style Dist fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style Treasury fill:#10B981,color:#FFFFFF,stroke:#059669
+    style Buyback fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style Stakers fill:#F59E0B,color:#1E1E2E,stroke:#D97706

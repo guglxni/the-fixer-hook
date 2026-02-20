@@ -1,0 +1,32 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+classDiagram
+        <<Interface>>
+        +swap()
+        +modifyLiquidity()
+    }
+    class BaseHook {
+        <<v4-periphery>>
+        +poolManager : IPoolManager
+        +validateHookAddress()
+        #_afterSwap()*
+    }
+    class ERC20 {
+        <<Solmate>>
+        #_mint(to, amount)
+        +balanceOf(owner) uint256
+        +transfer(to, amount) bool
+    }
+    class Hooks {
+        <<Library>>
+        +Permissions struct
+        +validateHookPermissions()
+    }
+    class ReferralHook {
+        -REWARD_AMOUNT : uint256
+        +getHookPermissions() Permissions
+        #_afterSwap() bytes4, int128
+    }
+    IPoolManager --> BaseHook : references
+    BaseHook <|-- ReferralHook : inherits
+    ERC20 <|-- ReferralHook : inherits
+    Hooks .. ReferralHook : uses

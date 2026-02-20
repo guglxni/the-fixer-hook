@@ -1,0 +1,13 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+    B --> C[" Referral Hook\n(Side-Effect)"]
+    C --> D["afterSwap()"]
+    D --> D1["1. Decode hookData"]
+    D1 --> D2["2. Validate referrer"]
+    D2 --> D3["3. Mint tokens"]
+    D3 --> E[" FIX Token minted\nto referrer"]
+    style A fill:#4F46E5,color:#fff,stroke:#4338CA
+    style B fill:#7C3AED,color:#fff,stroke:#6D28D9
+    style C fill:#2563EB,color:#fff,stroke:#1D4ED8
+    style D fill:#F59E0B,color:#000,stroke:#D97706
+    style E fill:#10B981,color:#fff,stroke:#059669

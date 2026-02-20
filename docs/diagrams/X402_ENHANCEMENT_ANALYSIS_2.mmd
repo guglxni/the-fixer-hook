@@ -1,0 +1,23 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+    Agent[" AI Agent\n(OpenClaw / Moltbook / Custom)"]
+    Agent <-->|"x402 HTTP 402 flow"| RaaS
+    Facilitator --> RaaS
+    subgraph raas["FixerHook RaaS Server\n(Express/Hono + x402 paymentMiddleware)"]
+        API1["Pool analytics API"]
+        API2[" Referrer discovery"]
+        API3[" Route optimization"]
+        API4[" Agent registration"]
+        API5[" Marketplace listings"]
+    end
+    raas -->|"Reads on-chain data"| Chain
+    Chain["FixerRegistryUpgradeable\n+ FixerHookV2\n(On-Chain, Unchanged)"]
+    style Facilitator fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style Agent fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style raas fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
+    style API1 fill:#10B981,color:#FFFFFF,stroke:#059669
+    style API2 fill:#10B981,color:#FFFFFF,stroke:#059669
+    style API3 fill:#10B981,color:#FFFFFF,stroke:#059669
+    style API4 fill:#10B981,color:#FFFFFF,stroke:#059669
+    style API5 fill:#10B981,color:#FFFFFF,stroke:#059669
+    style Chain fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9

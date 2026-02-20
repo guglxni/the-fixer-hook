@@ -25,7 +25,7 @@
 
 This document provides comprehensive implementation plans for evolving the FixerHook from its current v1.0 fixed-reward system to advanced features including dynamic rewards, tiered referrals, cross-pool tracking, and NFT-based credentials.
 
-> 📚 **Related Documentation:**
+>  **Related Documentation:**
 > - **[IMPLEMENTATION_TASKS.md](./IMPLEMENTATION_TASKS.md)** - Detailed task breakdown with estimates
 > - **[MARKET_SENTIMENT_ANALYSIS.md](./MARKET_SENTIMENT_ANALYSIS.md)** - Research backing all decisions
 > - **[UPGRADEABILITY_AND_AI_AGENTS.md](./UPGRADEABILITY_AND_AI_AGENTS.md)** - UUPS proxy pattern and AI agent integration (v2.2+)
@@ -455,12 +455,11 @@ Enable referrers to earn rewards across all pools using the FixerHook, with unif
 ### Architecture
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    Reg["📦 FixerRegistry\n(Central State)\n• referrerStats[]\n• tierThresholds[]\n• poolRegistry[]\n• mintReward()"]
-    Reg --> HA["🪝 FixerHook\n(Pool A)\nafterSwap() → registry.call"]
-    Reg --> HB["🪝 FixerHook\n(Pool B)\nafterSwap() → registry.call"]
-    Reg --> HC["🪝 FixerHook\n(Pool C)\nafterSwap() → registry.call"]
-
+    Reg --> HA[" FixerHook\n(Pool A)\nafterSwap() → registry.call"]
+    Reg --> HB[" FixerHook\n(Pool B)\nafterSwap() → registry.call"]
+    Reg --> HC[" FixerHook\n(Pool C)\nafterSwap() → registry.call"]
     style Reg fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style HA fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
     style HB fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
@@ -770,7 +769,7 @@ contract FixerCredential is ERC721 {
 
 ## Version 2.2: UUPS Upgradeability & AI Agent Integration
 
-> 📚 **Detailed Documentation:** [UPGRADEABILITY_AND_AI_AGENTS.md](./UPGRADEABILITY_AND_AI_AGENTS.md)
+>  **Detailed Documentation:** [UPGRADEABILITY_AND_AI_AGENTS.md](./UPGRADEABILITY_AND_AI_AGENTS.md)
 
 ### Overview
 
@@ -853,20 +852,17 @@ function recordAgentReferral(
 ### Architecture
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    Agent["🤖 AI Agent Wallet (ERC-4337)\n• Session keys for automated trading\n• Multi-sig for security\n• Gas sponsorship"]
     Agent --> Registry
-
     subgraph Registry["FixerRegistry (UUPS Proxy)"]
         direction LR
-        ERC20["💰 ERC20\nFIX"]
+        ERC20[" ERC20\nFIX"]
         Stats["Referrer\nStats"]
-        AgentReg["🤖 Agent Registry\n(V2.2+)"]
+        AgentReg[" Agent Registry\n(V2.2+)"]
     end
-
     Upgrade["Implementation V1 → V2 → V3 ... (upgradeable)"]
     Registry --> Upgrade
-
     style Agent fill:#F59E0B,color:#1E1E2E,stroke:#D97706
     style Registry fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
     style ERC20 fill:#10B981,color:#FFFFFF,stroke:#059669
@@ -900,23 +896,19 @@ flowchart TD
 ## Implementation Timeline
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 gantt
-    title FixerHook Implementation Timeline (2026)
     dateFormat YYYY-MM-DD
     axisFormat %b %Y
-
     section Q1 2026
     v1.1 Development          :2026-01-01, 14d
     v1.1 Audit & Deploy       :2026-01-15, 14d
-
     section Q2 2026
     v1.2 Development          :2026-04-01, 21d
     v1.2 Audit & Deploy       :2026-04-22, 21d
-
     section Q3 2026
     v2.0 Development          :2026-07-01, 28d
     v2.0 Integration & Deploy :2026-07-29, 28d
-
     section Q4 2026
     v2.1 Development          :2026-10-01, 28d
     v2.1 Audit & Launch       :2026-10-29, 28d

@@ -61,15 +61,14 @@ The **Referral Hook** introduces an **on-chain affiliate system** for Uniswap v4
 ### 2. Architectural Pattern: Side-Effect Tokenization
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    A["📦 Swap Transaction\n(with hookData)"] --> B["[IN PROGRESS] PoolManager\n(Swap Execution)"]
-    B --> C["🪝 Referral Hook\n(Side-Effect)"]
+    B --> C[" Referral Hook\n(Side-Effect)"]
     C --> D["afterSwap()"]
     D --> D1["1. Decode hookData"]
     D1 --> D2["2. Validate referrer"]
     D2 --> D3["3. Mint tokens"]
-    D3 --> E["🎁 FIX Token minted\nto referrer"]
-
+    D3 --> E[" FIX Token minted\nto referrer"]
     style A fill:#4F46E5,color:#fff,stroke:#4338CA
     style B fill:#7C3AED,color:#fff,stroke:#6D28D9
     style C fill:#2563EB,color:#fff,stroke:#1D4ED8
@@ -82,8 +81,8 @@ flowchart TD
 ### 3. Component Overview
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 classDiagram
-    class ReferralHook {
         <<Main Contract>>
         +REWARD_AMOUNT : uint256
         +constructor(IPoolManager)
@@ -111,17 +110,15 @@ classDiagram
 ### 4. Workflow Sequence
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 sequenceDiagram
-    participant F as 🖥️ Frontend
-    participant R as 🔀 SwapRouter
-    participant PM as 🏊 PoolManager
-    participant H as 🪝 ReferralHook
-
+    participant R as  SwapRouter
+    participant PM as  PoolManager
+    participant H as  ReferralHook
     F->>F: User clicks "Swap with Referral"
     F->>R: encode(referrer) in hookData
     R->>PM: swap(key, params, hookData)
     PM->>H: afterSwap() + hookData
-    
     rect rgb(30, 41, 59)
         Note over H: Validation Pipeline
         H->>H: 1. decode(hookData) → referrer
@@ -129,7 +126,6 @@ sequenceDiagram
         H->>H: 3. referrer ≠ tx.origin?
         H->>H: 4. _mint(referrer, REWARD)
     end
-    
     H-->>PM: return selector
     PM-->>R: swap complete
     R-->>F: transaction confirmed
@@ -285,14 +281,13 @@ const hookData = encodeAbiParameters(
 ### Happy Path: Successful Referral
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    Start["hookData received"] --> Check1{"hookData.length > 0?"}
     Check1 -- "YES" --> Decode["referrer = decode(hookData)"]
     Decode --> Check2{"referrer ≠ address(0)?"}
     Check2 -- "YES" --> Check3{"referrer ≠ tx.origin?"}
     Check3 -- "YES" --> Mint["[PASS] _mint(referrer, REWARD_AMOUNT)"]
-    Mint --> Result["🎁 FIX Token minted to referrer"]
-
+    Mint --> Result[" FIX Token minted to referrer"]
     style Start fill:#4F46E5,color:#fff,stroke:#4338CA
     style Check1 fill:#F59E0B,color:#000,stroke:#D97706
     style Decode fill:#7C3AED,color:#fff,stroke:#6D28D9
@@ -305,11 +300,10 @@ flowchart TD
 ### Edge Case: No Referral Data
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    Start["hookData received"] --> Check1{"hookData.length > 0?"}
-    Check1 -- "NO" --> Skip["⏩ Skip processing\nReturn selector"]
+    Check1 -- "NO" --> Skip[" Skip processing\nReturn selector"]
     Skip --> Result["Normal swap\nNo rewards minted"]
-
     style Start fill:#4F46E5,color:#fff,stroke:#4338CA
     style Check1 fill:#F59E0B,color:#000,stroke:#D97706
     style Skip fill:#6B7280,color:#fff,stroke:#4B5563
@@ -319,13 +313,12 @@ flowchart TD
 ### Edge Case: Self-Referral Attempt
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    Start["hookData = encode(tx.origin)"] --> Check1{"hookData.length > 0?"}
     Check1 -- "YES" --> Decode["referrer = decode(hookData)"]
     Decode --> Check3{"referrer ≠ tx.origin?"}
-    Check3 -- "NO (BLOCKED)" --> Skip["🚫 Skip minting\nReturn selector"]
+    Check3 -- "NO (BLOCKED)" --> Skip[" Skip minting\nReturn selector"]
     Skip --> Result["Swap completes\nNo rewards (anti-gaming)"]
-
     style Start fill:#DC2626,color:#fff,stroke:#B91C1C
     style Check1 fill:#F59E0B,color:#000,stroke:#D97706
     style Decode fill:#7C3AED,color:#fff,stroke:#6D28D9
@@ -341,8 +334,8 @@ flowchart TD
 ### Inheritance Hierarchy
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 classDiagram
-    class IPoolManager {
         <<Interface>>
         +swap()
         +modifyLiquidity()
@@ -369,7 +362,6 @@ classDiagram
         +getHookPermissions() Permissions
         #_afterSwap() bytes4, int128
     }
-
     IPoolManager --> BaseHook : references
     BaseHook <|-- ReferralHook : inherits
     ERC20 <|-- ReferralHook : inherits
@@ -436,14 +428,13 @@ if (hookData.length >= 32) {
 ### Comparison
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart LR
-    subgraph gas["Gas Comparison"]
         direction TB
         A["[IN PROGRESS] Vanilla Swap\n~150,000 gas"]
         B["Swap + Referral Hook\n(with mint)\n~172,300 gas (+15%)"]
-        C["⏩ Swap + Referral Hook\n(no referral)\n~150,250 gas (+0.17%)"]
+        C[" Swap + Referral Hook\n(no referral)\n~150,250 gas (+0.17%)"]
     end
-
     style A fill:#10B981,color:#FFFFFF,stroke:#059669
     style B fill:#F59E0B,color:#1E1E2E,stroke:#D97706
     style C fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
@@ -459,10 +450,9 @@ flowchart LR
 ### Component Hierarchy (v2.2)
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    Proxy["ERC1967Proxy\n(User-facing address)"]
-    Proxy -->|delegatecall| Impl["📦 FixerRegistryUpgradeable\nv2.3.0 (Implementation)"]
-    
+    Proxy -->|delegatecall| Impl[" FixerRegistryUpgradeable\nv2.3.0 (Implementation)"]
     Impl --> Init["Initializable"]
     Impl --> UUPS["UUPSUpgradeable"]
     Impl --> Own["OwnableUpgradeable"]
@@ -470,9 +460,7 @@ flowchart TD
     Impl --> Guard["ReentrancyGuard\nUpgradeable"]
     Impl --> Emerg["EmergencyModule"]
     Impl --> Store["FixerRegistryStorage"]
-    
-    Store -->|ERC-7201| NS["📁 Namespaced Storage\n(MainStorage struct)"]
-
+    Store -->|ERC-7201| NS[" Namespaced Storage\n(MainStorage struct)"]
     style Proxy fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
     style Impl fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style Init fill:#6B7280,color:#FFFFFF,stroke:#4B5563
@@ -488,8 +476,8 @@ flowchart TD
 ### Storage Architecture (ERC-7201)
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    subgraph storage["FixerRegistryStorage.MainStorage @ ERC-7201 Computed Slot"]
         direction TB
         subgraph packed1["Slot Group 1: Reward Parameters (1 slot packed)"]
             P1["uint128 minSwapAmount\nuint64 rewardRateBps\nuint64 __reserved1"]
@@ -520,7 +508,6 @@ flowchart TD
         end
         GAP["uint256[50] __gap — reserved for upgrades"]
     end
-
     style storage fill:#1E1E2E,color:#E2E8F0,stroke:#7C3AED
     style packed1 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style packed2 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
@@ -535,59 +522,51 @@ flowchart TD
 ### Emergency Module Flow
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 stateDiagram-v2
-    [*] --> Normal
-    
     Normal --> Paused : Security Council\ncalls pauseReferrals()
     Normal --> CircuitBreaker : mintedThisHour\n> threshold
-    
     CircuitBreaker --> Paused : Auto-pauses\nrewards only
-    
     Paused --> Normal : Security Council resume()\n(within 7 days)
     Paused --> DAORequired : 7 days elapsed
     DAORequired --> Normal : DAO governance\ncalls resume()
-    
     state Normal {
         [*] --> AllActive
         AllActive : [PASS] All operations active
         AllActive : Circuit breaker monitors minting hourly
     }
-    
     state Paused {
         [*] --> Restricted
         Restricted : [FAIL] Affected ops revert with SystemPaused()
         Restricted : [PASS] Other operations continue normally
     }
-    
     state DAORequired {
         [*] --> Locked
         Locked : Security council CANNOT resume
-        Locked : 🏛️ Only DAO governance can resume
+        Locked :  Only DAO governance can resume
     }
-    
     state CircuitBreaker {
         [*] --> Triggered
-        Triggered : ⚡ mintedThisHour > threshold
-        Triggered : 🛑 Auto-pauses rewards
-        Triggered : 🔧 Requires manual resume
+        Triggered :  mintedThisHour > threshold
+        Triggered :  Auto-pauses rewards
+        Triggered :  Requires manual resume
     }
 ```
 
 ### Protocol Fee Flow (v2.2)
 
 ```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
 flowchart TD
-    Swap["[IN PROGRESS] Swap with Referral"] --> Compute["_computeNetReward()"]
     Compute --> Base["baseReward = swapAmount × rewardRateBps / 10000"]
     Base --> Fee["_applyProtocolFee()"]
     Fee --> CalcFee["protocolFee = baseReward × 500 / 10000 (5%)"]
     CalcFee --> Net["netReward = baseReward − protocolFee"]
     CalcFee --> Accum["accumulatedFees += protocolFee"]
     Accum --> Dist["distributeFees()\n(callable by anyone)"]
-    Dist --> Treasury["🏦 Treasury\n50%"]
+    Dist --> Treasury[" Treasury\n50%"]
     Dist --> Buyback["[IN PROGRESS] Buyback Contract\n30%"]
-    Dist --> Stakers["💎 Staker Rewards\n20%"]
-
+    Dist --> Stakers[" Staker Rewards\n20%"]
     style Swap fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
     style Compute fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
     style Base fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8

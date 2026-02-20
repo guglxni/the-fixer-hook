@@ -147,7 +147,7 @@ gh issue close <number>
 1. [PASS] **Visit Project Board**: https://github.com/users/guglxni/projects/1
 2. **Organize columns** (drag issues between Todo/In Progress/Done)
 3. **Start with Issue #1**: Install Solady library
-4. 📝 **Create feature branch** as per Issue #3
+4.  **Create feature branch** as per Issue #3
 5. [IN PROGRESS] **Work through v1.1 sprint** (Issues #1-20)
 
 ## Notes
