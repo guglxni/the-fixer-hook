@@ -1,0 +1,26 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+flowchart TD
+        direction LR
+        A1["Sybil Attacker"]
+        A2["Malicious Referrer"]
+        A3["Unauthorized Upgrader"]
+        A4["Flash Loan MEV"]
+    end
+    subgraph surface["Attack Surfaces"]
+        direction LR
+        S1["Self-referral"]
+        S2["Mint inflation"]
+        S3["Proxy storage"]
+        S4["Emergency bypass"]
+    end
+    subgraph mitigations[" Mitigations"]
+        direction LR
+        M1["tx.origin != referrer"]
+        M2["Daily mint ceiling\nCircuit breaker"]
+        M3["ERC-7201 + 48h timelock"]
+        M4["7-day DAO escalation"]
+    end
+    actors --> surface --> mitigations
+    style actors fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
+    style surface fill:#F59E0B,color:#1E1E2E,stroke:#D97706
+    style mitigations fill:#10B981,color:#FFFFFF,stroke:#059669
