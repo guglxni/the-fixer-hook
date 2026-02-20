@@ -1,0 +1,64 @@
+flowchart TD
+    subgraph reactive["REACTIVE NETWORK"]
+        subgraph orch["FixerReactiveOrchestrator.sol"]
+            direction TB
+            subgraph subs["SUBSCRIPTIONS"]
+                S1["CrossPoolReferral events"]
+                S2["TierUpgrade events"]
+                S3["FIX Transfer events"]
+                S4["Uniswap Sync events"]
+                S5["External DEX swap events"]
+            end
+            subgraph state["STATE"]
+                ST1["crossChainVolume[referrer]"]
+                ST2["crossChainTier[referrer]"]
+                ST3["stopOrders[id]"]
+                ST4["autoCompound[user]"]
+            end
+            subgraph actions["ACTIONS (via Callback)"]
+                A1["syncCrossChainStats()"]
+                A2["forceUpgradeTier()"]
+                A3["executeStopLoss()"]
+                A4["autoCompound()"]
+            end
+        end
+    end
+
+    reactive -->|Callbacks| dest
+
+    subgraph dest["DESTINATION CHAINS"]
+        direction LR
+        subgraph eth["ETHEREUM"]
+            ER["FixerRegistry\n(Primary)"]
+            ER --> EH["FixerHookV2[]\n(multiple pools)"]
+        end
+        subgraph base["BASE"]
+            BR["FixerRegistry\n(Secondary)"]
+            BR --> BH["FixerHookV2[]\n(multiple pools)"]
+        end
+        subgraph arb["ARBITRUM"]
+            AR["FixerRegistry\n(Secondary)"]
+            AR --> AH["FixerHookV2[]"]
+        end
+    end
+
+    subgraph cbs["CALLBACK CONTRACTS"]
+        direction LR
+        SL["StopLossCallback\nexecuteSwap()"]
+        AC["AutoCompoundCb\nstake()"]
+    end
+
+    dest --> cbs
+
+    style reactive fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
+    style orch fill:#10B981,color:#FFFFFF,stroke:#059669
+    style subs fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style state fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style actions fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style dest fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
+    style eth fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style base fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style arb fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style cbs fill:#1E1E2E,color:#E2E8F0,stroke:#F59E0B
+    style SL fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
+    style AC fill:#F59E0B,color:#1E1E2E,stroke:#D97706

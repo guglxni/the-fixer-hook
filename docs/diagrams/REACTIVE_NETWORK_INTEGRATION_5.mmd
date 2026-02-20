@@ -1,0 +1,32 @@
+flowchart LR
+    subgraph chain1["CHAIN 1 (Ethereum)"]
+        Reg1["📦 FixerRegistry\n(Primary)"]
+        Reg1 --> H1A["🪝 FixerHookV2\n(Pool A)"]
+        Reg1 --> H1B["🪝 FixerHookV2\n(Pool B)"]
+    end
+
+    subgraph reactive["REACTIVE NETWORK"]
+        RC["🧠 FixerReactive Contract\n• Monitor swaps\n• Aggregate stats\n• Trigger callbacks\n• Sync tiers"]
+    end
+
+    subgraph chain2["CHAIN 2 (Base)"]
+        Reg2["📦 FixerRegistry\n(Secondary)"]
+        Reg2 --> H2C["🪝 FixerHookV2\n(Pool C)"]
+        Reg2 --> Cred2["🎖️ FixerCredential\n(sync)"]
+    end
+
+    H1A -->|events| RC
+    H1B -->|events| RC
+    RC -->|callback| Reg1
+    RC -->|callback| Reg2
+
+    style chain1 fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
+    style reactive fill:#1E1E2E,color:#E2E8F0,stroke:#10B981
+    style chain2 fill:#1E1E2E,color:#E2E8F0,stroke:#2563EB
+    style Reg1 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
+    style Reg2 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
+    style RC fill:#10B981,color:#FFFFFF,stroke:#059669
+    style H1A fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style H1B fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style H2C fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
+    style Cred2 fill:#F59E0B,color:#1E1E2E,stroke:#D97706

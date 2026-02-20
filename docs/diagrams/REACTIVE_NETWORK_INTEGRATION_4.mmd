@@ -1,0 +1,13 @@
+flowchart TD
+    Reg["📦 FixerRegistry\n(Single Chain)"]
+    Reg --> HookA["🪝 FixerHookV2\n(Pool A)"]
+    Reg --> HookB["🪝 FixerHookV2\n(Pool B)"]
+    Reg --> Cred["🎖️ FixerCredential\n(NFT)"]
+
+    Limits["[WARNING] LIMITATIONS\n• Single chain only\n• No automatic notifications\n• Manual claim required\n• No cross-protocol awareness"]
+
+    style Reg fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
+    style HookA fill:#6B7280,color:#FFFFFF,stroke:#4B5563
+    style HookB fill:#6B7280,color:#FFFFFF,stroke:#4B5563
+    style Cred fill:#6B7280,color:#FFFFFF,stroke:#4B5563
+    style Limits fill:#F59E0B,color:#1E1E2E,stroke:#D97706
