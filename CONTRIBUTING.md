@@ -21,22 +21,22 @@ forge test -vvv
 
 ```mermaid
 flowchart LR
-    Fork["🍴 Fork repo"] --> Branch["🌿 Create branch"]
-    Branch --> Code["💻 Make changes"]
-    Code --> Test["🧪 forge test"]
-    Test --> Fmt["✨ forge fmt"]
-    Fmt --> PR["📨 Create PR"]
-    PR --> Review["🔍 Code review"]
-    Review --> Merge["✅ Merge"]
+    Fork["Fork repo"] --> Branch["Create branch"]
+    Branch --> Code["Make changes"]
+    Code --> Test["forge test"]
+    Test --> Fmt["forge fmt"]
+    Fmt --> PR["Create PR"]
+    PR --> Review["Code review"]
+    Review --> Merge["Merge"]
 
-    style Fork fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
-    style Branch fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
-    style Code fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
-    style Test fill:#10B981,color:#FFFFFF,stroke:#059669
-    style Fmt fill:#F59E0B,color:#1E1E2E,stroke:#D97706
-    style PR fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
-    style Review fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
-    style Merge fill:#10B981,color:#FFFFFF,stroke:#059669
+    style Fork fill:#1e3a8a,color:#fff
+    style Branch fill:#1e3a8a,color:#fff
+    style Code fill:#1e3a8a,color:#fff
+    style Test fill:#059669,color:#fff
+    style Fmt fill:#f59e0b,color:#000
+    style PR fill:#1e3a8a,color:#fff
+    style Review fill:#1e3a8a,color:#fff
+    style Merge fill:#059669,color:#fff
 ```
 
 1. Fork the repository

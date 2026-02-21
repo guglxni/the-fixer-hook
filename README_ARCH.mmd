@@ -1,0 +1,63 @@
+%%{init: {'theme': 'base', 'themeVariables': { 
+  'primaryColor': '#1e3a8a', 
+  'primaryTextColor': '#ffffff', 
+  'primaryBorderColor': '#1e40af', 
+  'lineColor': '#334155', 
+  'secondaryColor': '#f1f5f9', 
+  'tertiaryColor': '#cbd5e1', 
+  'background': '#ffffff',
+  'mainBkg': '#ffffff',
+  'nodeBorder': '#475569',
+  'clusterBkg': '#f8fafc',
+  'clusterBorder': '#cbd5e1',
+  'titleColor': '#0f172a',
+  'edgeLabelBackground': '#ffffff',
+  'fontFamily': 'Arial, Helvetica, sans-serif',
+  'fontSize': '14px'
+}}}%%
+flowchart TB
+    subgraph USER["User"]
+        U1["User initiates swap\nwith hookData"]
+    end
+    
+    subgraph SWAP["Swap Execution"]
+        U2["SwapRouter"] --> U3["PoolManager"]
+        U3 --> U4["FixerHook\nafterSwap()"]
+    end
+    
+    subgraph VALIDATION["Validation"]
+        U4 --> U5{"Valid\nhookData?"}
+        U5 -->|No| U6["Skip\nReturn selector"]
+        U5 -->|Yes| U7["Decode\nreferrer"]
+        U7 --> U8{"referrer !=\naddress(0)?"}
+        U8 -->|No| U6
+        U8 -->|Yes| U9{"referrer !=\ntx.origin?"}
+    end
+    
+    subgraph REWARD["Reward Distribution"]
+        U9 -->|No| U6
+        U9 -->|Yes| U10["Calculate\nReward"]
+        U10 --> U11["Mint FIX\nto referrer"]
+    end
+    
+    U1 --> U2
+    U6 --> END1["Swap Complete\n(normal)"]
+    U11 --> END2["Swap Complete\n(with reward)"]
+    
+    style USER fill:#1e3a8a,color:#fff,stroke:#1e40af
+    style SWAP fill:#1e40af,color:#fff,stroke:#3b82f6
+    style VALIDATION fill:#059669,color:#fff,stroke:#10b981
+    style REWARD fill:#7c3aed,color:#fff,stroke:#8b5cf6
+    style U1 color:#fff
+    style U2 color:#fff
+    style U3 color:#fff
+    style U4 color:#fff
+    style U5 fill:#f59e0b,color:#000,stroke:#d97706
+    style U6 fill:#64748b,color:#fff,stroke:#475569
+    style U7 color:#fff
+    style U8 fill:#f59e0b,color:#000,stroke:#d97706
+    style U9 fill:#f59e0b,color:#000,stroke:#d97706
+    style U10 color:#fff
+    style U11 fill:#10b981,color:#fff,stroke:#059669
+    style END1 fill:#64748b,color:#fff
+    style END2 fill:#10b981,color:#fff

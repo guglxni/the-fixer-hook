@@ -39,3 +39,7 @@ repomix-output.xml
 # Internal documentation (audits, reports, code reviews)
 # These contain sensitive internal analysis and are not for public release
 /internal/
+
+# Temporary skill repository
+temp_skill_repo/
+/scripts/

@@ -2,7 +2,7 @@
 
 > **A Learning-Focused Implementation of On-Chain Referral Rewards for Uniswap v4**
 
-*"Everybody pays the Fixer."*
+"Everybody pays the Fixer."
 
 ---
 
@@ -39,25 +39,7 @@ This repository documents my journey building my first Uniswap v4 hook. If you'r
 
 **The Solution:** The Fixer Hook creates an on-chain affiliate system. When someone swaps, they can include a referrer's address. The hook automatically mints reward tokens to that referrer.
 
-```mermaid
-flowchart TD
-    A["🧑‍💻 User initiates swap\nwith hookData = encode(referrer)"] --> B["🔄 Pool executes swap\nvia PoolManager"]
-    B --> C["🪝 FixerHook's afterSwap() runs"]
-    C --> D{"Decode & Validate\nhookData"}
-    D -- "Valid referrer" --> E["🏭 Mint FIX tokens\nto referrer"]
-    D -- "No data / Invalid" --> F["⏩ Skip — no reward"]
-    E --> G["✅ Referrer earns rewards"]
-    F --> H["✅ Swap completes normally"]
-
-    style A fill:#4F46E5,color:#fff,stroke:#4338CA
-    style B fill:#7C3AED,color:#fff,stroke:#6D28D9
-    style C fill:#2563EB,color:#fff,stroke:#1D4ED8
-    style D fill:#F59E0B,color:#000,stroke:#D97706
-    style E fill:#10B981,color:#fff,stroke:#059669
-    style F fill:#6B7280,color:#fff,stroke:#4B5563
-    style G fill:#10B981,color:#fff,stroke:#059669
-    style H fill:#6B7280,color:#fff,stroke:#4B5563
-```
+![Architecture](./README_ARCH.png)
 
 ---
 
@@ -86,21 +68,21 @@ Hooks are **smart contracts that extend pool behavior**. They're called at speci
 
 ```mermaid
 flowchart LR
-    subgraph lifecycle["⚡ Uniswap v4 Pool Lifecycle"]
+    subgraph lifecycle["Uniswap v4 Pool Lifecycle"]
         direction TB
         I["Initialize Pool"] --> IL["beforeInitialize / afterInitialize"]
         AL["Add Liquidity"] --> ALL["beforeAddLiquidity / afterAddLiquidity"]
         RL["Remove Liquidity"] --> RLL["beforeRemoveLiquidity / afterRemoveLiquidity"]
-        S["Swap"] --> SL["beforeSwap / afterSwap ✅"]
+        S["Swap"] --> SL["beforeSwap / afterSwap"]
         D["Donate"] --> DL["beforeDonate / afterDonate"]
     end
 
-    SL -. "We use this!" .-> Hook["🪝 FixerHook\nafterSwap()"]
+    SL -. "We use this" .-> Hook["FixerHook\nafterSwap()"]
 
-    style lifecycle fill:#1E1E2E,color:#CDD6F4,stroke:#89B4FA
-    style S fill:#4F46E5,color:#fff,stroke:#4338CA
-    style SL fill:#7C3AED,color:#fff,stroke:#6D28D9
-    style Hook fill:#10B981,color:#fff,stroke:#059669
+    style lifecycle fill:#f1f5f9,stroke:#94a3b8
+    style S fill:#1e3a8a,color:#fff,stroke:#1e40af
+    style SL fill:#1e3a8a,color:#fff,stroke:#1e40af
+    style Hook fill:#059669,color:#fff,stroke:#10b981
 ```
 
 ### The Hook Address System
@@ -146,26 +128,28 @@ The Fixer Hook uses what I call the **"Side-Effect Pattern"**:
 
 ```mermaid
 flowchart TD
-    subgraph traditional["❌ Traditional Fee Hook"]
+    subgraph traditional["Traditional Fee Hook"]
         direction TB
         T1["User swaps 100 USDC"] --> T2["Hook takes 1 USDC fee"]
         T2 --> T3["User receives 99 USDC"]
     end
 
-    subgraph sideeffect["✅ Side-Effect Hook · The Fixer"]
+    subgraph sideeffect["Side-Effect Hook - The Fixer"]
         direction TB
         S1["User swaps 100 USDC"] --> S2["Swap executes normally\n(full 100 USDC)"]
         S2 --> S3["User receives expected amount"]
         S3 --> S4["Hook mints NEW FIX tokens\nto referrer"]
     end
 
-    style traditional fill:#1E1E2E,color:#F87171,stroke:#EF4444
-    style sideeffect fill:#1E1E2E,color:#34D399,stroke:#10B981
-    style T2 fill:#DC2626,color:#fff,stroke:#B91C1C
-    style T3 fill:#F87171,color:#000,stroke:#EF4444
-    style S2 fill:#4F46E5,color:#fff,stroke:#4338CA
-    style S3 fill:#10B981,color:#fff,stroke:#059669
-    style S4 fill:#F59E0B,color:#000,stroke:#D97706
+    style traditional fill:#fef2f2,stroke:#ef4444
+    style sideeffect fill:#f0fdf4,stroke:#22c55e
+    style T1 fill:#1e3a8a,color:#fff
+    style T2 fill:#dc2626,color:#fff
+    style T3 fill:#ef4444,color:#fff
+    style S1 fill:#1e3a8a,color:#fff
+    style S2 fill:#1e3a8a,color:#fff
+    style S3 fill:#22c55e,color:#fff
+    style S4 fill:#f59e0b,color:#000
 ```
 
 **Why this approach?**
@@ -308,40 +292,40 @@ function getHookPermissions() public pure override
 ```
 the-fixer-hook/
 ├── src/
-│   ├── FixerHook.sol                  # v1 — Original hook (BaseHook + ERC20)
-│   ├── FixerHookV2.sol                # v2 — Lightweight hook (delegates to registry)
-│   ├── FixerRegistry.sol              # v1 — Non-upgradeable central registry
-│   ├── FixerRegistryUpgradeable.sol   # v2.3 — UUPS proxy registry + EIP-3009
-│   ├── FixerCredential.sol            # v2.1 — Soulbound NFT credentials
+│   ├── FixerHook.sol                  # v1 - Original hook (BaseHook + ERC20)
+│   ├── FixerHookV2.sol                # v2 - Lightweight hook (delegates to registry)
+│   ├── FixerRegistry.sol              # v1 - Non-upgradeable central registry
+│   ├── FixerRegistryUpgradeable.sol   # v2.3 - UUPS proxy registry + EIP-3009
+│   ├── FixerCredential.sol            # v2.1 - Soulbound NFT credentials
 │   ├── storage/
 │   │   └── FixerRegistryStorage.sol   # ERC-7201 namespaced storage
 │   ├── modules/
 │   │   └── EmergencyModule.sol        # Circuit breaker + pause system
 │   ├── libraries/
 │   │   └── BPSMath.sol                # Basis-point math helpers
-│   ├── interfaces/                    # IFixerRegistry, IAgentRegistry, etc.
+│   ├── interfaces/                   # IFixerRegistry, IAgentRegistry, etc.
 │   └── types/
-│       └── AgentTypes.sol             # Tier constants, fee constants
+│       └── AgentTypes.sol              # Tier constants, fee constants
 │
 ├── test/                              # 314 tests across 28 suites
-│   ├── FixerHook.t.sol                # v1 hook tests
+│   ├── FixerHook.t.sol               # v1 hook tests
 │   ├── FixerRegistry.t.sol            # v1 registry tests
 │   ├── FixerRegistryUpgrade.t.sol     # Proxy + upgrade tests
-│   ├── FixerCredential.t.sol          # NFT credential tests
-│   ├── Hardening.t.sol                # Supply cap, timelock, invariants
-│   ├── EmergencyModule.t.sol          # Emergency / circuit breaker tests
-│   └── X402.t.sol                     # x402 agent & EIP-3009 tests
+│   ├── FixerCredential.t.sol         # NFT credential tests
+│   ├── Hardening.t.sol               # Supply cap, timelock, invariants
+│   ├── EmergencyModule.t.sol         # Emergency / circuit breaker tests
+│   └── X402.t.sol                    # x402 agent & EIP-3009 tests
 │
 ├── script/
-│   ├── Deploy.s.sol                   # v1 deployment
+│   ├── Deploy.s.sol                  # v1 deployment
 │   ├── DeployUpgradeable.s.sol        # UUPS proxy deployment
-│   ├── DeployV2.s.sol                 # v2 hook + registry deployment
+│   ├── DeployV2.s.sol                # v2 hook + registry deployment
 │   ├── DeployX402.s.sol               # v2.3 x402 upgrade / fresh deploy
 │   └── HookMiner.sol                  # CREATE2 address mining
 │
 ├── x402/                              # Off-chain x402 services
-│   ├── raas-server/                   # RaaS API (Hono + x402 paywall)
-│   └── mcp-server/                    # MCP server for AI agents
+│   ├── raas-server/                  # RaaS API (Hono + x402 paywall)
+│   └── mcp-server/                   # MCP server for AI agents
 │
 ├── docs/                              # Comprehensive documentation
 └── foundry.toml                       # Foundry configuration
@@ -438,39 +422,39 @@ As the project evolved beyond v1, we built a **UUPS proxy-based upgradeable arch
 
 ```mermaid
 flowchart TD
-    subgraph onchain["🔗 On-Chain (Base L2)"]
+    subgraph onchain["On-Chain (Base L2)"]
         direction TB
         PM["Uniswap v4\nPoolManager"] --> HookV2["FixerHookV2\n(Lightweight)"]
         HookV2 --> Proxy["ERC1967 Proxy"]
-        Proxy --> Registry["FixerRegistryUpgradeable v2.3\n• ERC-20 FIX Token\n• Referral tracking\n• Tiered rewards\n• Agent registry\n• EIP-3009"]
+        Proxy --> Registry["FixerRegistryUpgradeable v2.3\n- ERC-20 FIX Token\n- Referral tracking\n- Tiered rewards\n- Agent registry\n- EIP-3009"]
         Registry --> Storage["ERC-7201\nNamespaced Storage"]
-        Registry --> Emergency["EmergencyModule\n• Circuit breaker\n• Pause system"]
+        Registry --> Emergency["EmergencyModule\n- Circuit breaker\n- Pause system"]
         Registry --> Cred["FixerCredential\nSoulbound NFT"]
     end
 
-    subgraph offchain["☁️ Off-Chain (x402)"]
+    subgraph offchain["Off-Chain (x402)"]
         direction TB
         RaaS["RaaS API Server\n(Hono + x402 paywall)"]
         MCP["MCP Server\n(AI Agent Tools)"]
     end
 
-    Agent["🤖 AI Agent"] --> MCP
+    Agent["AI Agent"] --> MCP
     Agent --> RaaS
     RaaS --> Proxy
     MCP --> Proxy
-    User["🧑‍💻 User"] --> PM
+    User["User"] --> PM
 
-    style onchain fill:#0F172A,color:#E2E8F0,stroke:#3B82F6
-    style offchain fill:#1E1B4B,color:#E2E8F0,stroke:#8B5CF6
-    style PM fill:#4F46E5,color:#fff,stroke:#4338CA
-    style HookV2 fill:#7C3AED,color:#fff,stroke:#6D28D9
-    style Proxy fill:#2563EB,color:#fff,stroke:#1D4ED8
-    style Registry fill:#10B981,color:#fff,stroke:#059669
-    style Agent fill:#F59E0B,color:#000,stroke:#D97706
-    style User fill:#4F46E5,color:#fff,stroke:#4338CA
+    style onchain fill:#f8fafc,stroke:#3b82f6
+    style offchain fill:#f5f3ff,stroke:#8b5cf6
+    style PM fill:#1e3a8a,color:#fff
+    style HookV2 fill:#1e3a8a,color:#fff
+    style Proxy fill:#1e3a8a,color:#fff
+    style Registry fill:#059669,color:#fff
+    style Agent fill:#f59e0b,color:#000
+    style User fill:#1e3a8a,color:#fff
 ```
 
-> **Learning Point:** The v2 architecture separates concerns — the hook stays lightweight (just routing), while the registry handles all business logic behind a UUPS proxy for upgradeability.
+> **Learning Point:** The v2 architecture separates concerns - the hook stays lightweight (just routing), while the registry handles all business logic behind a UUPS proxy for upgradeability.
 
 ---
 
