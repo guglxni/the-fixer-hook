@@ -1,0 +1,30 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#1e40af', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#1e40af', 'lineColor': '#64748b', 'secondaryColor': '#e2e8f0', 'tertiaryColor': '#cbd5e1', 'background': '#ffffff', 'mainBkg': '#f8fafc', 'nodeBorder': '#94a3b8', 'clusterBkg': '#f1f5f9', 'clusterBorder': '#cbd5e1', 'titleColor': '#0f172a', 'edgeLabelBackground': '#ffffff'}}}%%
+flowchart TB
+    subgraph TESTS["Test Coverage"]
+        direction TB
+        T1["Unit Tests"]
+        T2["Integration Tests"]
+        T3["Invariant Tests"]
+        T4["Fuzz Tests"]
+    end
+    
+    subgraph CONTRACTS["Contracts Tested"]
+        C1["FixerHook"]
+        C2["FixerHookV2"]
+        C3["FixerRegistryUpgradeable"]
+        C4["EmergencyModule"]
+    end
+    
+    subgraph TOOLS["Testing Tools"]
+        Tool1["Forge"]
+        Tool2["Slither"]
+        Tool3["Solhint"]
+        Tool4["Mythril"]
+    end
+    
+    TESTS --> CONTRACTS
+    TOOLS --> TESTS
+    
+    style TESTS fill:#e0e7ff,stroke:#6366f1
+    style CONTRACTS fill:#dcfce7,stroke:#22c55e
+    style TOOLS fill:#fef3c7,stroke:#f59e0b

@@ -1,0 +1,26 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#1e40af', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#1e40af', 'lineColor': '#64748b', 'secondaryColor': '#e2e8f0', 'tertiaryColor': '#cbd5e1', 'background': '#ffffff', 'mainBkg': '#f8fafc', 'nodeBorder': '#94a3b8', 'clusterBkg': '#f1f5f9', 'clusterBorder': '#cbd5e1', 'titleColor': '#0f172a', 'edgeLabelBackground': '#ffffff'}}}%%
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant R as SwapRouter
+    participant PM as PoolManager
+    participant H as FixerHook
+    participant REG as FixerRegistry
+    
+    U->>F: Select token pair & referrer
+    F->>R: Build swap params with hookData
+    R->>PM: Execute swap(key, params, hookData)
+    PM->>H: Call afterSwap hook
+    rect rgb(240, 248, 255)
+        Note over H: Validation
+        H->>H: Decode referrer from hookData
+        H->>H: Validate referrer != tx.origin
+    end
+    H->>REG: recordReferral(referrer, volume)
+    REG->>REG: Calculate reward
+    REG->>REG: Update referrer stats
+    REG->>REG: Check tier thresholds
+    H-->>PM: Return (selector, 0)
+    PM-->>R: Swap complete
+    R-->>F: Transaction receipt
+    F-->>U: Success - referral recorded
