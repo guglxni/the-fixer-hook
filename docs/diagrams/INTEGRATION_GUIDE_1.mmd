@@ -1,9 +1,11 @@
-%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+%%{init: {'theme': 'neutral', 'themeVariables': {'fontFamily': 'Inter, system-ui, sans-serif', 'actorTextColor': '#1e293b', 'actorBorder': '#475569', 'actorBkg': '#f8fafc', 'actorLineColor': '#64748b', 'signalColor': '#475569', 'signalTextColor': '#1e293b', 'labelBoxBkgColor': '#f1f5f9', 'labelBoxBorderColor': '#94a3b8', 'labelTextColor': '#1e293b', 'loopTextColor': '#1e293b', 'activationBorderColor': '#475569', 'activationBkgColor': '#e2e8f0', 'noteBkgColor': '#f1f5f9', 'noteBorderColor': '#94a3b8', 'noteTextColor': '#1e293b'}}}%%
 sequenceDiagram
+    participant User
     participant Frontend
     participant Router as Uniswap Router
     participant Hook as FixerHookV2
     participant Registry as FixerRegistry
+
     User->>Frontend: Click referral link
     Frontend->>Frontend: Extract referrer from URL
     Frontend->>Frontend: abi.encode(referrerAddress)

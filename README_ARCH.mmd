@@ -1,63 +1,48 @@
-%%{init: {'theme': 'base', 'themeVariables': { 
-  'primaryColor': '#1e3a8a', 
-  'primaryTextColor': '#ffffff', 
-  'primaryBorderColor': '#1e40af', 
-  'lineColor': '#334155', 
-  'secondaryColor': '#f1f5f9', 
-  'tertiaryColor': '#cbd5e1', 
-  'background': '#ffffff',
-  'mainBkg': '#ffffff',
-  'nodeBorder': '#475569',
-  'clusterBkg': '#f8fafc',
-  'clusterBorder': '#cbd5e1',
-  'titleColor': '#0f172a',
-  'edgeLabelBackground': '#ffffff',
-  'fontFamily': 'Arial, Helvetica, sans-serif',
-  'fontSize': '14px'
-}}}%%
+%%{init: {'theme': 'neutral', 'themeVariables': {'fontFamily': 'Inter, system-ui, sans-serif'}}}%%
 flowchart TB
     subgraph USER["User"]
-        U1["User initiates swap\nwith hookData"]
+        U1["Initiate swap with hookData<br/>(encoded referrer address)"]
     end
-    
+
     subgraph SWAP["Swap Execution"]
-        U2["SwapRouter"] --> U3["PoolManager"]
-        U3 --> U4["FixerHook\nafterSwap()"]
+        S1["SwapRouter"]
+        S2["PoolManager"]
+        S3["FixerHook afterSwap callback"]
     end
-    
-    subgraph VALIDATION["Validation"]
-        U4 --> U5{"Valid\nhookData?"}
-        U5 -->|No| U6["Skip\nReturn selector"]
-        U5 -->|Yes| U7["Decode\nreferrer"]
-        U7 --> U8{"referrer !=\naddress(0)?"}
-        U8 -->|No| U6
-        U8 -->|Yes| U9{"referrer !=\ntx.origin?"}
+
+    subgraph VALIDATION["Referral Validation"]
+        V1{"hookData<br/>present?"}
+        V2["Decode referrer address"]
+        V3{"referrer != <br/>address(0)?"}
+        V4{"referrer != <br/>tx.origin?"}
     end
-    
+
     subgraph REWARD["Reward Distribution"]
-        U9 -->|No| U6
-        U9 -->|Yes| U10["Calculate\nReward"]
-        U10 --> U11["Mint FIX\nto referrer"]
+        R1["Calculate reward amount"]
+        R2["Mint FIX tokens to referrer"]
     end
-    
-    U1 --> U2
-    U6 --> END1["Swap Complete\n(normal)"]
-    U11 --> END2["Swap Complete\n(with reward)"]
-    
-    style USER fill:#1e3a8a,color:#fff,stroke:#1e40af
-    style SWAP fill:#1e40af,color:#fff,stroke:#3b82f6
-    style VALIDATION fill:#059669,color:#fff,stroke:#10b981
-    style REWARD fill:#7c3aed,color:#fff,stroke:#8b5cf6
-    style U1 color:#fff
-    style U2 color:#fff
-    style U3 color:#fff
-    style U4 color:#fff
-    style U5 fill:#f59e0b,color:#000,stroke:#d97706
-    style U6 fill:#64748b,color:#fff,stroke:#475569
-    style U7 color:#fff
-    style U8 fill:#f59e0b,color:#000,stroke:#d97706
-    style U9 fill:#f59e0b,color:#000,stroke:#d97706
-    style U10 color:#fff
-    style U11 fill:#10b981,color:#fff,stroke:#059669
-    style END1 fill:#64748b,color:#fff
-    style END2 fill:#10b981,color:#fff
+
+    SKIP["Skip -- return selector"]
+
+    U1 --> S1
+    S1 --> S2
+    S2 --> S3
+    S3 --> V1
+    V1 -->|No| SKIP
+    V1 -->|Yes| V2
+    V2 --> V3
+    V3 -->|No| SKIP
+    V3 -->|Yes| V4
+    V4 -->|No| SKIP
+    V4 -->|Yes| R1
+    R1 --> R2
+    R2 --> END1["Swap complete with reward"]
+    SKIP --> END2["Swap complete, no reward"]
+
+    style USER fill:#f8fafc,stroke:#94a3b8,color:#1e293b
+    style SWAP fill:#f1f5f9,stroke:#94a3b8,color:#1e293b
+    style VALIDATION fill:#f1f5f9,stroke:#94a3b8,color:#1e293b
+    style REWARD fill:#f1f5f9,stroke:#94a3b8,color:#1e293b
+    style SKIP fill:#e2e8f0,color:#1e293b,stroke:#64748b
+    style END1 fill:#1e293b,color:#f8fafc,stroke:#0f172a
+    style END2 fill:#e2e8f0,color:#1e293b,stroke:#64748b

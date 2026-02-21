@@ -1,59 +1,43 @@
-%%{init: {'theme': 'base', 'themeVariables': { 
-  'primaryColor': '#1e3a8a', 
-  'primaryTextColor': '#ffffff', 
-  'primaryBorderColor': '#1e40af', 
-  'lineColor': '#475569', 
-  'secondaryColor': '#e2e8f0', 
-  'tertiaryColor': '#cbd5e1', 
-  'background': '#ffffff',
-  'mainBkg': '#f8fafc',
-  'nodeBorder': '#64748b',
-  'clusterBkg': '#f1f5f9',
-  'clusterBorder': '#94a3b8',
-  'titleColor': '#0f172a',
-  'edgeLabelBackground': '#ffffff',
-  'fontFamily': 'Inter, system-ui, sans-serif'
-}}}%%
+%%{init: {'theme': 'neutral', 'themeVariables': {'fontFamily': 'Inter, system-ui, sans-serif', 'labelColor': '#1e293b', 'altBackground': '#f1f5f9'}}}%%
 stateDiagram-v2
-    [*] --> NORMAL: Initialization
-    NORMAL --> PAUSED: pauseReferrals()
-    NORMAL --> PAUSED: pauseAgents()
-    NORMAL --> PAUSED: pauseRewards()
-    NORMAL --> PAUSED: pauseAll()
-    NORMAL --> CIRCUIT_BREAKER: minted > threshold
-    CIRCUIT_BREAKER --> PAUSED: Auto-trigger
-    PAUSED --> NORMAL: resume() < 7 days
-    PAUSED --> DAO_LOCK: 7 days elapsed
-    DAO_LOCK --> NORMAL: DAO governance resume()
-    DAO_LOCK --> NORMAL: executeUpgrade()
-    
-    state NORMAL {
-        [*] --> ACTIVE
-        ACTIVE --> ACTIVE: All operations permitted
+    [*] --> Normal : Initialization
+
+    Normal --> Paused : pauseReferrals()
+    Normal --> Paused : pauseAgents()
+    Normal --> Paused : pauseRewards()
+    Normal --> Paused : pauseAll()
+    Normal --> CircuitBreaker : minted > threshold
+
+    CircuitBreaker --> Paused : Auto-trigger
+
+    Paused --> Normal : resume() within 7 days
+    Paused --> DAOLock : 7 days elapsed
+
+    DAOLock --> Normal : DAO governance resume()
+    DAOLock --> Normal : executeUpgrade()
+
+    state Normal {
+        [*] --> Active
+        Active : All operations permitted
+        Active : Circuit breaker monitors hourly minting
     }
-    
-    state PAUSED {
-        [*] --> REFERRALS_OFF
-        REFERRALS_OFF: Referrals paused
-        REFERRALS_OFF --> REFERRALS_OFF: continue paused
-        REFERRALS_OFF --> ACTIVE: resumeReferrals()
+
+    state Paused {
+        [*] --> Restricted
+        Restricted : Affected operations revert
+        Restricted : Other operations continue
+        Restricted : Security council can resume
     }
-    
-    state DAO_LOCK {
-        [*] --> SECURE_LOCKED
-        SECURE_LOCKED: Security council
-        SECURE_LOCKED: CANNOT resume
-        SECURE_LOCKED --> SECURE_LOCKED: Only DAO can
+
+    state DAOLock {
+        [*] --> Locked
+        Locked : Security council cannot resume
+        Locked : Only DAO governance can act
     }
-    
-    state CIRCUIT_BREAKER {
-        [*] --> TRIGGERED
-        TRIGGERED: Hourly threshold
-        TRIGGERED: exceeded
-        TRIGGERED --> TRIGGERED: Manual resume required
+
+    state CircuitBreaker {
+        [*] --> Triggered
+        Triggered : Hourly mint threshold exceeded
+        Triggered : Automatically pauses rewards
+        Triggered : Manual resume required
     }
-    
-    style NORMAL fill:#dcfce7,stroke:#22c55e
-    style PAUSED fill:#fef3c7,stroke:#f59e0b
-    style DAO_LOCK fill:#fee2e2,stroke:#ef4444
-    style CIRCUIT_BREAKER fill:#fee2e2,stroke:#ef4444

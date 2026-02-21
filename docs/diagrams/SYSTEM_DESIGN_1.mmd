@@ -1,13 +1,12 @@
-%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+%%{init: {'theme': 'neutral', 'themeVariables': {'fontFamily': 'Inter, system-ui, sans-serif'}}}%%
 flowchart TD
-    B --> C[" Referral Hook\n(Side-Effect)"]
-    C --> D["afterSwap()"]
-    D --> D1["1. Decode hookData"]
-    D1 --> D2["2. Validate referrer"]
-    D2 --> D3["3. Mint tokens"]
-    D3 --> E[" FIX Token minted\nto referrer"]
-    style A fill:#4F46E5,color:#fff,stroke:#4338CA
-    style B fill:#7C3AED,color:#fff,stroke:#6D28D9
-    style C fill:#2563EB,color:#fff,stroke:#1D4ED8
-    style D fill:#F59E0B,color:#000,stroke:#D97706
-    style E fill:#10B981,color:#fff,stroke:#059669
+    A["PoolManager"] --> B["FixerHook<br/>(BaseHook + ERC20)"]
+    B --> C["afterSwap() callback"]
+    C --> D["1. Decode hookData"]
+    D --> E["2. Validate referrer"]
+    E --> F["3. Mint FIX tokens"]
+    F --> G(["FIX tokens minted<br/>to referrer"])
+
+    style A fill:#e2e8f0,color:#1e293b,stroke:#64748b
+    style B fill:#1e293b,color:#f8fafc,stroke:#0f172a
+    style G fill:#1e293b,color:#f8fafc,stroke:#0f172a

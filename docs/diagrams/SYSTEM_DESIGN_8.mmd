@@ -1,11 +1,13 @@
-%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+%%{init: {'theme': 'neutral', 'themeVariables': {'fontFamily': 'Inter, system-ui, sans-serif'}}}%%
 flowchart LR
+    subgraph gas["Gas Comparison"]
         direction TB
-        A["[IN PROGRESS] Vanilla Swap\n~150,000 gas"]
-        B["Swap + Referral Hook\n(with mint)\n~172,300 gas (+15%)"]
-        C[" Swap + Referral Hook\n(no referral)\n~150,250 gas (+0.17%)"]
+        A["Vanilla Swap<br/>~150,000 gas"]
+        B["Swap + Referral Hook<br/>(with mint)<br/>~172,300 gas (+15%)"]
+        C["Swap + Referral Hook<br/>(no referral)<br/>~150,250 gas (+0.17%)"]
     end
-    style A fill:#10B981,color:#FFFFFF,stroke:#059669
-    style B fill:#F59E0B,color:#1E1E2E,stroke:#D97706
-    style C fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
-    style gas fill:#1E1E2E,color:#E2E8F0,stroke:#4F46E5
+
+    style gas fill:#f8fafc,stroke:#94a3b8,color:#1e293b
+    style A fill:#f1f5f9,color:#1e293b,stroke:#64748b
+    style B fill:#e2e8f0,color:#1e293b,stroke:#64748b
+    style C fill:#f1f5f9,color:#1e293b,stroke:#64748b

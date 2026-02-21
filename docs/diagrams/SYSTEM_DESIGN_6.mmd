@@ -1,12 +1,10 @@
-%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
+%%{init: {'theme': 'neutral', 'themeVariables': {'fontFamily': 'Inter, system-ui, sans-serif'}}}%%
 flowchart TD
-    Check1 -- "YES" --> Decode["referrer = decode(hookData)"]
-    Decode --> Check3{"referrer ≠ tx.origin?"}
-    Check3 -- "NO (BLOCKED)" --> Skip[" Skip minting\nReturn selector"]
-    Skip --> Result["Swap completes\nNo rewards (anti-gaming)"]
-    style Start fill:#DC2626,color:#fff,stroke:#B91C1C
-    style Check1 fill:#F59E0B,color:#000,stroke:#D97706
-    style Decode fill:#7C3AED,color:#fff,stroke:#6D28D9
-    style Check3 fill:#F59E0B,color:#000,stroke:#D97706
-    style Skip fill:#DC2626,color:#fff,stroke:#B91C1C
-    style Result fill:#6B7280,color:#fff,stroke:#4B5563
+    Start{"hookData.length > 0?"} -->|Yes| Decode["referrer = decode(hookData)"]
+    Decode --> Check3{"referrer !=<br/>tx.origin?"}
+    Check3 -->|No| Skip["Self-referral blocked<br/>Return selector"]
+    Skip --> Result(["Swap completes<br/>No rewards (anti-gaming)"])
+
+    style Start fill:#e2e8f0,color:#1e293b,stroke:#64748b
+    style Skip fill:#e2e8f0,color:#1e293b,stroke:#64748b
+    style Result fill:#1e293b,color:#f8fafc,stroke:#0f172a
