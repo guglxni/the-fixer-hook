@@ -1,8 +1,0 @@
-%%{init: {'theme': 'neutral', 'themeVariables': {'fontFamily': 'Inter, system-ui, sans-serif'}}}%%
-flowchart TD
-    Start{"hookData.length > 0?"} -->|No| Skip["Skip processing<br/>Return selector"]
-    Skip --> Result(["Normal swap<br/>No rewards minted"])
-
-    style Start fill:#e2e8f0,color:#1e293b,stroke:#64748b
-    style Skip fill:#e2e8f0,color:#1e293b,stroke:#64748b
-    style Result fill:#1e293b,color:#f8fafc,stroke:#0f172a

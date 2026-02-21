@@ -1,0 +1,198 @@
+<mxfile host="app.diagrams.net" agent="Claude" version="26.0.0">
+  <diagram name="Swap Flow" id="swap-flow-01">
+    <mxGraphModel dx="1200" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1100" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="Swap Flow with Referral Validation" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="200" y="30" width="600" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- START                                      -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="start" value="User initiates swap&lt;br&gt;with hookData" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=16;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="350" y="90" width="300" height="56" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: start -> decision1 -->
+        <mxCell id="a1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="start" target="decision1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- DECISION 1: hookData present?              -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="decision1" value="hookData&lt;br&gt;present?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="410" y="190" width="180" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- No path: normal swap -->
+        <mxCell id="normal-swap" value="Normal swap&lt;br&gt;(no rewards)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#E2E8F0;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="720" y="214" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a-no1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="decision1" target="normal-swap" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl-no1" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" connectable="0" parent="a-no1">
+          <mxGeometry x="-0.3" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="a-no1-end" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="normal-swap" target="end-no-reward" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="end-no-reward" value="End" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#E2E8F0;strokeColor=#94A3B8;strokeWidth=1;fontSize=14;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="780" y="310" width="80" height="36" as="geometry" />
+        </mxCell>
+
+        <!-- Yes path: decode -->
+        <mxCell id="decode" value="Decode referrer address&lt;br&gt;from hookData" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="380" y="350" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a-yes1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="decision1" target="decode" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl-yes1" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" connectable="0" parent="a-yes1">
+          <mxGeometry x="-0.3" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- Arrow: decode -> decision2 -->
+        <mxCell id="a2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="decode" target="decision2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- DECISION 2: referrer != address(0)?        -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="decision2" value="referrer !=&lt;br&gt;address(0)?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="410" y="460" width="180" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- No path: skip invalid -->
+        <mxCell id="skip-invalid" value="Skip — invalid referrer" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#E2E8F0;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="720" y="484" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a-no2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="decision2" target="skip-invalid" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl-no2" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" connectable="0" parent="a-no2">
+          <mxGeometry x="-0.3" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="a-no2-end" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="skip-invalid" target="end-invalid" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="end-invalid" value="End" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#E2E8F0;strokeColor=#94A3B8;strokeWidth=1;fontSize=14;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="790" y="580" width="80" height="36" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: decision2 yes -> decision3 -->
+        <mxCell id="a-yes2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="decision2" target="decision3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl-yes2" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" connectable="0" parent="a-yes2">
+          <mxGeometry x="-0.3" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- DECISION 3: referrer != tx.origin?         -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="decision3" value="referrer !=&lt;br&gt;tx.origin?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="410" y="620" width="180" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- No path: block self-referral -->
+        <mxCell id="block-self" value="Block — self-referral" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#E2E8F0;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="110" y="644" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a-no3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="decision3" target="block-self" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl-no3" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" connectable="0" parent="a-no3">
+          <mxGeometry x="-0.3" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="a-no3-end" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="block-self" target="end-self" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="end-self" value="End" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#E2E8F0;strokeColor=#94A3B8;strokeWidth=1;fontSize=14;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="180" y="740" width="80" height="36" as="geometry" />
+        </mxCell>
+
+        <!-- Yes path: calculate reward -->
+        <mxCell id="calc-reward" value="Calculate reward&lt;br&gt;swapAmount x rewardRateBps / 10000" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="370" y="790" width="260" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="a-yes3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="decision3" target="calc-reward" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl-yes3" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" connectable="0" parent="a-yes3">
+          <mxGeometry x="-0.3" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- Arrow: calc-reward -> decision4 -->
+        <mxCell id="a4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="calc-reward" target="decision4" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- DECISION 4: reward within bounds?          -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="decision4" value="reward within&lt;br&gt;bounds?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="410" y="910" width="180" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- No path: cap at max -->
+        <mxCell id="cap-max" value="Cap at maxRewardAmount" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#E2E8F0;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="700" y="934" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a-no4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="decision4" target="cap-max" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl-no4" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" connectable="0" parent="a-no4">
+          <mxGeometry x="-0.3" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <!-- cap-max reconnects to mint -->
+        <mxCell id="a-cap-mint" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="cap-max" target="mint-tokens" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="820" y="1070" />
+              <mxPoint x="500" y="1070" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Yes path: mint FIX tokens -->
+        <mxCell id="mint-tokens" value="Mint FIX tokens to referrer" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=16;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="370" y="1090" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a-yes4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="decision4" target="mint-tokens" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lbl-yes4" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" connectable="0" parent="a-yes4">
+          <mxGeometry x="-0.3" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- Arrow: mint -> record -->
+        <mxCell id="a5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="mint-tokens" target="record-referral" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Record referral -->
+        <mxCell id="record-referral" value="Record referral in registry" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="370" y="1200" width="260" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: record -> end -->
+        <mxCell id="a6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="record-referral" target="end-success" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- End: Swap Complete -->
+        <mxCell id="end-success" value="Swap Complete&lt;br&gt;(with referral reward)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=16;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="1310" width="300" height="56" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

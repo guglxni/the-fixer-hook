@@ -1,0 +1,114 @@
+<mxfile host="app.diagrams.net" agent="Claude" version="26.0.0">
+  <diagram name="Contract Inheritance" id="contract-inherit-01">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1100" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="Contract Inheritance Hierarchy" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="150" y="30" width="800" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- IPoolManager (Interface)                   -->
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- Class name compartment -->
+        <mxCell id="ipm-header" value="&lt;&lt;interface&gt;&gt;&#xa;IPoolManager" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;verticalAlign=middle;align=center;" vertex="1" parent="1">
+          <mxGeometry x="380" y="90" width="340" height="50" as="geometry" />
+        </mxCell>
+        <!-- Methods compartment -->
+        <mxCell id="ipm-methods" value="+ swap(key, params, hookData)&#xa;+ modifyLiquidity(key, params, hookData)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="380" y="140" width="340" height="56" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- BaseHook (v4-periphery)                    -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="bh-header" value="BaseHook&lt;br&gt;&lt;font style=&quot;font-size:12px;font-style:italic;color:#94A3B8;&quot;&gt;v4-periphery&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;verticalAlign=middle;align=center;" vertex="1" parent="1">
+          <mxGeometry x="160" y="290" width="300" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="bh-fields" value="# poolManager : IPoolManager" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="160" y="344" width="300" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="bh-methods" value="# validateHookAddress(hook)&#xa;# _afterSwap(sender, key, params, delta, hookData)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="160" y="378" width="300" height="56" as="geometry" />
+        </mxCell>
+
+        <!-- Inheritance: BaseHook -> IPoolManager -->
+        <mxCell id="arrow-bh-ipm" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=block;endFill=0;endSize=14;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" edge="1" source="bh-header" target="ipm-methods" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- ERC20 (Solmate)                            -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="erc20-header" value="ERC20&lt;br&gt;&lt;font style=&quot;font-size:12px;font-style:italic;color:#94A3B8;&quot;&gt;Solmate&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;verticalAlign=middle;align=center;" vertex="1" parent="1">
+          <mxGeometry x="640" y="290" width="300" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="erc20-methods" value="+ _mint(to, amount)&#xa;+ balanceOf(owner) : uint256&#xa;+ transfer(to, amount) : bool" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="640" y="344" width="300" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Inheritance: ERC20 -> IPoolManager (not needed, but ERC20 stands alone) -->
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- Hooks (Library)                            -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="hooks-header" value="Hooks&lt;br&gt;&lt;font style=&quot;font-size:12px;font-style:italic;color:#94A3B8;&quot;&gt;Library&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;verticalAlign=middle;align=center;" vertex="1" parent="1">
+          <mxGeometry x="400" y="480" width="300" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="hooks-fields" value="Permissions : struct" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="400" y="534" width="300" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="hooks-methods" value="+ validateHookPermissions(hook, perms)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="400" y="568" width="300" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- ReferralHook / FixerHook (main contract)   -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="fixer-header" value="ReferralHook (FixerHook)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=16;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;verticalAlign=middle;align=center;" vertex="1" parent="1">
+          <mxGeometry x="300" y="700" width="500" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="fixer-fields" value="- REWARD_AMOUNT : uint256" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=14;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="300" y="750" width="500" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="fixer-methods" value="+ getHookPermissions() : Permissions&#xa;# _afterSwap(sender, key, params, delta, hookData) : (bytes4, int128)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=14;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="300" y="784" width="500" height="56" as="geometry" />
+        </mxCell>
+
+        <!-- Inheritance: FixerHook -> BaseHook -->
+        <mxCell id="arrow-fixer-bh" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=block;endFill=0;endSize=14;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="fixer-header" target="bh-methods" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="label-inherits-bh" value="inherits" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" connectable="0" parent="arrow-fixer-bh">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Inheritance: FixerHook -> ERC20 -->
+        <mxCell id="arrow-fixer-erc20" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=block;endFill=0;endSize=14;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="fixer-header" target="erc20-methods" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="label-inherits-erc20" value="inherits" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" connectable="0" parent="arrow-fixer-erc20">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Uses: FixerHook -> Hooks (dashed) -->
+        <mxCell id="arrow-fixer-hooks" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;dashed=1;dashPattern=8 4;endArrow=open;endFill=0;endSize=10;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="fixer-header" target="hooks-methods" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="label-uses" value="uses" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" connectable="0" parent="arrow-fixer-hooks">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

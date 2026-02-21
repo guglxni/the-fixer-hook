@@ -1,0 +1,108 @@
+<mxfile host="app.diagrams.net" agent="Claude" version="26.0.0">
+  <diagram name="Security Model" id="security-model-01">
+    <mxGraphModel dx="1000" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1000" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="Security Model and Threat Mitigations" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="50" y="30" width="900" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- Column headers                             -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="col-threat-header" value="Threat Vectors" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="85" width="280" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="col-mitig-header" value="Mitigations" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="560" y="85" width="340" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- THREAT 1: Front-Running                    -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="threat-1" value="Front-Running" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="120" width="280" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mitig-1" value="Side-effect pattern (zero-delta hook)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="560" y="120" width="340" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- THREAT 2: Sybil Attacks                    -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="threat-2" value="Sybil Attacks" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="195" width="280" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mitig-2" value="Minimum swap amount threshold" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="560" y="195" width="340" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- THREAT 3: Self-Referral Gaming              -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="threat-3" value="Self-Referral Gaming" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="270" width="280" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mitig-3" value="tx.origin != referrer validation" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="560" y="270" width="340" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- THREAT 4: Rug Pull / Token Drain           -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="threat-4" value="Rug Pull / Token Drain" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="345" width="280" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mitig-4" value="MAX_SUPPLY cap + circuit breaker" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="560" y="345" width="340" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- ARROWS: Threat -> Mitigation               -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="arrow-t1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="threat-1" target="mitig-1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-t2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="threat-2" target="mitig-2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-t3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="threat-3" target="mitig-3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-t4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="threat-4" target="mitig-4" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- BOTTOM SECTION: On-Chain Guards            -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="guards-group" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="50" y="440" width="900" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="guards-label" value="On-Chain Guards" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="50" y="448" width="900" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="guard-1" value="onlyPoolManager" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1;fontSize=13;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="485" width="155" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="guard-2" value="nonReentrant" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1;fontSize=13;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="245" y="485" width="155" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="guard-3" value="mulDiv overflow&lt;br&gt;protection" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1;fontSize=13;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="485" width="155" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="guard-4" value="48h timelock" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1;fontSize=13;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="595" y="485" width="155" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="guard-5" value="7-day DAO lock" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1;fontSize=13;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="770" y="485" width="155" height="44" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
