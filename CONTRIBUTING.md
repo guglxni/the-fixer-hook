@@ -19,25 +19,7 @@ forge test -vvv
 
 ## Pull Request Process
 
-```mermaid
-flowchart LR
-    Fork["Fork repo"] --> Branch["Create branch"]
-    Branch --> Code["Make changes"]
-    Code --> Test["forge test"]
-    Test --> Fmt["forge fmt"]
-    Fmt --> PR["Create PR"]
-    PR --> Review["Code review"]
-    Review --> Merge["Merge"]
-
-    style Fork fill:#1e3a8a,color:#fff
-    style Branch fill:#1e3a8a,color:#fff
-    style Code fill:#1e3a8a,color:#fff
-    style Test fill:#059669,color:#fff
-    style Fmt fill:#f59e0b,color:#000
-    style PR fill:#1e3a8a,color:#fff
-    style Review fill:#1e3a8a,color:#fff
-    style Merge fill:#059669,color:#fff
-```
+![System Architecture](docs/diagrams/drawio/system-architecture.png)
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)

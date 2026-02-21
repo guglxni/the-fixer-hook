@@ -11,18 +11,7 @@
 
 Uniswap v4 hooks require deployment to addresses with specific bits set based on enabled permissions. This guide covers the address mining and deployment process.
 
-```mermaid
-%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
-flowchart LR
-    Deploy --> Verify["[PASS] Verify\nBlock explorer"]
-    Verify --> Config[" Configure\nRegister hooks, set params"]
-    Config --> Test["Post-Deploy Check\nSmoke tests"]
-    style Mine fill:#F59E0B,color:#1E1E2E,stroke:#D97706
-    style Deploy fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
-    style Verify fill:#10B981,color:#FFFFFF,stroke:#059669
-    style Config fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
-    style Test fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
-```
+![Deployment Pipeline](diagrams/drawio/deployment-pipeline.png)
 
 ---
 

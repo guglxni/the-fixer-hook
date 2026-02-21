@@ -66,24 +66,7 @@ Before diving in, you should understand:
 
 Hooks are **smart contracts that extend pool behavior**. They're called at specific points during pool operations:
 
-```mermaid
-flowchart LR
-    subgraph lifecycle["Uniswap v4 Pool Lifecycle"]
-        direction TB
-        I["Initialize Pool"] --> IL["beforeInitialize / afterInitialize"]
-        AL["Add Liquidity"] --> ALL["beforeAddLiquidity / afterAddLiquidity"]
-        RL["Remove Liquidity"] --> RLL["beforeRemoveLiquidity / afterRemoveLiquidity"]
-        S["Swap"] --> SL["beforeSwap / afterSwap"]
-        D["Donate"] --> DL["beforeDonate / afterDonate"]
-    end
-
-    SL -. "We use this" .-> Hook["FixerHook\nafterSwap()"]
-
-    style lifecycle fill:#f1f5f9,stroke:#94a3b8
-    style S fill:#1e3a8a,color:#fff,stroke:#1e40af
-    style SL fill:#1e3a8a,color:#fff,stroke:#1e40af
-    style Hook fill:#059669,color:#fff,stroke:#10b981
-```
+![System Architecture](docs/diagrams/drawio/system-architecture.png)
 
 ### The Hook Address System
 
@@ -126,31 +109,7 @@ function afterSwap(..., bytes calldata hookData) {
 
 The Fixer Hook uses what I call the **"Side-Effect Pattern"**:
 
-```mermaid
-flowchart TD
-    subgraph traditional["Traditional Fee Hook"]
-        direction TB
-        T1["User swaps 100 USDC"] --> T2["Hook takes 1 USDC fee"]
-        T2 --> T3["User receives 99 USDC"]
-    end
-
-    subgraph sideeffect["Side-Effect Hook - The Fixer"]
-        direction TB
-        S1["User swaps 100 USDC"] --> S2["Swap executes normally\n(full 100 USDC)"]
-        S2 --> S3["User receives expected amount"]
-        S3 --> S4["Hook mints NEW FIX tokens\nto referrer"]
-    end
-
-    style traditional fill:#fef2f2,stroke:#ef4444
-    style sideeffect fill:#f0fdf4,stroke:#22c55e
-    style T1 fill:#1e3a8a,color:#fff
-    style T2 fill:#dc2626,color:#fff
-    style T3 fill:#ef4444,color:#fff
-    style S1 fill:#1e3a8a,color:#fff
-    style S2 fill:#1e3a8a,color:#fff
-    style S3 fill:#22c55e,color:#fff
-    style S4 fill:#f59e0b,color:#000
-```
+![Swap Flow](docs/diagrams/drawio/swap-flow.png)
 
 **Why this approach?**
 - User experience unchanged (they get exactly what they expect)
@@ -166,29 +125,7 @@ The hook inherits from two parents:
 contract ReferralHook is BaseHook, ERC20 {
 ```
 
-```mermaid
-classDiagram
-    class BaseHook {
-        <<abstract>>
-        #poolManager : IPoolManager
-        +getHookPermissions()*
-        #_afterSwap()*
-    }
-    class ERC20 {
-        <<Solmate>>
-        +name : string
-        +symbol : string
-        #_mint(to, amount)
-        +transfer(to, amount)
-    }
-    class ReferralHook {
-        +REWARD_AMOUNT : uint256
-        +getHookPermissions()
-        #_afterSwap()
-    }
-    BaseHook <|-- ReferralHook : Hook logic
-    ERC20 <|-- ReferralHook : Token capability
-```
+![Contract Inheritance](docs/diagrams/drawio/contract-inheritance.png)
 
 > **Learning Point:** Single contract = Hook + Token. Deploy once, get both capabilities.
 
@@ -420,39 +357,7 @@ forge test --gas-report
 
 As the project evolved beyond v1, we built a **UUPS proxy-based upgradeable architecture** with a central registry, emergency controls, and x402 AI agent support:
 
-```mermaid
-flowchart TD
-    subgraph onchain["On-Chain (Base L2)"]
-        direction TB
-        PM["Uniswap v4\nPoolManager"] --> HookV2["FixerHookV2\n(Lightweight)"]
-        HookV2 --> Proxy["ERC1967 Proxy"]
-        Proxy --> Registry["FixerRegistryUpgradeable v2.3\n- ERC-20 FIX Token\n- Referral tracking\n- Tiered rewards\n- Agent registry\n- EIP-3009"]
-        Registry --> Storage["ERC-7201\nNamespaced Storage"]
-        Registry --> Emergency["EmergencyModule\n- Circuit breaker\n- Pause system"]
-        Registry --> Cred["FixerCredential\nSoulbound NFT"]
-    end
-
-    subgraph offchain["Off-Chain (x402)"]
-        direction TB
-        RaaS["RaaS API Server\n(Hono + x402 paywall)"]
-        MCP["MCP Server\n(AI Agent Tools)"]
-    end
-
-    Agent["AI Agent"] --> MCP
-    Agent --> RaaS
-    RaaS --> Proxy
-    MCP --> Proxy
-    User["User"] --> PM
-
-    style onchain fill:#f8fafc,stroke:#3b82f6
-    style offchain fill:#f5f3ff,stroke:#8b5cf6
-    style PM fill:#1e3a8a,color:#fff
-    style HookV2 fill:#1e3a8a,color:#fff
-    style Proxy fill:#1e3a8a,color:#fff
-    style Registry fill:#059669,color:#fff
-    style Agent fill:#f59e0b,color:#000
-    style User fill:#1e3a8a,color:#fff
-```
+![UUPS Proxy Architecture](docs/diagrams/drawio/uups-proxy.png)
 
 > **Learning Point:** The v2 architecture separates concerns - the hook stays lightweight (just routing), while the registry handles all business logic behind a UUPS proxy for upgradeability.
 

@@ -5,21 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-```mermaid
-flowchart LR
-    V10["🌱 v1.0\nFixed Rewards"] --> V11["📊 v1.1\nDynamic Rewards"]
-    V11 --> V12["⭐ v1.2\nTiered System"]
-    V12 --> V22["⚙️ v2.2\nUUPS Registry"]
-    V22 --> V24["🛡️ v2.4\nEmergency Module"]
-    V24 --> V23["🤖 v2.3\nx402 Agents"]
-
-    style V10 fill:#6B7280,color:#FFFFFF,stroke:#4B5563
-    style V11 fill:#2563EB,color:#FFFFFF,stroke:#1D4ED8
-    style V12 fill:#7C3AED,color:#FFFFFF,stroke:#6D28D9
-    style V22 fill:#4F46E5,color:#FFFFFF,stroke:#4338CA
-    style V24 fill:#DC2626,color:#FFFFFF,stroke:#B91C1C
-    style V23 fill:#10B981,color:#FFFFFF,stroke:#059669
-```
+![System Architecture](docs/diagrams/drawio/system-architecture.png)
 
 ## [1.2.0] - 2026-01-31
 

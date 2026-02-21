@@ -8,23 +8,7 @@
 
 This guide shows how to encode referral data and integrate with various frontend frameworks.
 
-```mermaid
-%%{init: {'theme': 'neutral', 'themeVariables': { 'primaryColor': '#2563eb', 'primaryTextColor': '#1e293b', 'primaryBorderColor': '#3b82f6', 'lineColor': '#64748b', 'secondaryColor': '#f1f5f9', 'tertiaryColor': '#e2e8f0'}}}%%
-sequenceDiagram
-    participant Frontend
-    participant Router as Uniswap Router
-    participant Hook as FixerHookV2
-    participant Registry as FixerRegistry
-    User->>Frontend: Click referral link
-    Frontend->>Frontend: Extract referrer from URL
-    Frontend->>Frontend: abi.encode(referrerAddress)
-    Frontend->>Router: swap(params, hookData)
-    Router->>Hook: afterSwap(hookData)
-    Hook->>Hook: decodeReferrer(hookData)
-    Hook->>Registry: recordReferral(referrer, swapper, volume)
-    Registry->>Registry: _mint(referrer, rewardAmount)
-    Registry-->>User: FIX tokens minted to referrer
-```
+![Swap Sequence](diagrams/drawio/swap-sequence.png)
 
 ---
 
