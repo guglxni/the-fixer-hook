@@ -31,8 +31,8 @@
         <mxCell id="bh-fields" value="# poolManager : IPoolManager" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;" vertex="1" parent="1">
           <mxGeometry x="160" y="344" width="300" height="34" as="geometry" />
         </mxCell>
-        <mxCell id="bh-methods" value="# validateHookAddress(hook)&#xa;# _afterSwap(sender, key, params, delta, hookData)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;" vertex="1" parent="1">
-          <mxGeometry x="160" y="378" width="300" height="56" as="geometry" />
+        <mxCell id="bh-methods" value="# validateHookAddress(hook)&#xa;# _afterSwap(key, params, delta, data)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="160" y="378" width="300" height="64" as="geometry" />
         </mxCell>
 
         <!-- Inheritance: BaseHook -> IPoolManager -->
@@ -78,24 +78,28 @@
           <mxGeometry x="300" y="784" width="500" height="56" as="geometry" />
         </mxCell>
 
-        <!-- Inheritance: FixerHook -> BaseHook (routes left to avoid Hooks library box) -->
-        <mxCell id="arrow-fixer-bh" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=block;endFill=0;endSize=14;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" edge="1" source="fixer-header" target="bh-methods" parent="1">
+        <!-- Inheritance: FixerHook -> BaseHook (explicit path left of canvas to avoid Hooks box) -->
+        <mxCell id="arrow-fixer-bh" style="rounded=1;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=block;endFill=0;endSize=14;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
+            <mxPoint x="300" y="725" as="sourcePoint" />
+            <mxPoint x="160" y="442" as="targetPoint" />
             <Array as="points">
               <mxPoint x="100" y="725" />
-              <mxPoint x="100" y="434" />
+              <mxPoint x="100" y="442" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="label-inherits-bh" value="inherits" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" connectable="0" parent="arrow-fixer-bh">
-          <mxGeometry x="0.3" relative="1" as="geometry">
+          <mxGeometry x="0.5" relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
 
-        <!-- Inheritance: FixerHook -> ERC20 (routes right to avoid Hooks library box) -->
-        <mxCell id="arrow-fixer-erc20" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=block;endFill=0;endSize=14;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=1;entryDx=0;entryDy=0;" edge="1" source="fixer-header" target="erc20-methods" parent="1">
+        <!-- Inheritance: FixerHook -> ERC20 (explicit path right of canvas to avoid Hooks box) -->
+        <mxCell id="arrow-fixer-erc20" style="rounded=1;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=block;endFill=0;endSize=14;" edge="1" parent="1">
           <mxGeometry relative="1" as="geometry">
+            <mxPoint x="800" y="725" as="sourcePoint" />
+            <mxPoint x="940" y="414" as="targetPoint" />
             <Array as="points">
               <mxPoint x="960" y="725" />
               <mxPoint x="960" y="414" />
@@ -103,7 +107,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="label-inherits-erc20" value="inherits" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=12;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" connectable="0" parent="arrow-fixer-erc20">
-          <mxGeometry x="0.3" relative="1" as="geometry">
+          <mxGeometry x="0.5" relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
