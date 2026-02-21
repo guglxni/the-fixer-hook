@@ -1,0 +1,64 @@
+%%{init: {'theme': 'base', 'themeVariables': { 
+  'primaryColor': '#1e3a8a', 
+  'primaryTextColor': '#ffffff', 
+  'primaryBorderColor': '#1e40af', 
+  'lineColor': '#475569', 
+  'secondaryColor': '#e2e8f0', 
+  'tertiaryColor': '#cbd5e1', 
+  'background': '#ffffff',
+  'mainBkg': '#f8fafc',
+  'nodeBorder': '#64748b',
+  'clusterBkg': '#f1f5f9',
+  'clusterBorder': '#94a3b8',
+  'titleColor': '#0f172a',
+  'edgeLabelBackground': '#ffffff',
+  'fontFamily': 'Inter, system-ui, sans-serif'
+}}}%%
+flowchart TB
+    subgraph CLIENT["Client Layer"]
+      direction LR
+      C1["User"]
+      C2["DApp Interface"]
+    end
+    
+    subgraph GATEWAY["Gateway Layer"]
+      direction LR
+      G1["SwapRouter"]
+      G2["PoolManager"]
+    end
+    
+    subgraph CORE["Core Protocol"]
+      direction LR
+      O1["FixerHook"]
+      O2["FixerHookV2"]
+    end
+    
+    subgraph DATA["Data Layer"]
+      direction LR
+      D1["FixerRegistry"]
+      D2["FixerCredential NFT"]
+    end
+    
+    subgraph SECURITY["Security Layer"]
+      direction LR
+      S1["EmergencyModule"]
+      S2["CircuitBreaker"]
+    end
+    
+    C1 --> C2
+    C2 --> G1
+    G1 --> G2
+    G2 --> O1
+    G2 --> O2
+    O1 --> D1
+    O2 --> D1
+    D1 --> D2
+    O1 -.-> S1
+    O2 -.-> S1
+    D1 -.-> S2
+    
+    style CLIENT fill:#1e3a8a,color:#fff,stroke:#1e40af
+    style GATEWAY fill:#1e40af,color:#fff,stroke:#3b82f6
+    style CORE fill:#059669,color:#fff,stroke:#10b981
+    style DATA fill:#7c3aed,color:#fff,stroke:#8b5cf6
+    style SECURITY fill:#dc2626,color:#fff,stroke:#ef4444

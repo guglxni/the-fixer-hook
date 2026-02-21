@@ -1,0 +1,52 @@
+%%{init: {'theme': 'base', 'themeVariables': { 
+  'primaryColor': '#1e3a8a', 
+  'primaryTextColor': '#ffffff', 
+  'primaryBorderColor': '#1e40af', 
+  'lineColor': '#475569', 
+  'secondaryColor': '#e2e8f0', 
+  'tertiaryColor': '#cbd5e1', 
+  'background': '#ffffff',
+  'mainBkg': '#f8fafc',
+  'nodeBorder': '#64748b',
+  'clusterBkg': '#f1f5f9',
+  'clusterBorder': '#94a3b8',
+  'titleColor': '#0f172a',
+  'edgeLabelBackground': '#ffffff',
+  'fontFamily': 'Inter, system-ui, sans-serif'
+}}}%%
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant R as SwapRouter
+    participant PM as PoolManager
+    participant H as FixerHook
+    participant REG as FixerRegistry
+    participant FIX as FIX Token
+    
+    U->>F: Select token pair + referrer
+    F->>R: Build swap with hookData
+    R->>PM: Execute swap(key, params, hookData)
+    
+    rect rgb(224, 242, 254)
+        PM->>H: afterSwap() callback
+        H->>H: Validate hookData
+        H->>H: Decode referrer
+    end
+    
+    rect rgb(229, 231, 235)
+        alt Valid referral
+            H->>REG: recordReferral(referrer, volume)
+            REG->>REG: Calculate reward
+            REG->>REG: Apply tier multiplier
+            REG->>REG: Check circuit breaker
+            REG->>FIX: Mint reward tokens
+            FIX-->>REG: Transfer complete
+            REG-->>H: Success
+        else Invalid referral
+            H-->>PM: Skip (return selector)
+        end
+    end
+    
+    PM-->>R: Swap complete
+    R-->>F: Transaction receipt
+    F-->>U: Success notification

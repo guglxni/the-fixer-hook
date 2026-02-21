@@ -1,0 +1,65 @@
+%%{init: {'theme': 'base', 'themeVariables': { 
+  'primaryColor': '#1e3a8a', 
+  'primaryTextColor': '#ffffff', 
+  'primaryBorderColor': '#1e40af', 
+  'lineColor': '#475569', 
+  'secondaryColor': '#e2e8f0', 
+  'tertiaryColor': '#cbd5e1', 
+  'background': '#ffffff',
+  'mainBkg': '#f8fafc',
+  'nodeBorder': '#64748b',
+  'clusterBkg': '#f1f5f9',
+  'clusterBorder': '#94a3b8',
+  'titleColor': '#0f172a',
+  'edgeLabelBackground': '#ffffff',
+  'fontFamily': 'Inter, system-ui, sans-serif'
+}}}%%
+flowchart TD
+    START["Swap Initiated"] --> HOOK_DATA{hookData exists}
+    
+    HOOK_DATA -->|No| SKIP["Skip Processing"]
+    SKIP --> RETURN1["Return selector"]
+    
+    HOOK_DATA -->|Yes| DECODE["Decode referrer address"]
+    DECODE --> VALID1{referrer not zero}
+    
+    VALID1 -->|No| SKIP
+    VALID1 -->|Yes| VALID2{not self-referral}
+    
+    VALID2 -->|No| SKIP
+    VALID2 -->|Yes| CALC["Calculate Reward"]
+    
+    CALC --> CHECK{max reward}
+    CHECK -->|No| CAP["Cap at MAX"]
+    CHECK -->|Yes| CHECK2
+    
+    CHECK2 --> CHECK3{min reward}
+    CHECK3 -->|No| FLOOR["Set at MIN"]
+    CHECK3 -->|Yes| MINT
+    
+    CAP --> MINT["Mint tokens"]
+    FLOOR --> MINT
+    
+    MINT --> UPDATE["Update stats"]
+    UPDATE --> RETURN2["Return selector"]
+    
+    RETURN1 --> END["Swap Complete"]
+    RETURN2 --> END
+    
+    style START fill:#1e3a8a,color:#fff
+    style HOOK_DATA fill:#1e40af,color:#fff
+    style DECODE fill:#7c3aed,color:#fff
+    style VALID1 fill:#f59e0b,color:#000
+    style VALID2 fill:#f59e0b,color:#000
+    style CALC fill:#059669,color:#fff
+    style MINT fill:#10b981,color:#fff
+    style SKIP fill:#64748b,color:#fff
+    style CHECK fill:#f59e0b,color:#000
+    style CHECK2 fill:#f59e0b,color:#000
+    style CHECK3 fill:#f59e0b,color:#000
+    style CAP fill:#ef4444,color:#fff
+    style FLOOR fill:#ef4444,color:#fff
+    style UPDATE fill:#059669,color:#fff
+    style RETURN1 fill:#64748b,color:#fff
+    style RETURN2 fill:#059669,color:#fff
+    style END fill:#1e3a8a,color:#fff
