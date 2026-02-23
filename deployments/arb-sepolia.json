@@ -1,0 +1,29 @@
+{
+  "network": "Arbitrum Sepolia",
+  "chainId": 421614,
+  "deployer": "0xDDe9D31a31d6763612C7f535f51E5dC9f830682e",
+  "deployedAt": "2026-02-22",
+  "contracts": {
+    "FixerRegistryUpgradeable_Implementation": "0xa5589Eed2A8831eEFbCdD39BF9FE59D6ef4344d9",
+    "FixerRegistryUpgradeable_Proxy": "0xC7206C83702B251A5408B28Ce4df195255F42B9e",
+    "FixerHookV2": "0x7A5E4C1b42d66f459c02b36115d184b907dF0040",
+    "FixerCredential": "0x0F94b615c27DAfe6D875aE863a77Ea50D9c30b79"
+  },
+  "poolConfig": {
+    "poolManager": "0xFB3e0C6F74eB1a21CC1Da29aeC80D2Dfe6C9a317",
+    "currency0_USDC": "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
+    "currency1_WETH": "0xE591bf0A0CF924A0674d7792db046B23CEbF5f34",
+    "fee": 3000,
+    "tickSpacing": 60,
+    "quoteTokenIndex": 0,
+    "poolId": "0x9293ef78c37665a3a4eb2dca397184f6f2fe86c0bdcd45416f7dc92c023b196d"
+  },
+  "verification": {
+    "VERSION": 2003000,
+    "tokenName": "Fixer Token",
+    "tokenSymbol": "FIX",
+    "owner": "0xDDe9D31a31d6763612C7f535f51E5dC9f830682e",
+    "hookAuthorized": true,
+    "hookRegistryMatch": true
+  }
+}

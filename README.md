@@ -258,7 +258,16 @@ the-fixer-hook/
 │   ├── DeployUpgradeable.s.sol        # UUPS proxy deployment
 │   ├── DeployV2.s.sol                # v2 hook + registry deployment
 │   ├── DeployX402.s.sol               # v2.3 x402 upgrade / fresh deploy
+│   ├── DeployTestnet.s.sol            # Generic testnet (env-configured)
+│   ├── DeployBaseSepolia.s.sol        # Base Sepolia deployment
+│   ├── DeployArbSepolia.s.sol         # Arbitrum Sepolia deployment
+│   ├── DeployUnichainSepolia.s.sol    # Unichain Sepolia deployment
 │   └── HookMiner.sol                  # CREATE2 address mining
+│
+├── deployments/                       # Live deployment records (JSON)
+│   ├── base-sepolia.json
+│   ├── arb-sepolia.json
+│   └── unichain-sepolia.json
 │
 ├── x402/                              # Off-chain x402 services
 │   ├── raas-server/                  # RaaS API (Hono + x402 paywall)
@@ -363,6 +372,22 @@ As the project evolved beyond v1, we built a **UUPS proxy-based upgradeable arch
 
 ---
 
+## Live Testnet Deployments
+
+The full Fixer Protocol v2.3 stack is deployed and verified on three L2 testnets:
+
+| Network | Registry Proxy | FixerHookV2 | FixerCredential |
+|---------|---------------|-------------|-----------------|
+| **Base Sepolia** | [`0x43c75D09...F94`](https://sepolia.basescan.org/address/0x43c75D09d7e53Ee1c768353708EDC3Bab4317F94) | [`0xb66603...040`](https://sepolia.basescan.org/address/0xb66603495944EA622F1c8e312b0d50A8A2F30040) | [`0xd2fD5c...3ef`](https://sepolia.basescan.org/address/0xd2fD5c0CaAbE15379a81b3d23081914D69FDA3ef) |
+| **Arbitrum Sepolia** | [`0xC7206C...B9e`](https://sepolia.arbiscan.io/address/0xC7206C83702B251A5408B28Ce4df195255F42B9e) | [`0x7A5E4C...040`](https://sepolia.arbiscan.io/address/0x7A5E4C1b42d66f459c02b36115d184b907dF0040) | [`0x0F94b6...c79`](https://sepolia.arbiscan.io/address/0x0F94b615c27DAfe6D875aE863a77Ea50D9c30b79) |
+| **Unichain Sepolia** | [`0xC13080...56f`](https://sepolia.uniscan.xyz/address/0xC13080390D3A1aCCdC7E6bbd7A41981db4bcd56f) | [`0x983eA9...040`](https://sepolia.uniscan.xyz/address/0x983eA96dd196f3F8395A051453505A7c9321c040) | [`0x88a31b...5c0`](https://sepolia.uniscan.xyz/address/0x88a31bFDa9B3E24a6bDFE7Ae627CB2C7A134f5c0) |
+
+Each deployment creates a USDC/WETH pool with 0.3% fee tier. The FIX token lives at the Registry Proxy address.
+
+For complete addresses, interaction instructions, diagrams, and `cast` commands, see the **[Testnet Deployments Guide](./docs/TESTNET_DEPLOYMENTS.md)**.
+
+---
+
 ## Documentation
 
 For deeper dives into specific topics:
@@ -372,9 +397,11 @@ For deeper dives into specific topics:
 | [System Design](./docs/SYSTEM_DESIGN.md) | Full architecture with diagrams |
 | [Implementation Guide](./docs/IMPLEMENTATION_GUIDE.md) | Step-by-step build instructions |
 | [Integration Guide](./docs/INTEGRATION_GUIDE.md) | How frontends connect |
+| [Testnet Deployments](./docs/TESTNET_DEPLOYMENTS.md) | Live testnet addresses + interaction guide |
+| [Mainnet Deployments](./docs/MAINNET_DEPLOYMENTS.md) | Mainnet deployment guide (coming soon) |
 | [Security Analysis](./docs/SECURITY.md) | Threat model and mitigations |
 | [Testing Strategy](./docs/TESTING.md) | Test patterns and coverage |
-| [Deployment Guide](./docs/DEPLOYMENT.md) | Going to production |
+| [Deployment Guide](./docs/DEPLOYMENT.md) | Deployment procedures + troubleshooting |
 
 ---
 

@@ -1,0 +1,29 @@
+{
+  "network": "Unichain Sepolia",
+  "chainId": 1301,
+  "deployer": "0xDDe9D31a31d6763612C7f535f51E5dC9f830682e",
+  "deployedAt": "2026-02-22",
+  "contracts": {
+    "FixerRegistryUpgradeable_Implementation": "0x43c75D09d7e53Ee1c768353708EDC3Bab4317F94",
+    "FixerRegistryUpgradeable_Proxy": "0xC13080390D3A1aCCdC7E6bbd7A41981db4bcd56f",
+    "FixerHookV2": "0x983eA96dd196f3F8395A051453505A7c9321c040",
+    "FixerCredential": "0x88a31bFDa9B3E24a6bDFE7Ae627CB2C7A134f5c0"
+  },
+  "poolConfig": {
+    "poolManager": "0x00B036B58a818B1BC34d502D3fE730Db729e62AC",
+    "currency0_USDC": "0x31d0220469e10c4E71834a79b1f276d740d3768F",
+    "currency1_WETH": "0x4200000000000000000000000000000000000006",
+    "fee": 3000,
+    "tickSpacing": 60,
+    "quoteTokenIndex": 0,
+    "poolId": "0x4defd10c81cdc84f7f9e8c5a4c254d255ef52b72806d752b088896882e0aa2d4"
+  },
+  "verification": {
+    "VERSION": 2003000,
+    "tokenName": "Fixer Token",
+    "tokenSymbol": "FIX",
+    "owner": "0xDDe9D31a31d6763612C7f535f51E5dC9f830682e",
+    "hookAuthorized": true,
+    "hookRegistryMatch": true
+  }
+}

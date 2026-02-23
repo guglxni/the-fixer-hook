@@ -5,7 +5,7 @@ libs = ["lib"]
 solc = "0.8.26"
 optimizer = true
 optimizer_runs = 200
-via_ir = false
+via_ir = true
 evm_version = "cancun"
 
 # Remappings - use v4-core from v4-periphery for version compatibility
@@ -33,3 +33,19 @@ depth = 15
 line_length = 100
 tab_width = 4
 bracket_spacing = true
+
+# RPC Endpoints (reads from .env)
+[rpc_endpoints]
+base_sepolia = "${BASE_SEPOLIA_RPC}"
+arb_sepolia = "${ARB_SEPOLIA_RPC}"
+unichain_sepolia = "${UNICHAIN_SEPOLIA_RPC}"
+base = "${BASE_RPC}"
+arb = "${ARB_RPC}"
+localhost = "http://127.0.0.1:8545"
+
+# Block Explorer Verification
+[etherscan]
+base_sepolia = { key = "${BASESCAN_API_KEY}", url = "https://api-sepolia.basescan.org/api", chain = 84532 }
+base = { key = "${BASESCAN_API_KEY}", url = "https://api.basescan.org/api", chain = 8453 }
+arb_sepolia = { key = "${ARBISCAN_API_KEY}", url = "https://api-sepolia.arbiscan.io/api", chain = 421614 }
+unichain_sepolia = { key = "${UNISCAN_API_KEY}", url = "https://api-sepolia.uniscan.xyz/api", chain = 1301 }

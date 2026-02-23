@@ -7,9 +7,12 @@ pragma solidity 0.8.26;
 ///      based on which hook functions are enabled. This library finds valid
 ///      addresses using CREATE2 salt mining.
 library HookMiner {
-    
+
+    /// @dev Uniswap v4 uses the lowest 14 bits of the hook address for permission flags
+    uint160 internal constant ALL_HOOK_MASK = uint160((1 << 14) - 1);
+
     /// @notice Find a valid hook address using CREATE2 salt mining
-    /// @param deployer The address that will deploy the hook
+    /// @param deployer The address that will deploy the hook (CREATE2 factory)
     /// @param flags The required permission flags (bits that must be set)
     /// @param creationCode The contract creation code (type(Contract).creationCode)
     /// @param constructorArgs The ABI-encoded constructor arguments
@@ -23,18 +26,19 @@ library HookMiner {
     ) internal pure returns (address hookAddress, bytes32 salt) {
         bytes memory initCode = abi.encodePacked(creationCode, constructorArgs);
         bytes32 initCodeHash = keccak256(initCode);
-        
+
         // Try salts until we find a valid address
         for (uint256 i = 0; i < 100000; i++) {
             salt = bytes32(i);
             hookAddress = computeAddress(deployer, salt, initCodeHash);
-            
-            // Check if the address has the required permission bits set
-            if (uint160(hookAddress) & flags == flags) {
+
+            // Address flag bits must EXACTLY match the desired flags
+            // (no extra permission bits set beyond what the hook declares)
+            if (uint160(hookAddress) & ALL_HOOK_MASK == flags) {
                 return (hookAddress, salt);
             }
         }
-        
+
         revert("HookMiner: No valid address found within iteration limit");
     }
     
