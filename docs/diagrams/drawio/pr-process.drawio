@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- Title -->
+    <mxCell id="title" value="Pull Request Process" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="160" y="0" width="480" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- Arrows (back layer) -->
+
+    <!-- Fork → Feature Branch -->
+    <mxCell id="a1" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" source="s1" target="s2" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Feature Branch → Make Changes -->
+    <mxCell id="a2" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" source="s2" target="s3" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Make Changes → Run Tests -->
+    <mxCell id="a3" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" source="s3" target="s4" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Run Tests → Tests Pass? -->
+    <mxCell id="a4" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" source="s4" target="d1" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Tests Pass? No → Make Changes (loop back left) -->
+    <mxCell id="a5" value="No" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;strokeColor=#FF0000;fontStyle=1;fontSize=13;" edge="1" source="d1" target="s3" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="150" y="393" />
+          <mxPoint x="150" y="225" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Tests Pass? Yes → Run Formatter -->
+    <mxCell id="a6" value="Yes" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;strokeColor=#00AA00;fontStyle=1;fontSize=13;" edge="1" source="d1" target="s5" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Run Formatter → Commit -->
+    <mxCell id="a7" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" source="s5" target="s6" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Commit → Push Branch -->
+    <mxCell id="a8" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" source="s6" target="s7" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Push Branch → Create PR -->
+    <mxCell id="a9" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" source="s7" target="s8" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Create PR → Code Review -->
+    <mxCell id="a10" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" source="s8" target="s9" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Code Review → Changes Requested? -->
+    <mxCell id="a11" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" source="s9" target="d2" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Changes Requested? Yes → Make Changes (loop back right) -->
+    <mxCell id="a12" value="Yes" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;strokeColor=#FF0000;fontStyle=1;fontSize=13;" edge="1" source="d2" target="s3" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="650" y="883" />
+          <mxPoint x="650" y="225" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Changes Requested? No → PR Merged -->
+    <mxCell id="a13" value="No" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;strokeColor=#00AA00;fontStyle=1;fontSize=13;" edge="1" source="d2" target="s10" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Shapes (front layer) -->
+
+    <!-- 1. Fork Repository (Start - green) -->
+    <mxCell id="s1" value="Fork the Repository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;fontStyle=1;arcSize=50;" vertex="1" parent="1">
+      <mxGeometry x="260" y="40" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- 2. Create Feature Branch (blue) -->
+    <mxCell id="s2" value="Create Feature Branch&lt;br&gt;&lt;font style=&quot;font-size: 13px;&quot;&gt;&lt;i&gt;git checkout -b feature/amazing-feature&lt;/i&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=15;" vertex="1" parent="1">
+      <mxGeometry x="260" y="120" width="280" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- 3. Make Changes (blue) -->
+    <mxCell id="s3" value="Make Your Changes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;" vertex="1" parent="1">
+      <mxGeometry x="260" y="200" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- 4. Run Tests (blue) -->
+    <mxCell id="s4" value="Run Tests&lt;br&gt;&lt;font style=&quot;font-size: 13px;&quot;&gt;&lt;i&gt;forge test&lt;/i&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=15;" vertex="1" parent="1">
+      <mxGeometry x="260" y="280" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- 5. Decision: Tests Pass? (yellow diamond) -->
+    <mxCell id="d1" value="Tests Pass?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="300" y="360" width="200" height="66" as="geometry" />
+    </mxCell>
+
+    <!-- 6. Run Formatter (blue) -->
+    <mxCell id="s5" value="Run Formatter&lt;br&gt;&lt;font style=&quot;font-size: 13px;&quot;&gt;&lt;i&gt;forge fmt&lt;/i&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=15;" vertex="1" parent="1">
+      <mxGeometry x="260" y="456" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- 7. Commit (blue) -->
+    <mxCell id="s6" value="Commit with Clear Messages" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;" vertex="1" parent="1">
+      <mxGeometry x="260" y="536" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- 8. Push Branch (blue) -->
+    <mxCell id="s7" value="Push Branch to Your Fork" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;" vertex="1" parent="1">
+      <mxGeometry x="260" y="616" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- 9. Create PR (blue) -->
+    <mxCell id="s8" value="Create a Pull Request" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;" vertex="1" parent="1">
+      <mxGeometry x="260" y="696" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- 10. Code Review (teal) -->
+    <mxCell id="s9" value="Code Review" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;" vertex="1" parent="1">
+      <mxGeometry x="260" y="776" width="280" height="50" as="geometry" />
+    </mxCell>
+
+    <!-- 11. Decision: Changes Requested? (yellow diamond) -->
+    <mxCell id="d2" value="Changes Requested?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="290" y="856" width="220" height="66" as="geometry" />
+    </mxCell>
+
+    <!-- 12. PR Merged (End - green) -->
+    <mxCell id="s10" value="PR Merged" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;fontStyle=1;arcSize=50;" vertex="1" parent="1">
+      <mxGeometry x="260" y="952" width="280" height="50" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>

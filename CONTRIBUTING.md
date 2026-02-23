@@ -19,14 +19,16 @@ forge test -vvv
 
 ## Pull Request Process
 
-![System Architecture](docs/diagrams/drawio/system-architecture.png)
+![PR Process](docs/diagrams/drawio/pr-process.drawio.png)
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
-4. Run tests (`forge test`)
-5. Commit with clear messages
-6. Push and create a Pull Request
+4. Run tests (`forge test`) — fix any failures before continuing
+5. Run formatter (`forge fmt`)
+6. Commit with clear messages
+7. Push branch to your fork and create a Pull Request
+8. Address any review feedback and re-run tests if needed
 
 ## Code Style
 
