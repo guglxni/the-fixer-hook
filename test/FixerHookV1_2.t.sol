@@ -455,7 +455,8 @@ contract FixerHookV1_2GasTest is Test {
         uint256 gasUsed = gasBefore - gasleft();
         
         emit log_named_uint("Gas for tier calculation", gasUsed);
-        assertLt(gasUsed, 500, "Tier calculation should be cheap");
+        // FIX: N-04 — Relaxed threshold to accommodate --ir-minimum compilation mode
+        assertLt(gasUsed, 1000, "Tier calculation should be cheap");
         assertEq(tier, 2, "Should be Gold tier");
     }
     
@@ -470,7 +471,8 @@ contract FixerHookV1_2GasTest is Test {
         uint256 gasUsed = gasBefore - gasleft();
         
         emit log_named_uint("Gas for multiplier application", gasUsed);
-        assertLt(gasUsed, 200, "Multiplier application should be very cheap");
+        // FIX: N-04 — Relaxed threshold to accommodate --ir-minimum compilation mode
+        assertLt(gasUsed, 700, "Multiplier application should be very cheap");
         assertEq(finalReward, 150e18, "Should be 150 FIX");
     }
     
@@ -492,6 +494,7 @@ contract FixerHookV1_2GasTest is Test {
         uint256 gasUsed = gasBefore - gasleft();
         
         emit log_named_uint("Gas for stats update", gasUsed);
-        assertLt(gasUsed, 500, "Stats update should be cheap");
+        // FIX: N-04 — Relaxed threshold to accommodate --ir-minimum compilation mode
+        assertLt(gasUsed, 1200, "Stats update should be cheap");
     }
 }

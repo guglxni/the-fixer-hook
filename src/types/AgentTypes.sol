@@ -104,3 +104,69 @@ library ProtocolFeeConstants {
     uint16 constant BUYBACK_SHARE = 3000;      // 30%
     uint16 constant STAKER_SHARE = 2000;       // 20%
 }
+
+/// @title ERC8004Constants
+/// @notice Constants for ERC-8004 "Trustless Agents" reputation-to-bonus mapping
+/// @dev Reputation scores (0-100) map to tiered bonus BPS applied on top of tier multiplier.
+///      Cache TTL controls how often reputation is refreshed from the ERC-8004 Reputation Registry.
+///      Tags identify Fixer Protocol feedback in the ERC-8004 ecosystem.
+library ERC8004Constants {
+    // ========================================================================
+    // REPUTATION-TO-BONUS THRESHOLDS (normalized 0-100 scale)
+    // ========================================================================
+
+    int128 constant REPUTATION_LOW_MIN = 1;        // 1-30:   500 BPS (5% bonus)
+    int128 constant REPUTATION_MEDIUM_MIN = 31;    // 31-60: 1500 BPS (15% bonus)
+    int128 constant REPUTATION_HIGH_MIN = 61;      // 61-80: 3000 BPS (30% bonus)
+    int128 constant REPUTATION_ELITE_MIN = 81;     // 81-100: 5000 BPS (50% bonus)
+
+    // ========================================================================
+    // BONUS BPS VALUES
+    // ========================================================================
+
+    uint16 constant BONUS_NONE = 0;
+    uint16 constant BONUS_LOW = 500;               // 5%
+    uint16 constant BONUS_MEDIUM = 1500;           // 15%
+    uint16 constant BONUS_HIGH = 3000;             // 30%
+    uint16 constant BONUS_ELITE = 5000;            // 50%
+
+    // ========================================================================
+    // CACHE CONFIGURATION
+    // ========================================================================
+
+    uint64 constant DEFAULT_CACHE_TTL = 3600;      // 1 hour
+    uint64 constant MIN_CACHE_TTL = 600;           // 10 minutes minimum
+    uint64 constant MAX_CACHE_TTL = 86400;         // 24 hours maximum
+
+    // ========================================================================
+    // VALIDATION
+    // ========================================================================
+
+    uint8 constant MIN_VALIDATION_SCORE = 0;       // Governable minimum score
+
+    // ========================================================================
+    // FEEDBACK TAGS (ERC-8004 Reputation Registry)
+    // ========================================================================
+
+    bytes32 constant TAG_REFERRAL = keccak256("fixer.referral");
+    bytes32 constant TAG_VOLUME = keccak256("fixer.volume");
+}
+
+/// @title XMTPConstants
+/// @notice Constants for XMTP communication layer integration
+/// @dev Part of the Agent Infrastructure Stack (XMTP + x402 + ERC-8004)
+library XMTPConstants {
+    // ========================================================================
+    // ENDPOINT URI LIMITS
+    // ========================================================================
+
+    /// @notice Maximum length for XMTP endpoint URI
+    uint256 constant MAX_ENDPOINT_URI_LENGTH = 256;
+
+    // ========================================================================
+    // EVENT TAGS
+    // ========================================================================
+
+    bytes32 constant TAG_XMTP_ENABLED = keccak256("fixer.xmtp.enabled");
+    bytes32 constant TAG_XMTP_DISABLED = keccak256("fixer.xmtp.disabled");
+}

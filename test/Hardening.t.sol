@@ -37,7 +37,7 @@ contract HardeningTest is Test {
             (owner, securityCouncil, governance)
         );
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
-        registry = FixerRegistryUpgradeable(address(proxy));
+        registry = FixerRegistryUpgradeable(payable(address(proxy)));
 
         // Register hook for referral tests
         vm.prank(owner);
@@ -89,7 +89,7 @@ contract HardeningTest is Test {
     }
 
     function test_version_updated() public view {
-        assertEq(registry.VERSION(), 2_003_000, "version should be v2.3.0");
+        assertEq(registry.VERSION(), 2_006_000, "version should be v2.6.0");
     }
 
     // ========================================================================
@@ -382,7 +382,7 @@ contract FixerInvariantTest is Test {
             (owner, securityCouncil, governance)
         );
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
-        registry = FixerRegistryUpgradeable(address(proxy));
+        registry = FixerRegistryUpgradeable(payable(address(proxy)));
 
         vm.prank(owner);
         registry.registerHook(hookAddr, poolId);

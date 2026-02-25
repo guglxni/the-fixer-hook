@@ -59,7 +59,7 @@ contract DeployUpgradeable is Script {
         console.log("Proxy deployed:", address(proxy));
 
         // 4. Verify initialization
-        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(address(proxy));
+        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(payable(address(proxy)));
         require(registry.owner() == deployer, "Owner mismatch");
         require(keccak256(bytes(registry.name())) == keccak256("Fixer Token"), "Name mismatch");
         require(keccak256(bytes(registry.symbol())) == keccak256("FIX"), "Symbol mismatch");

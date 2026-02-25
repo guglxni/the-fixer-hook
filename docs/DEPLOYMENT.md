@@ -2,14 +2,14 @@
 
 > Deploy the FixerHook Protocol — Hook, Upgradeable Registry, and Proxy Infrastructure
 
-**Last Updated:** February 22, 2026
-**Covers:** FixerHookV2 + FixerRegistryUpgradeable v2.3 (UUPS proxy), Hook mining, Upgrade process
+**Last Updated:** February 25, 2026
+**Covers:** FixerHookV2 + FixerRegistryUpgradeable v2.6.0 (UUPS proxy), Hook mining, Upgrade process
 
 ---
 
 ## Overview
 
-Uniswap v4 hooks require deployment to addresses with specific bits set based on enabled permissions. This guide covers the address mining and deployment process for the full Fixer Protocol v2.3 stack.
+Uniswap v4 hooks require deployment to addresses with specific bits set based on enabled permissions. This guide covers the address mining and deployment process for the full Fixer Protocol v2.6 stack.
 
 For live testnet deployment addresses and interaction instructions, see [Testnet Deployments](./TESTNET_DEPLOYMENTS.md).
 
@@ -91,6 +91,7 @@ library HookMiner {
 | Base Sepolia | 84532 | `0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408` | `https://sepolia.base.org` |
 | Arbitrum Sepolia | 421614 | `0xFB3e0C6F74eB1a21CC1Da29aeC80D2Dfe6C9a317` | `https://sepolia-rollup.arbitrum.io/rpc` |
 | Unichain Sepolia | 1301 | `0x00B036B58a818B1BC34d502D3fE730Db729e62AC` | `https://sepolia.unichain.org` |
+| Lasna (Reactive) | 5318007 | _N/A (no Uniswap v4)_ | `https://lasna-rpc.rnk.dev/` |
 
 ### Mainnet Addresses
 
@@ -194,7 +195,7 @@ PROXY=0x...    # Registry proxy address
 HOOK=0x...     # FixerHookV2 address
 RPC=...        # RPC URL
 
-# 1. Registry version (expect: 2003000)
+# 1. Registry version (expect: 2006000)
 cast call $PROXY "VERSION()(uint256)" --rpc-url $RPC
 
 # 2. Ownership
@@ -288,15 +289,15 @@ UUPS proxies do not support direct rollback. If an upgrade has issues:
 
 ## Deployment Checklist
 
-### v2.3 (Full Stack)
+### v2.6 (Full Stack + XMTP)
 
-- [ ] PoolManager address verified on-chain (`cast code <addr>`)
+- [ ] PoolManager address verified on-chain (`cast code <addr>`) — or N/A for Lasna
 - [ ] CREATE2 deployer exists at `0x4e59b44...B4956C` on target chain
 - [ ] Private key has sufficient gas balance
 - [ ] `via_ir = true` set in foundry.toml (contract size under 24576 bytes)
 - [ ] Dry run completes without errors
 - [ ] All 5 transactions confirm on-chain
-- [ ] `VERSION()` returns `2003000`
+- [ ] `VERSION()` returns `2006000`
 - [ ] `owner()` returns deployer address
 - [ ] `isAuthorizedHook()` returns `true` for deployed hook
 - [ ] Hook address has correct permission bits (bit 6 only in lowest 14 bits)

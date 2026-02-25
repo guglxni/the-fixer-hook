@@ -40,7 +40,7 @@ contract FixerRegistryUpgradeTest is Test {
         );
 
         proxy = new ERC1967Proxy(address(implementation), initData);
-        registry = FixerRegistryUpgradeable(address(proxy));
+        registry = FixerRegistryUpgradeable(payable(address(proxy)));
     }
 
     // ========================================================================
@@ -58,7 +58,7 @@ contract FixerRegistryUpgradeTest is Test {
     }
 
     function test_initialization_version() public view {
-        assertEq(registry.VERSION(), 2_003_000);
+        assertEq(registry.VERSION(), 2_006_000);
     }
 
     function test_initialization_protocolFee() public view {
@@ -234,7 +234,8 @@ contract FixerRegistryUpgradeTest is Test {
         uint256 fees = registry.getAccumulatedFees();
         assertGt(fees, 0);
 
-        // Distribute
+        // Distribute — FIX: F-11 — distributeFees now requires onlyOwner
+        vm.prank(owner);
         registry.distributeFees();
 
         // Check distribution (50/30/20)
@@ -314,12 +315,16 @@ contract FixerRegistryUpgradeTest is Test {
     function test_upgrade_ownerCanUpgrade() public {
         FixerRegistryUpgradeable newImpl = new FixerRegistryUpgradeable();
 
-        vm.prank(owner);
-        registry.upgradeToAndCall(address(newImpl), "");
+        // FIX: F-01 — Must go through propose → timelock → execute flow
+        vm.startPrank(owner);
+        registry.proposeUpgrade(address(newImpl));
+        vm.warp(block.timestamp + 48 hours + 1);
+        registry.executeUpgrade();
+        vm.stopPrank();
 
         // Still works after upgrade
         assertEq(registry.owner(), owner);
-        assertEq(registry.VERSION(), 2_003_000);
+        assertEq(registry.VERSION(), 2_006_000);
     }
 
     function test_upgrade_nonOwnerReverts() public {
@@ -350,10 +355,13 @@ contract FixerRegistryUpgradeTest is Test {
         (uint64 preHookCount,,) = registry.getGlobalStats();
         (uint64 preFee,) = registry.getProtocolFeeConfig();
 
-        // Upgrade
+        // Upgrade — FIX: F-01 — Must go through propose → timelock → execute flow
         FixerRegistryUpgradeable newImpl = new FixerRegistryUpgradeable();
-        vm.prank(owner);
-        registry.upgradeToAndCall(address(newImpl), "");
+        vm.startPrank(owner);
+        registry.proposeUpgrade(address(newImpl));
+        vm.warp(block.timestamp + 48 hours + 1);
+        registry.executeUpgrade();
+        vm.stopPrank();
 
         // Verify state preserved
         assertEq(registry.totalSupply(), preSupply);
@@ -384,10 +392,13 @@ contract FixerRegistryUpgradeTest is Test {
         registry.recordReferral(user1, user2, 1000e18, poolId);
         uint256 balBefore = registry.balanceOf(user1);
 
-        // Upgrade
+        // Upgrade — FIX: F-01 — Must go through propose → timelock → execute flow
         FixerRegistryUpgradeable newImpl = new FixerRegistryUpgradeable();
-        vm.prank(owner);
-        registry.upgradeToAndCall(address(newImpl), "");
+        vm.startPrank(owner);
+        registry.proposeUpgrade(address(newImpl));
+        vm.warp(block.timestamp + 48 hours + 1);
+        registry.executeUpgrade();
+        vm.stopPrank();
 
         // Post-upgrade referral
         vm.prank(hookAddr);

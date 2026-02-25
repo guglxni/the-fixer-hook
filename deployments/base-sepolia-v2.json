@@ -1,0 +1,20 @@
+{
+  "chain": "Base Sepolia",
+  "chainId": 84532,
+  "version": "2.6.0",
+  "upgradedAt": "2026-02-25",
+  "upgradeStatus": "executed",
+  "contracts": {
+    "FixerLib": "0x2A29cc3CAE2Cd0198789497CEE4178Af26AEB9e3",
+    "FixerRegistryUpgradeable_impl_v250": "0xef7801E05D1C1737Fb8dD96de4FF8AB09efDACE6",
+    "FixerRegistryUpgradeable_impl_v260": "0x07dF8c1c6d5Fc2109bf442dFBc1e7050eDf4f9Eb",
+    "RegistryProxy": "0x3Fb805C6C01e8Dd8534fA9FD52Ee699e256Eb960",
+    "FixerRegistryExtension_v250": "0xC7206C83702B251A5408B28Ce4df195255F42B9e",
+    "FixerRegistryExtension_v260": "0xC752308cf7c663De032018713F1D2481EC45b3bD",
+    "FixerHookV2": "0x2CE392Ba90fcAeE3CD23dBcFe11fC2Dc098A8040",
+    "FixerCredential": "0xB624bbeC6e044365d365A7f66A253abf27226f82"
+  },
+  "architecture": "Reactive Modular (DELEGATECALL fallback)",
+  "stack": ["ERC-8004 Identity", "x402 Payments", "XMTP Communication"],
+  "notes": "Core (20,507B) + Extension (14,659B) -- EIP-170 compliant. v2.6.0 adds XMTP agent communication. Upgrade executed via timewarp DELEGATECALL."
+}

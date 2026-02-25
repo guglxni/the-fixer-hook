@@ -1,0 +1,251 @@
+<mxfile host="app.diagrams.net" agent="Claude" version="26.0.0">
+  <diagram name="Reward Flow" id="research-reward-01">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- TITLE                                                          -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="title" value="Figure 3: afterSwap Reward Calculation Flow (Detailed)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="100" y="20" width="1300" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Complete execution path from PoolManager callback to FIX token mint with gas cost annotations" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="200" y="54" width="1100" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- PHASE 1: Hook Processing (FixerHookV2)                         -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="phase1-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#F0FDF4;strokeColor=#86EFAC;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="1440" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="phase1-label" value="Phase 1: FixerHookV2._afterSwap() -- Hook Processing" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#15803D;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="75" y="97" width="400" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Step 1: hookData decode -->
+        <mxCell id="s1" value="&lt;b&gt;hookData&lt;br&gt;Decode&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#166534;strokeColor=#14532D;strokeWidth=1.5;fontSize=13;fontColor=#F0FDF4;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="140" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s1-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;abi.decode(hookData, (address))&lt;br&gt;try/catch for malformed data&lt;br&gt;&lt;b&gt;Gas: ~800&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#166534;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="60" y="200" width="160" height="46" as="geometry" />
+        </mxCell>
+
+        <!-- Early exit check -->
+        <mxCell id="s1-check" value="hookData.length == 0?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#86EFAC;strokeWidth=1;fontSize=10;fontColor=#166534;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="248" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="s1-exit" value="&lt;font color=&quot;#DC2626&quot;&gt;Return early&lt;br&gt;(0 gas overhead)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="60" y="260" width="20" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Step 2: Resolve swapper -->
+        <mxCell id="s2" value="&lt;b&gt;Resolve&lt;br&gt;Swapper&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#166534;strokeColor=#14532D;strokeWidth=1.5;fontSize=13;fontColor=#F0FDF4;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="250" y="140" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s2-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;Trusted Router: IMsgSender()&lt;br&gt;Fallback: tx.origin&lt;br&gt;&lt;b&gt;Gas: ~2,400 (SLOAD + call)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#166534;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="228" y="200" width="165" height="46" as="geometry" />
+        </mxCell>
+
+        <!-- Step 3: Validate referrer -->
+        <mxCell id="s3" value="&lt;b&gt;Validate&lt;br&gt;Referrer&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#166534;strokeColor=#14532D;strokeWidth=1.5;fontSize=13;fontColor=#F0FDF4;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="420" y="140" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;referrer != address(0)&lt;br&gt;referrer != swapper&lt;br&gt;&lt;b&gt;Gas: ~200&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#166534;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="410" y="200" width="140" height="46" as="geometry" />
+        </mxCell>
+
+        <!-- Step 4: Calculate volume -->
+        <mxCell id="s4" value="&lt;b&gt;Calculate&lt;br&gt;Volume&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#166534;strokeColor=#14532D;strokeWidth=1.5;fontSize=13;fontColor=#F0FDF4;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="590" y="140" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s4-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;abs(delta[quoteTokenIndex])&lt;br&gt;Uses immutable quoteTokenIndex&lt;br&gt;&lt;b&gt;Gas: ~200&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#166534;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="565" y="200" width="170" height="46" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows between steps -->
+        <mxCell id="a12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#15803D;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s1" target="s2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#15803D;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s2" target="s3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#15803D;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s3" target="s4" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Boundary: cross from Hook to Registry -->
+        <mxCell id="boundary" value="registry.recordReferral(referrer, swapper, volume, poolId)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7C3AED;strokeWidth=2.5;fontSize=9;fontColor=#7C3AED;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;" edge="1" source="s4" target="s5" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- PHASE 2: Registry Processing (FixerRegistryUpgradeable)        -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="phase2-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#FAF5FF;strokeColor=#D8B4FE;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="60" y="310" width="1440" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="phase2-label" value="Phase 2: FixerRegistryUpgradeable.recordReferral() -- Reward Calculation" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#7C3AED;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="75" y="317" width="500" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Step 5: Volume threshold -->
+        <mxCell id="s5" value="&lt;b&gt;Min Volume&lt;br&gt;Check&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#5B21B6;strokeColor=#4C1D95;strokeWidth=1.5;fontSize=13;fontColor=#F5F3FF;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="360" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s5-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;volume &amp;lt; minSwapAmount?&lt;br&gt;Default: 100e18 (~$100)&lt;br&gt;&lt;b&gt;Gas: ~2,100 (SLOAD)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#5B21B6;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="55" y="420" width="170" height="46" as="geometry" />
+        </mxCell>
+
+        <!-- Step 6: Base reward -->
+        <mxCell id="s6" value="&lt;b&gt;Base&lt;br&gt;Reward&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#5B21B6;strokeColor=#4C1D95;strokeWidth=1.5;fontSize=13;fontColor=#F5F3FF;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="250" y="360" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s6-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;volume x rewardRateBps / 10000&lt;br&gt;Clamped: [minReward, maxReward]&lt;br&gt;Default: 0.1% rate&lt;br&gt;&lt;b&gt;Gas: ~4,500 (mulDiv + SLOADs)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#5B21B6;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="220" y="420" width="185" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Step 7: Tier multiplier -->
+        <mxCell id="s7" value="&lt;b&gt;Tier&lt;br&gt;Multiplier&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#5B21B6;strokeColor=#4C1D95;strokeWidth=1.5;fontSize=13;fontColor=#F5F3FF;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="420" y="360" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s7-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;base x tierMultiplierBps / 10000&lt;br&gt;Bronze=1.0x, Silver=1.25x,&lt;br&gt;Gold=1.5x, Platinum=2.0x&lt;br&gt;&lt;b&gt;Gas: ~4,200 (2x SLOAD + mulDiv)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#5B21B6;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="390" y="420" width="185" height="64" as="geometry" />
+        </mxCell>
+
+        <!-- Step 8: Agent bonus -->
+        <mxCell id="s8" value="&lt;b&gt;Agent&lt;br&gt;Bonus&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#5B21B6;strokeColor=#4C1D95;strokeWidth=1.5;fontSize=13;fontColor=#F5F3FF;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="590" y="360" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s8-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;if (agent.verified &amp;&amp; bonus &gt; 0):&lt;br&gt;gross += gross x bonusBps / 10000&lt;br&gt;Max agent bonus: 50%&lt;br&gt;&lt;b&gt;Gas: ~4,300 (SLOAD + mulDiv)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#5B21B6;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="557" y="420" width="190" height="64" as="geometry" />
+        </mxCell>
+
+        <!-- Step 9: Protocol fee -->
+        <mxCell id="s9" value="&lt;b&gt;Protocol&lt;br&gt;Fee&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#5B21B6;strokeColor=#4C1D95;strokeWidth=1.5;fontSize=13;fontColor=#F5F3FF;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="760" y="360" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s9-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;fee = gross x protocolFeeBps / 10000&lt;br&gt;net = gross - fee&lt;br&gt;Default: 5% (500 bps), max 10%&lt;br&gt;Fees accumulated for distribution&lt;br&gt;&lt;b&gt;Gas: ~5,100 (SLOAD + SSTORE)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#5B21B6;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="725" y="420" width="195" height="72" as="geometry" />
+        </mxCell>
+
+        <!-- Phase 2 arrows -->
+        <mxCell id="a56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#7C3AED;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s5" target="s6" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a67" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#7C3AED;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s6" target="s7" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a78" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#7C3AED;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s7" target="s8" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a89" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#7C3AED;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s8" target="s9" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- PHASE 3: Stats + Mint + Emit                                   -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="phase3-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#FDF2F8;strokeColor=#F9A8D4;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="60" y="540" width="1440" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="phase3-label" value="Phase 3: Stats Update, Circuit Breaker, Mint, and Event Emission" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#BE185D;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="75" y="548" width="450" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Step 10: Update stats -->
+        <mxCell id="s10" value="&lt;b&gt;Update&lt;br&gt;Stats&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#9F1239;strokeColor=#881337;strokeWidth=1.5;fontSize=13;fontColor=#FFF1F2;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="590" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s10-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;referrerStats: volume, count, earned&lt;br&gt;poolInfos: totalReferrals, totalVolume&lt;br&gt;globalCounters: totalReferrals, totalVolume&lt;br&gt;&lt;b&gt;Gas: ~20,000+ (multiple SSTOREs)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#9F1239;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="45" y="650" width="195" height="64" as="geometry" />
+        </mxCell>
+
+        <!-- Step 11: Tier upgrade check -->
+        <mxCell id="s11" value="&lt;b&gt;Tier&lt;br&gt;Upgrade?&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#9F1239;strokeColor=#881337;strokeWidth=1.5;fontSize=13;fontColor=#FFF1F2;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="290" y="590" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s11-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;_calculateTier(volume, refCount)&lt;br&gt;if newTier &gt; currentTier: upgrade&lt;br&gt;emit TierUpgrade if changed&lt;br&gt;&lt;b&gt;Gas: ~6,400 (3x SLOAD + cmp)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#9F1239;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="260" y="650" width="185" height="64" as="geometry" />
+        </mxCell>
+
+        <!-- Step 12: Circuit breaker -->
+        <mxCell id="s12" value="&lt;b&gt;Circuit&lt;br&gt;Breaker&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#9F1239;strokeColor=#881337;strokeWidth=1.5;fontSize=13;fontColor=#FFF1F2;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="500" y="590" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s12-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;_checkCircuitBreaker(reward)&lt;br&gt;Hourly: 1M FIX/hr threshold&lt;br&gt;Daily: 10M FIX/day ceiling&lt;br&gt;Auto-pauses rewards if exceeded&lt;br&gt;&lt;b&gt;Gas: ~5,300 (SLOADs + SSTOREs)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#9F1239;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="465" y="650" width="195" height="72" as="geometry" />
+        </mxCell>
+
+        <!-- Step 13: Mint -->
+        <mxCell id="s13" value="&lt;b&gt;_mint()&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#9F1239;strokeColor=#881337;strokeWidth=1.5;fontSize=13;fontColor=#FFF1F2;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="710" y="590" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s13-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;_mint(referrer, netReward)&lt;br&gt;MAX_SUPPLY check (1B FIX cap)&lt;br&gt;ERC20Upgradeable._update()&lt;br&gt;&lt;b&gt;Gas: ~26,000 (SSTORE x2)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#9F1239;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="680" y="650" width="185" height="64" as="geometry" />
+        </mxCell>
+
+        <!-- Step 14: Emit event -->
+        <mxCell id="s14" value="&lt;b&gt;Emit&lt;br&gt;Events&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#9F1239;strokeColor=#881337;strokeWidth=1.5;fontSize=13;fontColor=#FFF1F2;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="920" y="590" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s14-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;emit CrossPoolReferral(referrer,&lt;br&gt;  swapper, poolId, volume, reward)&lt;br&gt;emit ReferralProcessed (hook)&lt;br&gt;&lt;b&gt;Gas: ~3,800 (LOG4)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#9F1239;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="885" y="650" width="195" height="64" as="geometry" />
+        </mxCell>
+
+        <!-- Return -->
+        <mxCell id="s15" value="&lt;b&gt;Return&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;(selector, 0)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#166534;strokeColor=#14532D;strokeWidth=1.5;fontSize=13;fontColor=#F0FDF4;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="590" width="120" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="s15-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;Back to PoolManager&lt;br&gt;int128(0): no delta mod&lt;br&gt;Swap output unchanged&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#166534;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="1105" y="650" width="170" height="46" as="geometry" />
+        </mxCell>
+
+        <!-- Phase 3 arrows -->
+        <mxCell id="a910" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#BE185D;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s9" target="s10" parent="1">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="820" y="530" /><mxPoint x="140" y="530" /></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="a1011" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#BE185D;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s10" target="s11" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a1112" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#BE185D;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s11" target="s12" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a1213" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#BE185D;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s12" target="s13" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a1314" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#BE185D;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s13" target="s14" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a1415" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#15803D;strokeWidth=2;endArrow=blockThin;endFill=1;" edge="1" source="s14" target="s15" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- TOTAL GAS SUMMARY                                              -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="gas-summary-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="770" width="1440" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gas-title" value="&lt;b&gt;Total Gas Budget&lt;/b&gt;" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontStyle=0;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="778" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="gas-noop" value="&lt;b&gt;No referrer (early exit):&lt;/b&gt; ~200 gas overhead" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="800" width="340" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="gas-full" value="&lt;b&gt;Full referral path:&lt;/b&gt; ~77,000 gas total (hook ~3,600 + registry ~73,400)" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="820" width="500" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="gas-formula" value="&lt;b&gt;Reward Formula:&lt;/b&gt; netReward = (volume x rateBps / 10000) x tierMultiplier x (1 + agentBonus) x (1 - protocolFee)" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="600" y="800" width="800" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="gas-cap" value="&lt;b&gt;Caps:&lt;/b&gt; Supply: 1B FIX | Hourly: 1M FIX | Daily: 10M FIX | Per-swap: max 1000 FIX, min 1 FIX" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="600" y="820" width="700" height="18" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

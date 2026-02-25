@@ -1,0 +1,20 @@
+{
+  "chain": "Arbitrum Sepolia",
+  "chainId": 421614,
+  "version": "2.6.0",
+  "upgradedAt": "2026-02-25",
+  "upgradeStatus": "executed",
+  "contracts": {
+    "FixerLib": "0x2A29cc3CAE2Cd0198789497CEE4178Af26AEB9e3",
+    "FixerRegistryUpgradeable_impl_v250": "0x3e0d0028DE34fbFe0365d52d9D5D955E0F193EBb",
+    "FixerRegistryUpgradeable_impl_v260": "0x6c1Bb082B63a97c52Fc9868A388b2FcE93862F52",
+    "RegistryProxy": "0x07dF8c1c6d5Fc2109bf442dFBc1e7050eDf4f9Eb",
+    "FixerRegistryExtension_v250": "0x2bF8E2e5f71645ad9e56cADb733141b41DD258B0",
+    "FixerRegistryExtension_v260": "0xAb340F430A1346923B4e0722B67bbCc500A6F6Db",
+    "FixerHookV2": "0x1bf835D48d3a7743dc4A179B0bE2b9dD9a8cC040",
+    "FixerCredential": "0x72489A460c90210e0Cfb0d24B2646F10D38EAcc1"
+  },
+  "architecture": "Reactive Modular (DELEGATECALL fallback)",
+  "stack": ["ERC-8004 Identity", "x402 Payments", "XMTP Communication"],
+  "notes": "Core (20,507B) + Extension (14,659B) -- EIP-170 compliant. v2.6.0 adds XMTP agent communication. Upgrade executed via timewarp DELEGATECALL."
+}

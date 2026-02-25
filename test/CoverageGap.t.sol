@@ -30,7 +30,7 @@ contract CoverageGapTest is Test {
             (owner, securityCouncil, governance)
         );
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
-        registry = FixerRegistryUpgradeable(address(proxy));
+        registry = FixerRegistryUpgradeable(payable(address(proxy)));
 
         vm.prank(owner);
         registry.registerHook(hookAddr, poolId);

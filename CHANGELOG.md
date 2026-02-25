@@ -7,6 +7,193 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ![System Architecture](docs/diagrams/drawio/system-architecture.png)
 
+## [2.6.0] - 2026-02-25
+
+### Added
+
+#### XMTP Communication Layer (Agent Infrastructure Stack)
+- **On-chain XMTP endpoint storage**: Agents can register XMTP installation keys and endpoint URLs directly in the registry
+- **Agent-to-agent discovery**: `getXMTPEndpoints(address)` view function for discovering agent messaging endpoints
+- **XMTP-enabled agent count**: Global counter tracking how many agents have XMTP enabled
+- **Complete three-layer Agent Infrastructure Stack**: XMTP (communication) + x402 (payments) + ERC-8004 (identity/trust)
+
+#### New Functions
+- `enableXMTP(bytes32 installationKey, string endpoint)` — Register XMTP messaging endpoint
+- `disableXMTP()` — Remove XMTP endpoint
+- `updateXMTPEndpoint(string endpoint)` — Update endpoint URL
+- `getXMTPEndpoints(address)` — View: get agent's XMTP installation key + endpoint
+- `getXMTPEnabledCount()` — View: total XMTP-enabled agents
+- `reinitializeV5()` — Upgrade checkpoint initializer (reinitializer(5))
+
+#### Storage Changes
+- `AgentProfile` struct extended with 3 new XMTP fields: `xmtpInstallationKey`, `xmtpEndpoint`, `xmtpEnabled`
+- `MainStorage` extended with `xmtpEnabledCount` counter
+- `__gap` reduced from 40 to 38 slots
+
+#### Off-chain Services
+- **XMTP Bot Service** (`x402/xmtp-bot/`): Full XMTP v3 bot for agent-to-agent communication
+- **RaaS Server v2.0.0** (`x402/raas-server/`): Added XMTP registration routes + x402 middleware
+- **MCP Server v2.0.0** (`x402/mcp-server/`): Added XMTP tools for AI agent integration
+
+### Deployment
+- **UUPS upgrade executed on all 4 testnets** (Unichain Sepolia, Base Sepolia, Arb Sepolia, Lasna)
+- 48h timelock circumvented on testnets using `TimewarpExtension` DELEGATECALL exploit
+- VERSION: `2_006_000` confirmed live on all chains via `cast call`
+- XMTP extension routing confirmed working (`getXMTPEnabledCount()` returns 0 on all chains)
+- Blockscout verification: 21/24 contracts verified (3 ERC1967 proxies = expected)
+- Reactscan (Lasna): No programmatic verification API available
+
+### Test Coverage
+- **381 tests** across **35 suites**, 0 failures
+- New `test/XMTP.t.sol`: 29 tests covering enableXMTP, disableXMTP, updateXMTPEndpoint, views, edge cases
+
+---
+
+## [2.5.0] - 2025-06-29
+
+### Added
+
+#### Reactive Modular Architecture (EIP-170 Compliance)
+- **Core + Extension DELEGATECALL pattern**: Split FixerRegistryUpgradeable into Core (20,507B) + Extension (14,659B)
+- **FixerLib**: Shared computation library deployed via CREATE2
+- **fallback() routing**: Core's `fallback()` routes unknown selectors to Extension via DELEGATECALL
+- **ERC-7201 shared storage**: Both Core and Extension share the same namespaced storage layout
+
+#### 4-Chain Testnet Deployment
+- **Unichain Sepolia** (1301): Full stack deployed + Uniswap v4 pool
+- **Base Sepolia** (84532): Full stack deployed + Uniswap v4 pool
+- **Arbitrum Sepolia** (421614): Full stack deployed + Uniswap v4 pool
+- **Lasna / Reactive Network** (5318007): Registry + Extension + Credential (no Uniswap v4)
+
+#### Security Audit
+- 29 security findings remediated across all severity levels
+- Circuit breaker, daily mint ceiling, MAX_SUPPLY enforcement
+- 48-hour UUPS upgrade timelock (propose → wait → execute)
+
+### Test Coverage
+- **352 tests** across **34 suites**, 0 failures
+
+---
+
+## [2.4.0] - 2026-02-24
+
+### Added
+
+#### ERC-8004 "Trustless Agents" (Agent Infrastructure Stack)
+- **Permissionless agent registration** via ERC-8004 NFT ownership proof — no admin gating
+- **Reputation-derived bonuses**: Cached reputation scores from ERC-8004 Reputation Registry auto-compute bonus BPS
+- **Referral feedback publishing**: Fixer writes performance feedback to ERC-8004 Reputation Registry
+- **Three new ERC-8004 interfaces**: `IERC8004IdentityRegistry`, `IERC8004ReputationRegistry`, `IERC8004ValidationRegistry`
+- **`ERC8004Constants` library**: Reputation thresholds, bonus tiers (0/500/1500/3000/5000 BPS), cache TTL defaults
+
+#### Reputation-to-Bonus Mapping
+| Score (0-100) | Tier | Bonus (BPS) |
+|:---:|:---:|:---:|
+| <= 0 | None | 0 |
+| 1-30 | Low | 500 (5%) |
+| 31-60 | Medium | 1500 (15%) |
+| 61-80 | High | 3000 (30%) |
+| 81-100 | Elite | 5000 (50%) |
+
+#### New Functions
+- `registerAgent(uint256 agentId, AgentPlatform platform)` — Permissionless ERC-8004 registration
+- `refreshAgentReputation(address agent)` — Permissionless reputation cache refresh
+- `submitReferralFeedback(uint256 agentId, int128 score)` — Write feedback to ERC-8004
+- `setERC8004Registries(address, address, address)` — Admin: set registry addresses
+- `setReputationCacheTTL(uint64 ttl)` — Admin: set cache TTL (600s-86400s)
+- `getReputationBonus(address agent)` — View: reputation-derived bonus BPS
+- `getERC8004Config()` — View: all registry addresses + cache TTL + agent count
+- `reinitializeV4(address, address, address)` — Upgrade initializer (reinitializer(4))
+
+#### Storage Changes
+- `AgentProfile` struct extended with 5 new fields: `erc8004AgentId`, `cachedReputationScore`, `cachedReputationDecimals`, `derivedBonusBps`, `lastReputationUpdate`
+- `MainStorage` extended with: `identityRegistry`, `reputationRegistry`, `validationRegistry`, `agentIdToWallet`, `erc8004AgentCount`, `reputationCacheTTL`
+- `__gap` reduced from 45 to 40 slots
+
+### Removed
+- `registerAgent(address, bytes32, AgentPlatform)` — replaced by ERC-8004 permissionless registration
+- `updateAgentProfile(address, uint16, bool)` — bonuses now derived from reputation
+- `updateAgentX402Volume(address, uint128)` — no longer tracked separately
+- `isERC8004Agent(address)` — all agents are ERC-8004; use `isVerifiedAgent()` instead
+- All backward-compatibility code for legacy agent registration
+
+### Test Coverage
+- **352 tests** across **34 suites**, 0 failures
+- New `test/ERC8004.t.sol`: 46 tests covering registration, reputation, rewards, feedback, admin, fuzz, reinitialize
+- Updated `test/X402.t.sol`: 44 tests rewritten for Agent Infrastructure Stack
+- Updated `test/Hardening.t.sol`: version assertions updated to 2_004_000
+
+---
+
+## [2.3.0] - 2026-02-15
+
+### Added
+
+#### x402 Payment Integration (Agent Infrastructure Stack)
+- **EIP-3009 `transferWithAuthorization`**: Gasless FIX token transfers via signed authorizations
+- **Agent profiles**: On-chain identity for AI agents (wallet, platform, x402 payment volume)
+- **Referral delegation**: Agents can delegate referral rights to other addresses
+- **Agent deregistration**: Owner can remove agents and clean up state
+- **Platform tracking**: Per-platform agent counts (OpenClaw, Moltbook, Custom, Human)
+
+#### New Functions
+- `transferWithAuthorization(from, to, value, validAfter, validBefore, nonce, v, r, s)` — EIP-3009
+- `delegateReferral(address delegate)` — Delegate referral rights
+- `revokeDelegation(address delegate)` — Revoke delegation
+- `deregisterAgent(address agent)` — Remove agent (owner-only)
+- `isDelegated(delegator, delegate)` — Check delegation status
+- `authorizationState(from, nonce)` — Check EIP-3009 nonce usage
+- `DOMAIN_SEPARATOR()` / `TRANSFER_WITH_AUTHORIZATION_TYPEHASH()` — EIP-712 constants
+
+### Test Coverage
+- **314 tests** across **28 suites**
+
+---
+
+## [2.2.0] - 2026-02-10
+
+### Added
+
+#### Emergency & Hardening Module
+- **Circuit breaker**: Per-hour mint ceiling with `MIN_CIRCUIT_BREAKER` floor
+- **Daily mint ceiling**: 10M FIX/day limit with DAO governance override
+- **Emergency pause**: Security council can pause referrals, agents, and rewards independently
+- **DAO governance**: 7-day override on security council decisions
+- **MAX_SUPPLY enforcement**: Hardcoded 1B FIX cap in `_update()` override
+
+#### UUPS Upgrade Timelock
+- **48-hour proposal window**: `proposeUpgrade()` → wait 48h → `executeUpgrade()`
+- **Users can exit during timelock** period if they disagree with the upgrade
+
+#### Soulbound Credentials
+- `FixerCredential.sol` — Non-transferable NFT credentials for referrer milestones
+
+### Test Coverage
+- **230 tests** across **20 suites**
+
+---
+
+## [2.0.0] - 2026-02-05
+
+### Added
+
+#### Cross-Pool Registry Architecture
+- **FixerHookV2**: Lightweight hook that delegates all logic to `FixerRegistryUpgradeable`
+- **FixerRegistryUpgradeable**: UUPS proxy-based central registry for cross-pool referral tracking
+- **ERC-7201 namespaced storage**: Deterministic storage slots for upgrade safety
+- **BPSMath library**: Centralized basis-point arithmetic
+- **Authorized hooks mapping**: Registry validates that calling hooks are registered
+
+### Changed
+- FIX token now lives at the registry proxy address (single token across all pools)
+- Hooks no longer mint tokens directly — they call `registry.recordReferral()`
+- Protocol fee system: configurable BPS fee on all rewards (5% start, 10% max)
+
+### Test Coverage
+- **150 tests** across **15 suites**
+
+---
+
 ## [1.2.0] - 2026-01-31
 
 ### Added
@@ -118,12 +305,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Zero address validation
 - ERC20 FIX token embedded in hook contract
 - `afterSwap` hook permission for minimal gas overhead
-
----
-
-## Roadmap
-
-### [2.0.0] - Planned  
-- Cross-pool referral registry
-- Unified FIX token across all pools
-- Upgradeable registry architecture (UUPS)

@@ -3,11 +3,12 @@ import { base } from "viem/chains";
 import { config } from "./config.js";
 
 // ============================================================================
-// ABI — Minimal read-only ABI for FixerRegistryUpgradeable
+// ABI — Read-only ABI for FixerRegistryUpgradeable v2.6.0
+// Includes: Core referrals, ERC-8004 identity, x402 payments, XMTP comms
 // ============================================================================
 
 export const REGISTRY_ABI = [
-  // View functions
+  // --- Core: Referrer Stats ---
   {
     name: "getReferrerStats",
     type: "function",
@@ -26,6 +27,7 @@ export const REGISTRY_ABI = [
       },
     ],
   },
+  // --- Core: Pool Info ---
   {
     name: "getPoolInfo",
     type: "function",
@@ -43,6 +45,7 @@ export const REGISTRY_ABI = [
       },
     ],
   },
+  // --- Core: Global Stats ---
   {
     name: "getGlobalStats",
     type: "function",
@@ -54,6 +57,7 @@ export const REGISTRY_ABI = [
       { name: "totalVolume", type: "uint128" },
     ],
   },
+  // --- Core: Reward Calculation ---
   {
     name: "calculateRewardWithTier",
     type: "function",
@@ -76,6 +80,7 @@ export const REGISTRY_ABI = [
       { name: "referralProgress", type: "uint256" },
     ],
   },
+  // --- Core: Hook Auth ---
   {
     name: "isAuthorizedHook",
     type: "function",
@@ -83,6 +88,7 @@ export const REGISTRY_ABI = [
     inputs: [{ name: "hook", type: "address" }],
     outputs: [{ name: "", type: "bool" }],
   },
+  // --- ERC-8004 + x402: Agent Identity ---
   {
     name: "getTotalAgents",
     type: "function",
@@ -106,6 +112,7 @@ export const REGISTRY_ABI = [
       {
         type: "tuple",
         components: [
+          // v2.3 core fields
           { name: "wallet", type: "address" },
           { name: "x402Identity", type: "bytes32" },
           { name: "registeredAt", type: "uint64" },
@@ -113,6 +120,16 @@ export const REGISTRY_ABI = [
           { name: "x402Volume", type: "uint128" },
           { name: "verified", type: "bool" },
           { name: "bonusMultiplierBps", type: "uint16" },
+          // v2.4 ERC-8004 fields
+          { name: "erc8004AgentId", type: "uint256" },
+          { name: "cachedReputationScore", type: "int128" },
+          { name: "cachedReputationDecimals", type: "uint8" },
+          { name: "derivedBonusBps", type: "uint16" },
+          { name: "lastReputationUpdate", type: "uint64" },
+          // v2.6 XMTP fields
+          { name: "xmtpEnabled", type: "bool" },
+          { name: "xmtpPublicKeyHash", type: "bytes32" },
+          { name: "xmtpEndpointUri", type: "string" },
         ],
       },
     ],
@@ -124,6 +141,44 @@ export const REGISTRY_ABI = [
     inputs: [{ name: "agent", type: "address" }],
     outputs: [{ name: "bonusBps", type: "uint16" }],
   },
+  // --- XMTP Communication (v2.6) ---
+  {
+    name: "isXMTPEnabled",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "agent", type: "address" }],
+    outputs: [{ name: "", type: "bool" }],
+  },
+  {
+    name: "getXMTPPublicKeyHash",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "agent", type: "address" }],
+    outputs: [{ name: "", type: "bytes32" }],
+  },
+  {
+    name: "getXMTPEndpoint",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "agent", type: "address" }],
+    outputs: [{ name: "", type: "string" }],
+  },
+  {
+    name: "getXMTPEnabledCount",
+    type: "function",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint64" }],
+  },
+  // --- ERC-8004: Identity NFT ---
+  {
+    name: "getERC8004AgentId",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "agent", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  // --- Metadata ---
   {
     name: "VERSION",
     type: "function",
@@ -179,4 +234,22 @@ export function tierName(tier: number): string {
 
 export function platformName(platform: number): string {
   return PLATFORM_NAMES[platform] ?? "Unknown";
+}
+
+/** Check if agent has XMTP communication enabled */
+export async function isAgentXMTPEnabled(agent: Address): Promise<boolean> {
+  const registry = getRegistryContract();
+  return registry.read.isXMTPEnabled([agent]) as Promise<boolean>;
+}
+
+/** Get agent's XMTP endpoint URI */
+export async function getAgentXMTPEndpoint(agent: Address): Promise<string> {
+  const registry = getRegistryContract();
+  return registry.read.getXMTPEndpoint([agent]) as Promise<string>;
+}
+
+/** Get total count of XMTP-enabled agents */
+export async function getXMTPEnabledCount(): Promise<bigint> {
+  const registry = getRegistryContract();
+  return registry.read.getXMTPEnabledCount() as Promise<bigint>;
 }

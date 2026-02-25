@@ -4,6 +4,7 @@ pragma solidity 0.8.26;
 import {Script, console} from "forge-std/Script.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {FixerRegistryUpgradeable} from "../src/FixerRegistryUpgradeable.sol";
+import {FixerRegistryExtension} from "../src/FixerRegistryExtension.sol";
 import {FixerHookV2} from "../src/FixerHookV2.sol";
 import {FixerCredential} from "../src/FixerCredential.sol";
 import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
@@ -84,10 +85,21 @@ contract DeployBaseSepolia is Script {
         ERC1967Proxy proxy = new ERC1967Proxy(address(impl), initData);
         console.log("[A2] Proxy:", address(proxy));
 
-        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(address(proxy));
+        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(payable(address(proxy)));
         require(registry.owner() == deployer, "Owner mismatch");
-        require(registry.VERSION() == 2_003_000, "Version mismatch");
-        console.log("[A3] Registry OK: FIX token, v2.3.0");
+        require(registry.VERSION() == 2_006_000, "Version mismatch");
+
+        // Initialize v4 (ERC-8004 Trustless Agents) — registries set to address(0)
+        // until real ERC-8004 registry contracts are deployed on this chain.
+        // Owner can later call setERC8004Registries() to activate agent registration.
+        registry.reinitializeV4(address(0), address(0), address(0));
+        registry.reinitializeV5();
+
+        // Deploy extension (Agent Infrastructure Stack + EIP-3009)
+        FixerRegistryExtension ext = new FixerRegistryExtension();
+        registry.setExtension(address(ext));
+        console.log("[A3] Extension:", address(ext));
+        console.log("[A4] Registry OK: FIX token, v2.6.0 (Agent Infrastructure Stack)");
 
         return address(proxy);
     }
@@ -131,7 +143,7 @@ contract DeployBaseSepolia is Script {
     }
 
     function _registerHook(address registryProxy, address hook) internal {
-        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(registryProxy);
+        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(payable(registryProxy));
         bytes32 poolId = FixerHookV2(hook).getPoolId();
         registry.registerHook(hook, poolId);
         console.log("[C1] Hook registered, Pool ID:", vm.toString(poolId));

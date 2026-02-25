@@ -2,9 +2,9 @@
 
 > Vulnerability Disclosure Policy & Bug Bounty Program for the FixerHook Protocol
 
-**Version:** 1.0  
-**Effective Date:** February 2025  
-**Last Updated:** February 2025
+**Version:** 2.0
+**Effective Date:** February 2025
+**Last Updated:** February 2026
 
 ---
 
@@ -42,11 +42,15 @@
 
 | Contract | Path | Version |
 |----------|------|---------|
-| FixerRegistryUpgradeable | `src/FixerRegistryUpgradeable.sol` | v2.2.2 |
-| EmergencyModule | `src/modules/EmergencyModule.sol` | v2.2.2 |
+| FixerRegistryUpgradeable | `src/FixerRegistryUpgradeable.sol` | v2.4.0 |
+| EmergencyModule | `src/modules/EmergencyModule.sol` | v2.4.0 |
 | FixerHookV2 | `src/FixerHookV2.sol` | v2.0.0 |
-| FixerRegistryStorage | `src/storage/FixerRegistryStorage.sol` | v2.2.2 |
+| FixerRegistryStorage | `src/storage/FixerRegistryStorage.sol` | v2.4.0 |
 | BPSMath | `src/libraries/BPSMath.sol` | v1.0.0 |
+| IAgentRegistry | `src/interfaces/IAgentRegistry.sol` | v2.4.0 |
+| IERC8004IdentityRegistry | `src/interfaces/IERC8004IdentityRegistry.sol` | v2.4.0 |
+| IERC8004ReputationRegistry | `src/interfaces/IERC8004ReputationRegistry.sol` | v2.4.0 |
+| IERC8004ValidationRegistry | `src/interfaces/IERC8004ValidationRegistry.sol` | v2.4.0 |
 
 ### In-Scope Vulnerability Categories
 
@@ -57,6 +61,9 @@
 - **Denial of Service:** Gas griefing, storage bloat, block stuffing
 - **Reentrancy:** Cross-function or cross-contract reentrancy
 - **Token Minting:** Unauthorized minting, supply cap bypass, daily ceiling circumvention
+- **ERC-8004 Identity:** NFT ownership spoofing, registration bypass, wallet mismatch exploits
+- **Reputation Gaming:** Cache manipulation, stale score exploitation, bonus tier inflation
+- **External Call Safety:** Revert-based DoS on ERC-8004 registry calls, missing try/catch
 
 ### Out of Scope
 
@@ -176,6 +183,9 @@ For detailed threat modeling and mitigation strategies, see [`docs/SECURITY.md`]
 | **Daily Mint Ceiling** | 10M FIX/day limit with DAO-owned council override |
 | **ReentrancyGuard** | OpenZeppelin nonReentrant on all state-mutating functions |
 | **BPSMath Library** | Centralized basis-point math preventing overflow |
+| **ERC-8004 Identity** | Permissionless agent registration via NFT ownership proof |
+| **Reputation Cache** | Configurable TTL (600s-86400s) with stale-cache grace degradation |
+| **External Call Safety** | All ERC-8004 registry calls wrapped in `try/catch` |
 
 ---
 
@@ -183,11 +193,12 @@ For detailed threat modeling and mitigation strategies, see [`docs/SECURITY.md`]
 
 | Audit | Status | Date |
 |-------|--------|------|
-| Slither Static Analysis | ✅ Completed (0 high/medium) | Feb 2025 |
-| Forge Coverage | ✅ >95% on production contracts | Feb 2025 |
-| Invariant Testing | ✅ 4 property-based tests | Feb 2025 |
-| Formal Verification | ⬜ Planned | TBD |
-| External Audit | ⬜ Planned | TBD |
+| Slither Static Analysis | Completed (0 high/medium) | Feb 2025 |
+| Forge Coverage | >95% on production contracts | Feb 2026 |
+| Forge Tests | 352 tests, 34 suites, 0 failures | Feb 2026 |
+| Invariant Testing | 4 property-based tests | Feb 2025 |
+| Formal Verification | Planned | TBD |
+| External Audit | Planned | TBD |
 
 ---
 

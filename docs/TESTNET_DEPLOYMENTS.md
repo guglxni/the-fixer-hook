@@ -1,89 +1,50 @@
 # Live Testnet Deployments
 
-> Fixer Protocol v2.3 — Deployed and verified on three L2 testnets
+> Fixer Protocol v2.6 -- Agent Infrastructure Stack (ERC-8004 + x402 + XMTP)
 
-**Deployed:** February 22, 2026
-**Version:** 2.3.0 (VERSION constant: `2003000`)
+**Deployed:** June 2025 (v2.5.0) | **Upgraded:** February 25, 2026 (v2.6.0 EXECUTED via TimewarpExtension)
+**Version:** 2.6.0 (VERSION constant: `2_006_000`) -- **LIVE on all 4 chains**
 **Deployer:** `0xDDe9D31a31d6763612C7f535f51E5dC9f830682e`
+**Verified on:** [Blockscout](https://blockscout.com) (21/24 verified, 3 ERC1967 proxies = expected) -- Lasna uses [Reactscan](https://lasna.reactscan.net) (no programmatic source verification API)
+
+---
+
+## Agent Infrastructure Stack
+
+v2.6.0 implements the complete **Agent Infrastructure Stack** with three protocol layers:
+
+| Layer | Protocol | Status | Description |
+|-------|----------|--------|-------------|
+| **Identity & Trust** | ERC-8004 | 100% on-chain | NFT-based agent identity, reputation scoring, credential delegation |
+| **Payments** | x402 | Production-ready | EIP-3009 gasless transfers, micropayment-gated RaaS API, USDC on Base |
+| **Communication** | XMTP | 100% on-chain | Agent-to-agent encrypted messaging, on-chain endpoint discovery |
+
+---
+
+## Architecture: Reactive Modular (DELEGATECALL Fallback)
+
+Uses a **Core + Extension** architecture to stay under the EIP-170 contract size limit (24,576 bytes):
+
+| Component | Size | Description |
+|-----------|------|-------------|
+| **FixerLib** | 2,308 B | Shared computation library (CREATE2 deployed) |
+| **FixerRegistryUpgradeable** (Core) | 20,507 B | UUPS implementation: referrals, ERC-20 FIX token, tiers, emergency, hooks, admin |
+| **FixerRegistryExtension** | 14,659 B | ERC-8004 agents, XMTP communication, delegation, reputation, EIP-3009 gasless transfers |
+| **ERC1967Proxy** | 130 B | Transparent proxy users interact with |
+| **FixerHookV2** | 4,480 B | Uniswap v4 `afterSwap` hook (CREATE2-mined address) |
+| **FixerCredential** | 11,787 B | Soulbound ERC-721 reputation NFT with on-chain SVG |
+
+The Core contract's `fallback()` function routes unknown selectors to the Extension via `DELEGATECALL`. Both share the same ERC-7201 namespaced storage layout.
+
+```
+User → ERC1967Proxy → FixerRegistryUpgradeable (Core)
+                         ├── Known selectors: handled directly
+                         └── Unknown selectors → fallback() → DELEGATECALL → FixerRegistryExtension
+```
 
 ---
 
 ## Deployed Contracts
-
-The full Fixer Protocol v2.3 stack is live on three Uniswap v4 testnets. Each deployment includes four contracts and one registration transaction:
-
-1. **FixerRegistryUpgradeable (Implementation)** — UUPS logic contract
-2. **ERC1967Proxy** — Transparent proxy users interact with (the "Registry")
-3. **FixerHookV2** — Uniswap v4 `afterSwap` hook (CREATE2-mined address)
-4. **FixerCredential** — Soulbound ERC-721 reputation NFT
-
----
-
-## Architecture Overview
-
-![Deployment Pipeline](diagrams/drawio/deployment-pipeline.png)
-
-![UUPS Proxy Architecture](diagrams/drawio/uups-proxy.png)
-
-
-
-### Base Sepolia
-
-| Property | Value |
-|----------|-------|
-| **Chain ID** | `84532` |
-| **RPC** | `https://sepolia.base.org` |
-| **Block Explorer** | [sepolia.basescan.org](https://sepolia.basescan.org) |
-| **PoolManager** | `0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408` |
-
-| Contract | Address |
-|----------|---------|
-| Registry Implementation | [`0x758C3046eAC928eFADbFEFbf2dDEaee0D7BAF1B8`](https://sepolia.basescan.org/address/0x758C3046eAC928eFADbFEFbf2dDEaee0D7BAF1B8) |
-| **Registry Proxy** | [`0x43c75D09d7e53Ee1c768353708EDC3Bab4317F94`](https://sepolia.basescan.org/address/0x43c75D09d7e53Ee1c768353708EDC3Bab4317F94) |
-| **FixerHookV2** | [`0xb66603495944EA622F1c8e312b0d50A8A2F30040`](https://sepolia.basescan.org/address/0xb66603495944EA622F1c8e312b0d50A8A2F30040) |
-| **FixerCredential** | [`0xd2fD5c0CaAbE15379a81b3d23081914D69FDA3ef`](https://sepolia.basescan.org/address/0xd2fD5c0CaAbE15379a81b3d23081914D69FDA3ef) |
-
-**Pool Configuration:**
-
-| Parameter | Value |
-|-----------|-------|
-| Currency0 (USDC) | `0x036CbD53842c5426634e7929541eC2318f3dCF7e` (6 decimals) |
-| Currency1 (WETH) | `0x4200000000000000000000000000000000000006` (18 decimals) |
-| Fee | 3000 (0.3%) |
-| Tick Spacing | 60 |
-| Quote Token Index | 0 (USDC) |
-| Pool ID | `0x83e03329531932d692cd2edb4091647ebe409c67de4980e311149cf8cbee6dc2` |
-
----
-
-### Arbitrum Sepolia
-
-| Property | Value |
-|----------|-------|
-| **Chain ID** | `421614` |
-| **RPC** | `https://sepolia-rollup.arbitrum.io/rpc` |
-| **Block Explorer** | [sepolia.arbiscan.io](https://sepolia.arbiscan.io) |
-| **PoolManager** | `0xFB3e0C6F74eB1a21CC1Da29aeC80D2Dfe6C9a317` |
-
-| Contract | Address |
-|----------|---------|
-| Registry Implementation | [`0xa5589Eed2A8831eEFbCdD39BF9FE59D6ef4344d9`](https://sepolia.arbiscan.io/address/0xa5589Eed2A8831eEFbCdD39BF9FE59D6ef4344d9) |
-| **Registry Proxy** | [`0xC7206C83702B251A5408B28Ce4df195255F42B9e`](https://sepolia.arbiscan.io/address/0xC7206C83702B251A5408B28Ce4df195255F42B9e) |
-| **FixerHookV2** | [`0x7A5E4C1b42d66f459c02b36115d184b907dF0040`](https://sepolia.arbiscan.io/address/0x7A5E4C1b42d66f459c02b36115d184b907dF0040) |
-| **FixerCredential** | [`0x0F94b615c27DAfe6D875aE863a77Ea50D9c30b79`](https://sepolia.arbiscan.io/address/0x0F94b615c27DAfe6D875aE863a77Ea50D9c30b79) |
-
-**Pool Configuration:**
-
-| Parameter | Value |
-|-----------|-------|
-| Currency0 (USDC) | `0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d` (6 decimals) |
-| Currency1 (WETH) | `0xE591bf0A0CF924A0674d7792db046B23CEbF5f34` (18 decimals) |
-| Fee | 3000 (0.3%) |
-| Tick Spacing | 60 |
-| Quote Token Index | 0 (USDC) |
-| Pool ID | `0x9293ef78c37665a3a4eb2dca397184f6f2fe86c0bdcd45416f7dc92c023b196d` |
-
----
 
 ### Unichain Sepolia
 
@@ -91,15 +52,24 @@ The full Fixer Protocol v2.3 stack is live on three Uniswap v4 testnets. Each de
 |----------|-------|
 | **Chain ID** | `1301` |
 | **RPC** | `https://sepolia.unichain.org` |
-| **Block Explorer** | [sepolia.uniscan.xyz](https://sepolia.uniscan.xyz) |
+| **Block Explorer** | [unichain-sepolia.blockscout.com](https://unichain-sepolia.blockscout.com) |
 | **PoolManager** | `0x00B036B58a818B1BC34d502D3fE730Db729e62AC` |
 
-| Contract | Address |
-|----------|---------|
-| Registry Implementation | [`0x43c75D09d7e53Ee1c768353708EDC3Bab4317F94`](https://sepolia.uniscan.xyz/address/0x43c75D09d7e53Ee1c768353708EDC3Bab4317F94) |
-| **Registry Proxy** | [`0xC13080390D3A1aCCdC7E6bbd7A41981db4bcd56f`](https://sepolia.uniscan.xyz/address/0xC13080390D3A1aCCdC7E6bbd7A41981db4bcd56f) |
-| **FixerHookV2** | [`0x983eA96dd196f3F8395A051453505A7c9321c040`](https://sepolia.uniscan.xyz/address/0x983eA96dd196f3F8395A051453505A7c9321c040) |
-| **FixerCredential** | [`0x88a31bFDa9B3E24a6bDFE7Ae627CB2C7A134f5c0`](https://sepolia.uniscan.xyz/address/0x88a31bFDa9B3E24a6bDFE7Ae627CB2C7A134f5c0) |
+| Contract | Address | Verified |
+|----------|---------|----------|
+| FixerLib | [`0x2A29cc3CAE2Cd0198789497CEE4178Af26AEB9e3`](https://unichain-sepolia.blockscout.com/address/0x2A29cc3CAE2Cd0198789497CEE4178Af26AEB9e3) | ✓ |
+| Registry Implementation | [`0x3Fb805C6C01e8Dd8534fA9FD52Ee699e256Eb960`](https://unichain-sepolia.blockscout.com/address/0x3Fb805C6C01e8Dd8534fA9FD52Ee699e256Eb960) | ✓ |
+| **Registry Proxy** | [`0xa5589Eed2A8831eEFbCdD39BF9FE59D6ef4344d9`](https://unichain-sepolia.blockscout.com/address/0xa5589Eed2A8831eEFbCdD39BF9FE59D6ef4344d9) | — |
+| FixerRegistryExtension | [`0x23f23CA1E68eE959c969A6FFD4E1e7Dfb81F5246`](https://unichain-sepolia.blockscout.com/address/0x23f23CA1E68eE959c969A6FFD4E1e7Dfb81F5246) | ✓ |
+| **FixerHookV2** | [`0x8D965484Bedb2CdEC65f919a91005b795c854040`](https://unichain-sepolia.blockscout.com/address/0x8D965484Bedb2CdEC65f919a91005b795c854040) | ✓ |
+| **FixerCredential** | [`0x3e0d0028DE34fbFe0365d52d9D5D955E0F193EBb`](https://unichain-sepolia.blockscout.com/address/0x3e0d0028DE34fbFe0365d52d9D5D955E0F193EBb) | ✓ |
+
+**v2.6.0 Upgrade (XMTP Communication) -- EXECUTED Feb 25, 2026:**
+
+| Contract | Address | Verified |
+|----------|---------|----------|
+| New Registry Impl (v2.6.0) | [`0xC752308cf7c663De032018713F1D2481EC45b3bD`](https://unichain-sepolia.blockscout.com/address/0xC752308cf7c663De032018713F1D2481EC45b3bD) | ✓ |
+| New Extension (XMTP) | [`0x2bF8E2e5f71645ad9e56cADb733141b41DD258B0`](https://unichain-sepolia.blockscout.com/address/0x2bF8E2e5f71645ad9e56cADb733141b41DD258B0) | ✓ |
 
 **Pool Configuration:**
 
@@ -110,19 +80,120 @@ The full Fixer Protocol v2.3 stack is live on three Uniswap v4 testnets. Each de
 | Fee | 3000 (0.3%) |
 | Tick Spacing | 60 |
 | Quote Token Index | 0 (USDC) |
-| Pool ID | `0x4defd10c81cdc84f7f9e8c5a4c254d255ef52b72806d752b088896882e0aa2d4` |
+
+---
+
+### Base Sepolia
+
+| Property | Value |
+|----------|-------|
+| **Chain ID** | `84532` |
+| **RPC** | `https://sepolia.base.org` |
+| **Block Explorer** | [base-sepolia.blockscout.com](https://base-sepolia.blockscout.com) |
+| **PoolManager** | `0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408` |
+
+| Contract | Address | Verified |
+|----------|---------|----------|
+| FixerLib | [`0x2A29cc3CAE2Cd0198789497CEE4178Af26AEB9e3`](https://base-sepolia.blockscout.com/address/0x2A29cc3CAE2Cd0198789497CEE4178Af26AEB9e3) | ✓ |
+| Registry Implementation | [`0xef7801E05D1C1737Fb8dD96de4FF8AB09efDACE6`](https://base-sepolia.blockscout.com/address/0xef7801E05D1C1737Fb8dD96de4FF8AB09efDACE6) | ✓ |
+| **Registry Proxy** | [`0x3Fb805C6C01e8Dd8534fA9FD52Ee699e256Eb960`](https://base-sepolia.blockscout.com/address/0x3Fb805C6C01e8Dd8534fA9FD52Ee699e256Eb960) | — |
+| FixerRegistryExtension | [`0xC7206C83702B251A5408B28Ce4df195255F42B9e`](https://base-sepolia.blockscout.com/address/0xC7206C83702B251A5408B28Ce4df195255F42B9e) | ✓ |
+| **FixerHookV2** | [`0x2CE392Ba90fcAeE3CD23dBcFe11fC2Dc098A8040`](https://base-sepolia.blockscout.com/address/0x2CE392Ba90fcAeE3CD23dBcFe11fC2Dc098A8040) | ✓ |
+| **FixerCredential** | [`0xB624bbeC6e044365d365A7f66A253abf27226f82`](https://base-sepolia.blockscout.com/address/0xB624bbeC6e044365d365A7f66A253abf27226f82) | ✓ |
+
+**v2.6.0 Upgrade (XMTP Communication) -- EXECUTED Feb 25, 2026:**
+
+| Contract | Address | Verified |
+|----------|---------|----------|
+| New Registry Impl (v2.6.0) | [`0x07dF8c1c6d5Fc2109bf442dFBc1e7050eDf4f9Eb`](https://base-sepolia.blockscout.com/address/0x07dF8c1c6d5Fc2109bf442dFBc1e7050eDf4f9Eb) | ✓ |
+| New Extension (XMTP) | [`0xC752308cf7c663De032018713F1D2481EC45b3bD`](https://base-sepolia.blockscout.com/address/0xC752308cf7c663De032018713F1D2481EC45b3bD) | ✓ |
+
+**Pool Configuration:**
+
+| Parameter | Value |
+|-----------|-------|
+| Currency0 (USDC) | `0x036CbD53842c5426634e7929541eC2318f3dCF7e` (6 decimals) |
+| Currency1 (WETH) | `0x4200000000000000000000000000000000000006` (18 decimals) |
+| Fee | 3000 (0.3%) |
+| Tick Spacing | 60 |
+| Quote Token Index | 0 (USDC) |
+
+---
+
+### Arbitrum Sepolia
+
+| Property | Value |
+|----------|-------|
+| **Chain ID** | `421614` |
+| **RPC** | `https://sepolia-rollup.arbitrum.io/rpc` |
+| **Block Explorer** | [arbitrum-sepolia.blockscout.com](https://arbitrum-sepolia.blockscout.com) |
+| **PoolManager** | `0xFB3e0C6F74eB1a21CC1Da29aeC80D2Dfe6C9a317` |
+
+| Contract | Address | Verified |
+|----------|---------|----------|
+| FixerLib | [`0x2A29cc3CAE2Cd0198789497CEE4178Af26AEB9e3`](https://arbitrum-sepolia.blockscout.com/address/0x2A29cc3CAE2Cd0198789497CEE4178Af26AEB9e3) | ✓ |
+| Registry Implementation | [`0x3e0d0028DE34fbFe0365d52d9D5D955E0F193EBb`](https://arbitrum-sepolia.blockscout.com/address/0x3e0d0028DE34fbFe0365d52d9D5D955E0F193EBb) | ✓ |
+| **Registry Proxy** | [`0x07dF8c1c6d5Fc2109bf442dFBc1e7050eDf4f9Eb`](https://arbitrum-sepolia.blockscout.com/address/0x07dF8c1c6d5Fc2109bf442dFBc1e7050eDf4f9Eb) | — |
+| FixerRegistryExtension | [`0x2bF8E2e5f71645ad9e56cADb733141b41DD258B0`](https://arbitrum-sepolia.blockscout.com/address/0x2bF8E2e5f71645ad9e56cADb733141b41DD258B0) | ✓ |
+| **FixerHookV2** | [`0x1bf835D48d3a7743dc4A179B0bE2b9dD9a8cC040`](https://arbitrum-sepolia.blockscout.com/address/0x1bf835D48d3a7743dc4A179B0bE2b9dD9a8cC040) | ✓ |
+| **FixerCredential** | [`0x72489A460c90210e0Cfb0d24B2646F10D38EAcc1`](https://arbitrum-sepolia.blockscout.com/address/0x72489A460c90210e0Cfb0d24B2646F10D38EAcc1) | ✓ |
+
+**v2.6.0 Upgrade (XMTP Communication) -- EXECUTED Feb 25, 2026:**
+
+| Contract | Address | Verified |
+|----------|---------|----------|
+| New Registry Impl (v2.6.0) | [`0x6c1Bb082B63a97c52Fc9868A388b2FcE93862F52`](https://arbitrum-sepolia.blockscout.com/address/0x6c1Bb082B63a97c52Fc9868A388b2FcE93862F52) | ✓ |
+| New Extension (XMTP) | [`0xAb340F430A1346923B4e0722B67bbCc500A6F6Db`](https://arbitrum-sepolia.blockscout.com/address/0xAb340F430A1346923B4e0722B67bbCc500A6F6Db) | ✓ |
+
+**Pool Configuration:**
+
+| Parameter | Value |
+|-----------|-------|
+| Currency0 (USDC) | `0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d` (6 decimals) |
+| Currency1 (WETH) | `0xE591bf0A0CF924A0674d7792db046B23CEbF5f34` (18 decimals) |
+| Fee | 3000 (0.3%) |
+| Tick Spacing | 60 |
+| Quote Token Index | 0 (USDC) |
+
+---
+
+### Lasna (Reactive Network)
+
+| Property | Value |
+|----------|-------|
+| **Chain ID** | `5318007` |
+| **RPC** | `https://lasna-rpc.rnk.dev/` |
+| **Block Explorer** | [lasna.reactscan.net](https://lasna.reactscan.net) |
+| **Currency** | lREACT |
+| **PoolManager** | _None — Reactive Network has no Uniswap v4_ |
+
+> **Note:** Lasna is the Reactive Network's execution layer for cross-chain event automation. There is no Uniswap v4 PoolManager on this chain, so **FixerHookV2 is not deployed**. Only the Registry, Extension, and Credential contracts are deployed here to support Reactive Contract integrations (e.g., cross-chain referral sync).
+
+| Contract | Address | Verified |
+|----------|---------|----------|
+| FixerLib | [`0xfD870250416F3127b8111fDE1D8dEBDc31D1BCA2`](https://lasna.reactscan.net/address/0xfD870250416F3127b8111fDE1D8dEBDc31D1BCA2) | — |
+| Registry Implementation | [`0x8160B7dba69D0B8b144f25a3022acB99509c79b7`](https://lasna.reactscan.net/address/0x8160B7dba69D0B8b144f25a3022acB99509c79b7) | — |
+| **Registry Proxy** | [`0xd2f11a95F1ca8cc94FB63926dc3A92655aAc6fF3`](https://lasna.reactscan.net/address/0xd2f11a95F1ca8cc94FB63926dc3A92655aAc6fF3) | — |
+| FixerRegistryExtension | [`0x2e0379c6226Ae9e2327cF86ABCbC26f68fbE290D`](https://lasna.reactscan.net/address/0x2e0379c6226Ae9e2327cF86ABCbC26f68fbE290D) | — |
+| **FixerCredential** | [`0xB9356961aa61AA1148f39Dd0C748656C3E574596`](https://lasna.reactscan.net/address/0xB9356961aa61AA1148f39Dd0C748656C3E574596) | — |
+
+**v2.6.0 Upgrade (XMTP Communication) -- EXECUTED Feb 25, 2026:**
+
+| Contract | Address | Verified |
+|----------|---------|----------|
+| New Registry Impl (v2.6.0) | [`0x6Cc135698BFE7B109E581f73A814E3aF4e919908`](https://lasna.reactscan.net/address/0x6Cc135698BFE7B109E581f73A814E3aF4e919908) | — |
+| New Extension (XMTP) | [`0x6d192eB2E06A3C48832047D5ccA775c60E87034C`](https://lasna.reactscan.net/address/0x6d192eB2E06A3C48832047D5ccA775c60E87034C) | — |
+
+> Source verification not available — Reactscan does not support programmatic contract verification (API returns 404). Contracts are deployed and functional but cannot be source-verified.
 
 ---
 
 ## On-Chain Verification
 
-All deployments were verified with the following `cast call` checks (all passed):
-
 ```bash
 # Replace <PROXY> and <HOOK> with addresses from the tables above
-# Replace <RPC> with the chain's RPC URL
 
-# Registry version (expect: 2003000)
+# Registry version (expect: 2006000 — v2.6.0 upgrade executed on all chains)
 cast call <PROXY> "VERSION()(uint256)" --rpc-url <RPC>
 
 # Registry owner (expect: 0xDDe9D31a...682e)
@@ -135,21 +206,22 @@ cast call <PROXY> "symbol()(string)" --rpc-url <RPC>   # "FIX"
 # Hook authorization (expect: true)
 cast call <PROXY> "isAuthorizedHook(address)(bool)" <HOOK> --rpc-url <RPC>
 
+# Extension address
+cast call <PROXY> "getExtension()(address)" --rpc-url <RPC>
+
 # Pool ID stored in hook
 cast call <HOOK> "getPoolId()(bytes32)" --rpc-url <RPC>
 
-# Hook references correct registry
-cast call <HOOK> "registry()(address)" --rpc-url <RPC>
+# XMTP enabled count (v2.6.0+ only)
+cast call <PROXY> "getXMTPEnabledCount()(uint64)" --rpc-url <RPC>
+
+# Check pending upgrade proposal
+cast call <PROXY> "getPendingUpgrade()(address,uint256,bool,uint256)" --rpc-url <RPC>
 ```
 
 ---
 
-## How to Interact with the Deployed Contracts
-
-### Prerequisites
-
-- [Foundry](https://book.getfoundry.sh/) installed (`cast`, `forge`)
-- Testnet ETH on the target chain (use faucets below)
+## How to Interact
 
 ### Faucets
 
@@ -158,508 +230,78 @@ cast call <HOOK> "registry()(address)" --rpc-url <RPC>
 | Base Sepolia | [faucet.quicknode.com/base/sepolia](https://faucet.quicknode.com/base/sepolia) |
 | Arbitrum Sepolia | [faucet.quicknode.com/arbitrum/sepolia](https://faucet.quicknode.com/arbitrum/sepolia) |
 | Unichain Sepolia | Bridge from Ethereum Sepolia via OptimismPortal `0x0d83dab629f0e0F9d36c0Cbc89B69a489f0751bD` |
+| Lasna (Reactive) | Send Sepolia ETH to `0x9b9BB25f1A81078C544C829c5EB7822d747Cf434` (1:100 ratio, max 5 ETH/tx) |
 
----
-
-### 1. Reading Contract State (No Gas Required)
-
-These are read-only calls — no transaction or private key needed.
-
-#### Check the Registry Version
-
-```bash
-cast call 0x43c75D09d7e53Ee1c768353708EDC3Bab4317F94 \
-  "VERSION()(uint256)" \
-  --rpc-url https://sepolia.base.org
-# Output: 2003000
-```
-
-#### Query a Referrer's Stats
-
-```bash
-cast call <PROXY> \
-  "getReferrerStats(address)((uint128,uint64,uint64,uint128,uint8))" \
-  <REFERRER_ADDRESS> \
-  --rpc-url <RPC>
-# Returns: (totalVolume, referralCount, lastUpdated, totalEarned, tier)
-# Tier: 0=Bronze, 1=Silver, 2=Gold, 3=Platinum
-```
-
-#### Check Tier Progress
-
-```bash
-cast call <PROXY> \
-  "getProgressToNextTier(address)(uint8,uint8,uint256,uint256)" \
-  <REFERRER_ADDRESS> \
-  --rpc-url <RPC>
-# Returns: (currentTier, nextTier, volumeProgressBps, referralProgressBps)
-# Progress values are 0-10000 (basis points, 100% = 10000)
-```
-
-#### View Pool Info
-
-```bash
-cast call <PROXY> \
-  "getPoolInfo(bytes32)((address,bool,uint64,uint128))" \
-  <POOL_ID> \
-  --rpc-url <RPC>
-# Returns: (hookAddress, active, totalReferrals, totalVolume)
-```
-
-#### Check Global Protocol Stats
-
-```bash
-cast call <PROXY> \
-  "getGlobalStats()(uint256,uint256,uint256)" \
-  --rpc-url <RPC>
-# Returns: (hookCount, totalReferrals, totalVolume)
-```
-
-#### Check FIX Token Balance
-
-```bash
-cast call <PROXY> \
-  "balanceOf(address)(uint256)" \
-  <ADDRESS> \
-  --rpc-url <RPC>
-```
-
-#### View Tier Requirements
-
-```bash
-# Check Gold tier thresholds
-cast call <PROXY> \
-  "getTierThresholds(uint8)((uint128,uint64,uint64))" \
-  2 \
-  --rpc-url <RPC>
-# Returns: (minVolume, minReferrals, multiplierBps)
-# Tier enum: 0=Bronze, 1=Silver, 2=Gold, 3=Platinum
-```
-
-#### Calculate Estimated Reward
-
-```bash
-# Calculate base reward for a swap volume
-cast call <PROXY> \
-  "calculateReward(uint256)(uint256)" \
-  1000000000000000000 \
-  --rpc-url <RPC>
-
-# Calculate reward with tier multiplier
-cast call <PROXY> \
-  "calculateRewardWithTier(uint256,address)(uint256)" \
-  1000000000000000000 \
-  <REFERRER_ADDRESS> \
-  --rpc-url <RPC>
-```
-
----
-
-### 2. Executing Swaps with Referrals
-
-The Fixer Hook processes referrals automatically during Uniswap v4 swaps. To include a referrer, encode their address into the `hookData` parameter of the swap.
-
-#### How the Referral Flow Works
-
-```
-1. User calls Uniswap v4 router.swap() with hookData = abi.encode(referrerAddress)
-2. PoolManager executes the swap
-3. PoolManager calls FixerHookV2.afterSwap() with the hookData
-4. FixerHookV2 decodes the referrer address
-5. FixerHookV2 resolves the actual swapper (IMsgSender or tx.origin)
-6. FixerHookV2 calculates volume from the quote token amount
-7. FixerHookV2 calls registry.recordReferral()
-8. Registry mints FIX tokens to the referrer (with tier multiplier)
-9. If the referrer crosses a tier threshold, a TierUpgrade event is emitted
-```
-
-#### Encoding hookData
-
-The hook expects `hookData` to be an ABI-encoded address:
+### Swaps with Referrals
 
 ```solidity
-// Solidity
 bytes memory hookData = abi.encode(referrerAddress);
-```
-
-```typescript
-// TypeScript (viem)
-import { encodeAbiParameters, parseAbiParameters } from 'viem';
-
-const hookData = encodeAbiParameters(
-  parseAbiParameters('address'),
-  ['0x1234...abcd']  // referrer address
-);
-```
-
-```typescript
-// TypeScript (ethers.js v6)
-import { AbiCoder } from 'ethers';
-
-const coder = AbiCoder.defaultAbiCoder();
-const hookData = coder.encode(['address'], ['0x1234...abcd']);
+// Pass hookData to Uniswap v4 swap router
 ```
 
 ```bash
-# Shell (cast)
+# Encode referrer address for hookData
 cast abi-encode "f(address)" 0x1234...abcd
 ```
 
-#### Validation Rules
-
-The hook enforces several rules before processing a referral:
-
-| Rule | Effect if Violated |
-|------|-------------------|
-| `hookData` is empty | Swap proceeds normally, no referral recorded |
-| Referrer is `address(0)` | No referral recorded |
-| Referrer == Swapper | No referral recorded (self-referral prevention) |
-| Volume below `minSwapAmount` | No referral recorded |
-| Hook is not authorized in registry | No referral recorded (graceful failure) |
-
----
-
-### 3. Minting a Credential NFT
-
-After making at least one successful referral, a referrer can mint a soulbound credential NFT.
+### Credential NFT
 
 ```bash
-# Mint a credential for a referrer (requires at least 1 referral)
-cast send <CREDENTIAL> \
-  "mint(address)(uint256)" \
-  <REFERRER_ADDRESS> \
-  --private-key <KEY> \
-  --rpc-url <RPC>
+cast send <CREDENTIAL> "mint(address)(uint256)" <REFERRER> --private-key <KEY> --rpc-url <RPC>
+cast call <CREDENTIAL> "tokenURI(uint256)(string)" <TOKEN_ID> --rpc-url <RPC>
 ```
-
-```bash
-# View the credential data
-cast call <CREDENTIAL> \
-  "getCredential(uint256)((uint8,uint128,uint64,uint64,uint64,bool))" \
-  <TOKEN_ID> \
-  --rpc-url <RPC>
-# Returns: (tier, totalVolume, referralCount, issuedAt, lastUpdated, locked)
-```
-
-```bash
-# Refresh credential with latest stats from registry
-cast send <CREDENTIAL> \
-  "refresh(uint256)" \
-  <TOKEN_ID> \
-  --private-key <KEY> \
-  --rpc-url <RPC>
-```
-
-```bash
-# View on-chain SVG artwork (returns base64 JSON with SVG)
-cast call <CREDENTIAL> \
-  "tokenURI(uint256)(string)" \
-  <TOKEN_ID> \
-  --rpc-url <RPC>
-```
-
-The credential is soulbound (non-transferable) by default. It displays the referrer's tier with color-coded artwork: Bronze, Silver, Gold, or Platinum.
-
----
-
-### 4. FIX Token Operations
-
-The FIX token (ERC-20) is minted by the registry when referrals are recorded. It lives at the **Registry Proxy** address (the proxy IS the token contract).
-
-```bash
-# Check balance
-cast call <PROXY> "balanceOf(address)(uint256)" <ADDRESS> --rpc-url <RPC>
-
-# Total supply
-cast call <PROXY> "totalSupply()(uint256)" --rpc-url <RPC>
-
-# Transfer FIX tokens
-cast send <PROXY> \
-  "transfer(address,uint256)(bool)" \
-  <TO_ADDRESS> \
-  <AMOUNT> \
-  --private-key <KEY> \
-  --rpc-url <RPC>
-
-# Approve spending
-cast send <PROXY> \
-  "approve(address,uint256)(bool)" \
-  <SPENDER> \
-  <AMOUNT> \
-  --private-key <KEY> \
-  --rpc-url <RPC>
-```
-
-#### Gasless Transfer (EIP-3009)
-
-The FIX token supports gasless transfers via EIP-3009. A payer signs an authorization off-chain, and a facilitator submits the transaction:
-
-```bash
-# Check if an authorization nonce has been used
-cast call <PROXY> \
-  "authorizationState(address,bytes32)(bool)" \
-  <AUTHORIZER> \
-  <NONCE> \
-  --rpc-url <RPC>
-
-# Submit a signed authorization (facilitator pays gas)
-cast send <PROXY> \
-  "transferWithAuthorization(address,address,uint256,uint256,uint256,bytes32,uint8,bytes32,bytes32)" \
-  <FROM> <TO> <VALUE> <VALID_AFTER> <VALID_BEFORE> <NONCE> <V> <R> <S> \
-  --private-key <FACILITATOR_KEY> \
-  --rpc-url <RPC>
-```
-
----
-
-### 5. Monitoring Events
-
-Use `cast logs` or an indexer to watch for protocol activity:
-
-```bash
-# Watch for referral events from the registry
-cast logs \
-  --from-block latest \
-  "CrossPoolReferral(address indexed,address indexed,bytes32 indexed,uint256,uint256)" \
-  --address <PROXY> \
-  --rpc-url <RPC>
-
-# Watch for tier upgrades
-cast logs \
-  --from-block latest \
-  "TierUpgrade(address indexed,uint8 indexed,uint8 indexed)" \
-  --address <PROXY> \
-  --rpc-url <RPC>
-
-# Watch for credential mints
-cast logs \
-  --from-block latest \
-  "CredentialMinted(address indexed,uint256 indexed,uint8)" \
-  --address <CREDENTIAL> \
-  --rpc-url <RPC>
-```
-
-#### Key Events Reference
-
-| Event | Contract | When Emitted |
-|-------|----------|-------------|
-| `CrossPoolReferral(referrer, swapper, poolId, volume, reward)` | Registry | Every successful referral |
-| `TierUpgrade(referrer, fromTier, toTier)` | Registry | When referrer reaches new tier threshold |
-| `HookRegistered(hook, poolId)` | Registry | When a new hook is authorized |
-| `ProtocolFeeCollected(fee)` | Registry | When protocol fee is deducted from reward |
-| `CredentialMinted(referrer, tokenId, tier)` | Credential | When soulbound NFT is minted |
-| `CredentialRefreshed(tokenId, tier)` | Credential | When credential stats are updated |
-| `ReferralProcessed(referrer, swapper, poolId, volume, reward)` | Hook | Hook-level confirmation of referral |
-
----
-
-### 6. Frontend Integration
-
-#### Referral URL Scheme
-
-```typescript
-// Generate a referral link
-const referralUrl = `https://yourapp.com/swap?ref=${referrerAddress}`;
-
-// Extract referrer from URL
-const params = new URLSearchParams(window.location.search);
-const referrer = params.get('ref');
-```
-
-#### React/Wagmi Integration
-
-```typescript
-import { useReadContract } from 'wagmi';
-
-// Read referrer stats
-const { data: stats } = useReadContract({
-  address: REGISTRY_PROXY,
-  abi: registryAbi,
-  functionName: 'getReferrerStats',
-  args: [referrerAddress],
-});
-
-// Read tier progress
-const { data: progress } = useReadContract({
-  address: REGISTRY_PROXY,
-  abi: registryAbi,
-  functionName: 'getProgressToNextTier',
-  args: [referrerAddress],
-});
-```
-
-#### Encoding Referral in Swap Transaction
-
-```typescript
-import { encodeAbiParameters, parseAbiParameters } from 'viem';
-
-// When building the swap transaction, include hookData
-const hookData = referrer
-  ? encodeAbiParameters(parseAbiParameters('address'), [referrer])
-  : '0x';  // No referrer = normal swap
-
-// Pass hookData to the Uniswap v4 swap router
-```
-
----
-
-## Tier System
-
-Referrers progress through tiers based on cumulative performance:
-
-| Tier | Reward Multiplier | Min Volume | Min Referrals |
-|------|-------------------|------------|---------------|
-| Bronze | 1.0x (10000 bps) | 0 | 0 |
-| Silver | 1.25x (12500 bps) | 10,000 | 10 |
-| Gold | 1.5x (15000 bps) | 100,000 | 50 |
-| Platinum | 2.0x (20000 bps) | 1,000,000 | 200 |
-
-Tier upgrades happen automatically when `recordReferral()` detects that both thresholds are met.
-
----
-
-## Protocol Parameters
-
-| Parameter | Default | Range | Description |
-|-----------|---------|-------|-------------|
-| Protocol Fee | 500 bps (5%) | 0 - 1000 bps | Deducted from each reward |
-| Reward Rate | 10 bps (0.1%) | Configurable | Base reward as % of swap volume |
-| Max Reward | 1000 FIX | Configurable | Cap per referral |
-| Min Swap Amount | 100 | Configurable | Minimum volume to qualify |
-| Max FIX Supply | 1,000,000,000 | Hard cap | Cannot be changed |
-| Upgrade Timelock | 48 hours | Hard coded | Delay before upgrades execute |
-| Fee Distribution | 50/30/20 | Configurable | Treasury / Buyback / Stakers |
-
----
-
-## Architecture Summary
-
-```
-                    ┌─────────────────┐
-                    │  Uniswap v4     │
-                    │  PoolManager    │
-                    └────────┬────────┘
-                             │ afterSwap callback
-                             ▼
-                    ┌─────────────────┐
-                    │  FixerHookV2    │  ← CREATE2-mined address
-                    │  (per pool)     │     with AFTER_SWAP flag
-                    └────────┬────────┘
-                             │ recordReferral()
-                             ▼
-                    ┌─────────────────┐
-                    │  ERC1967 Proxy  │  ← Users interact here
-                    │  (Registry)     │     ERC-20 FIX token
-                    │                 │     Tier management
-                    │                 │     Fee collection
-                    └────────┬────────┘
-                             │ delegates to
-                             ▼
-                    ┌─────────────────┐
-                    │  FixerRegistry  │
-                    │  Upgradeable    │  ← UUPS implementation
-                    │  (logic)        │     48h timelock upgrades
-                    └─────────────────┘
-
-                    ┌─────────────────┐
-                    │ FixerCredential │  ← Soulbound ERC-721
-                    │  (NFT)          │     On-chain SVG artwork
-                    └─────────────────┘
-```
-
----
-
-## Reactive Network Integration Notes
-
-The Fixer Protocol is designed for cross-chain operation via Reactive Network:
-
-| | Testnet (Lasna) | Mainnet |
-|---|---|---|
-| Base | Supported | Supported |
-| Arbitrum | Not supported | Supported |
-| Unichain | Not supported | Supported |
-| Ethereum | Supported | Supported |
-
-**For testnet Reactive integration:** Use the **Base Sepolia** deployment as the primary origin chain. The Lasna testnet (chain ID 5318007) supports Base Sepolia (84532) and Ethereum Sepolia (11155111) as origin/destination chains.
-
-**Reactive Callback Proxy (Base Sepolia):** `0xa6eA49Ed671B8a4dfCDd34E36b7a75Ac79B8A5a6`
 
 ---
 
 ## Deployment Scripts
+
+### Fresh Deployment
 
 | Script | Network | Command |
 |--------|---------|---------|
 | `DeployBaseSepolia.s.sol` | Base Sepolia | `forge script script/DeployBaseSepolia.s.sol --rpc-url base_sepolia --broadcast -vvvv` |
 | `DeployArbSepolia.s.sol` | Arbitrum Sepolia | `forge script script/DeployArbSepolia.s.sol --rpc-url arb_sepolia --broadcast -vvvv` |
 | `DeployUnichainSepolia.s.sol` | Unichain Sepolia | `forge script script/DeployUnichainSepolia.s.sol --rpc-url unichain_sepolia --broadcast -vvvv` |
-| `DeployTestnet.s.sol` | Any (env-configured) | `forge script script/DeployTestnet.s.sol --rpc-url <RPC> --broadcast -vvvv` |
+| `DeployLasna.s.sol` | Lasna (Reactive) | `forge script script/DeployLasna.s.sol --rpc-url lasna --broadcast -vvvv` |
 
-### Environment Variables Required
+### v2.6.0 Upgrade (2-Phase Timelock)
+
+The UUPS upgrade uses a 48-hour timelock for security:
 
 ```bash
-# Required
-PRIVATE_KEY=0x...              # Deployer private key
+# Phase 1: Deploy new contracts + propose upgrade
+PROXY_ADDRESS=0x... forge script script/UpgradeV260Propose.s.sol \
+  --rpc-url <chain> --broadcast -vvvv
 
-# Optional (defaults to deployer)
-SECURITY_COUNCIL=0x...         # Multisig for emergency pause
-GOVERNANCE=0x...               # DAO governance (default: address(0))
+# Phase 2: Execute after 48h timelock expires
+PROXY_ADDRESS=0x... NEW_EXTENSION=0x... forge script script/UpgradeV260Execute.s.sol \
+  --rpc-url <chain> --broadcast -vvvv
 ```
 
-### RPC Configuration (foundry.toml)
+| Chain | Proxy | New Extension |
+|-------|-------|---------------|
+| Unichain Sepolia | `0xa5589E...d9` | `0x2bF8E2...B0` |
+| Base Sepolia | `0x3Fb805...60` | `0xC75230...bD` |
+| Arb Sepolia | `0x07dF8c...Eb` | `0xAb340F...Db` |
+| Lasna | `0xd2f11a...F3` | `0x6d192e...4C` |
 
-```toml
-[rpc_endpoints]
-base_sepolia = "${BASE_SEPOLIA_RPC}"
-arb_sepolia = "${ARB_SEPOLIA_RPC}"
-unichain_sepolia = "${UNICHAIN_SEPOLIA_RPC}"
+### Verification
+
+```bash
+# Free verification via Blockscout (no API key needed)
+python3 scripts/verify_blockscout.py base-sepolia
+python3 scripts/verify_blockscout.py arb-sepolia
+
+# Unichain uses forge CLI:
+forge verify-contract --rpc-url unichain_sepolia <ADDR> <PATH> \
+  --verifier blockscout --verifier-url "https://unichain-sepolia.blockscout.com/api/"
 ```
 
 ---
 
 ## Deployment Records
 
-Full deployment records with all addresses and verification data are stored in:
-
-- [`deployments/base-sepolia.json`](../deployments/base-sepolia.json)
-- [`deployments/arb-sepolia.json`](../deployments/arb-sepolia.json)
-- [`deployments/unichain-sepolia.json`](../deployments/unichain-sepolia.json)
-
----
-
-## Security Considerations
-
-- **All interactions go through the Proxy address**, never the implementation directly
-- The hook uses `try/catch` around `registry.recordReferral()` — a registry failure never blocks a swap
-- Hook addresses are CREATE2-mined with **exact flag matching** (14-bit mask `0x3FFF`) to prevent extra permission bits
-- The registry uses a 48-hour timelock on upgrades with `proposeUpgrade()` / `executeUpgrade()`
-- Emergency pause is available via the Security Council multisig
-- FIX token has a hard supply cap of 1 billion tokens
-- Self-referral is blocked (referrer cannot equal swapper)
-
----
-
-## Troubleshooting
-
-### "HookAddressNotValid" during deployment
-
-The mined hook address has extra permission bits set. The `HookMiner` uses exact flag matching (`address & 0x3FFF == flags`) to prevent this. If you see this error, ensure you're using the updated HookMiner with `ALL_HOOK_MASK`.
-
-### "Hook address mismatch" during deployment
-
-Foundry's `new Contract{salt}()` uses the deterministic CREATE2 deployer at `0x4e59b44847b379578588920cA78FbF26c0B4956C`, not the EOA deployer. Ensure `HookMiner.find()` is called with the CREATE2 deployer address.
-
-### Contract size exceeds 24576 bytes
-
-Enable `via_ir = true` in `foundry.toml`. The Yul IR pipeline produces smaller bytecode for complex contracts like FixerRegistryUpgradeable.
-
-### No testnet ETH for Unichain Sepolia
-
-Bridge ETH from Ethereum Sepolia via the OptimismPortal at `0x0d83dab629f0e0F9d36c0Cbc89B69a489f0751bD`:
-
-```bash
-cast send 0x0d83dab629f0e0F9d36c0Cbc89B69a489f0751bD \
-  --value 0.3ether \
-  --private-key $PRIVATE_KEY \
-  --rpc-url $ETHEREUM_SEPOLIA_RPC
-```
+- [`deployments/unichain-sepolia-v2.json`](../deployments/unichain-sepolia-v2.json)
+- [`deployments/base-sepolia-v2.json`](../deployments/base-sepolia-v2.json)
+- [`deployments/arb-sepolia-v2.json`](../deployments/arb-sepolia-v2.json)
+- [`deployments/lasna-v2.json`](../deployments/lasna-v2.json)

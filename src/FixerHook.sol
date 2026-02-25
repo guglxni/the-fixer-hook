@@ -176,6 +176,10 @@ contract FixerHook is BaseHook, ERC20, Ownable {
     
     /// @notice Maximum basis points (100%)
     uint256 private constant BPS_DENOMINATOR = 10000;
+
+    /// @notice Maximum total supply of FIX tokens (1 billion)
+    /// @dev FIX: F-07 — Immutable hard cap to prevent unbounded supply growth
+    uint256 public constant MAX_SUPPLY = 1_000_000_000e18;
     
     // ========================================================================
     // STATE VARIABLES
@@ -341,9 +345,15 @@ contract FixerHook is BaseHook, ERC20, Ownable {
         // STEP 2: Decode the referrer address
         // ====================================================================
         // hookData format: abi.encode(address referrer)
-        // This produces a 32-byte padded address representation.
-        // If hookData is malformed, abi.decode will revert.
-        address referrer = abi.decode(hookData, (address));
+        // FIX: F-05 — Wrap abi.decode in try/catch to prevent malformed hookData
+        // from reverting the entire swap. Uses external self-call pattern.
+        address referrer;
+        try this.decodeReferrer(hookData) returns (address decoded) {
+            referrer = decoded;
+        } catch {
+            // Malformed hookData — skip referral silently
+            return (this.afterSwap.selector, 0);
+        }
         
         // ====================================================================
         // STEP 3: Validate - Check for zero address
@@ -439,7 +449,15 @@ contract FixerHook is BaseHook, ERC20, Ownable {
         // STEP 11: Mint reward tokens
         // ====================================================================
         // All validation passed. Mint calculated reward to the referrer.
-        // _mint is inherited from Solmate's ERC20 implementation.
+        // FIX: F-07 — Enforce MAX_SUPPLY cap before minting
+        if (totalSupply + reward > MAX_SUPPLY) {
+            // Cap reward to remaining supply or skip if at cap
+            uint256 remaining = MAX_SUPPLY - totalSupply;
+            if (remaining == 0) {
+                return (this.afterSwap.selector, 0);
+            }
+            reward = remaining;
+        }
         _mint(referrer, reward);
         
         // Emit event for indexing and tracking
@@ -508,6 +526,9 @@ contract FixerHook is BaseHook, ERC20, Ownable {
         // Select the quote token amount for volume calculation
         // This ensures consistent volume measurement across pools with different token pairs
         int128 quoteAmount = quoteTokenIndex == 0 ? amount0 : amount1;
+        
+        // FIX: N-03 — Guard against int128.min negation overflow (matching V2 fix F-13)
+        if (quoteAmount == type(int128).min) return uint256(uint128(type(int128).max));
         
         // Convert to absolute value
         // forge-lint: disable-next-line(unsafe-typecast)
@@ -731,6 +752,8 @@ contract FixerHook is BaseHook, ERC20, Ownable {
         // Validate parameters
         if (_rewardRateBps > BPS_DENOMINATOR) revert InvalidParameter();
         if (_minRewardAmount > _maxRewardAmount) revert InvalidParameter();
+        // FIX: F-18 — Prevent maxRewardAmount exceeding uint128.max
+        if (_maxRewardAmount > type(uint128).max) revert InvalidParameter();
         
         minSwapAmount = _minSwapAmount;
         rewardRateBps = _rewardRateBps;
@@ -750,5 +773,17 @@ contract FixerHook is BaseHook, ERC20, Ownable {
         
         tierThresholds[tier] = thresholds;
         emit TierThresholdsUpdated(tier, thresholds);
+    }
+
+    // ========================================================================
+    // HELPER FUNCTIONS
+    // ========================================================================
+
+    /// @notice External function to decode referrer (for try/catch pattern)
+    /// @dev FIX: F-05 — Used internally to handle malformed hookData gracefully
+    /// @param hookData The encoded hook data
+    /// @return referrer The decoded referrer address
+    function decodeReferrer(bytes calldata hookData) external pure returns (address) {
+        return abi.decode(hookData, (address));
     }
 }

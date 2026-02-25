@@ -71,7 +71,7 @@
         <mxCell id="impl_title" value="FixerRegistryUpgradeable" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontFamily=Inter,system-ui;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1">
           <mxGeometry x="240" y="268" width="420" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="impl_ver" value="v2.3.0 -- Implementation Contract" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#CBD5E1;" vertex="1" parent="1">
+        <mxCell id="impl_ver" value="v2.4.0 -- Implementation Contract" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#CBD5E1;" vertex="1" parent="1">
           <mxGeometry x="240" y="298" width="420" height="30" as="geometry" />
         </mxCell>
 

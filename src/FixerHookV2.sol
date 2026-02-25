@@ -24,6 +24,9 @@ import {Currency} from "v4-core/types/Currency.sol";
 // Trusted Router Pattern (ERC-4337 compatible user identification)
 import {IMsgSender} from "./interfaces/IMsgSender.sol";
 
+// FIX: F-08 — Use Ownable for safe admin rotation instead of immutable owner
+import {Ownable} from "solady/auth/Ownable.sol";
+
 // ============================================================================
 // CONTRACT
 // ============================================================================
@@ -54,7 +57,7 @@ import {IMsgSender} from "./interfaces/IMsgSender.sol";
 /// - Graceful error handling (swap never fails due to hook)
 /// - Gas optimized: minimal storage, no token operations
 /// - Trusted Router pattern for ERC-4337 compatible user identification
-contract FixerHookV2 is BaseHook {
+contract FixerHookV2 is BaseHook, Ownable {
     using PoolIdLibrary for PoolKey;
     
     // ========================================================================
@@ -91,6 +94,7 @@ contract FixerHookV2 is BaseHook {
     error InvalidQuoteTokenIndex();
     
     /// @notice Thrown when a non-owner calls an owner-only function
+    /// @dev Kept for backwards compatibility; Ownable also has its own error
     error NotOwner();
     
     // ========================================================================
@@ -105,9 +109,6 @@ contract FixerHookV2 is BaseHook {
     
     /// @notice Quote token index for volume calculation (0 = token0, 1 = token1)
     uint256 public immutable quoteTokenIndex;
-    
-    /// @notice The deployer/admin who can manage trusted routers
-    address public immutable owner;
     
     // ========================================================================
     // STORAGE
@@ -159,7 +160,8 @@ contract FixerHookV2 is BaseHook {
         });
         poolId = key.toId().toBytes32();
         quoteTokenIndex = _quoteTokenIndex;
-        owner = msg.sender;
+        // FIX: F-08 — Use Ownable for safe admin rotation instead of immutable owner
+        _initializeOwner(msg.sender);
     }
     
     // ========================================================================
@@ -167,12 +169,11 @@ contract FixerHookV2 is BaseHook {
     // ========================================================================
     
     /// @notice Add or remove a trusted router from the allowlist
-    /// @dev Only the deployer/owner can manage the router allowlist.
-    ///      Trusted routers must implement IMsgSender to resolve the actual user.
+    /// @dev FIX: F-08 — Uses Ownable's onlyOwner instead of immutable owner check.
+    ///      Owner can now be rotated via transferOwnership for key compromise recovery.
     /// @param router The router address to update
     /// @param trusted Whether the router should be trusted
-    function setTrustedRouter(address router, bool trusted) external {
-        if (msg.sender != owner) revert NotOwner();
+    function setTrustedRouter(address router, bool trusted) external onlyOwner {
         trustedRouters[router] = trusted;
         emit TrustedRouterUpdated(router, trusted);
     }
@@ -281,6 +282,7 @@ contract FixerHookV2 is BaseHook {
     
     /// @notice Calculates the swap volume using the configured quote token
     /// @dev Uses quoteTokenIndex to determine which token amount to use
+    ///      FIX: F-13 — Guards against int128.min negation overflow
     /// @param delta The balance changes from the swap
     /// @return volume The calculated volume in quote token units
     function _calculateSwapVolume(BalanceDelta delta) internal view returns (uint256) {
@@ -289,6 +291,9 @@ contract FixerHookV2 is BaseHook {
         
         // Select amount based on quote token configuration
         int128 quoteAmount = quoteTokenIndex == 0 ? amount0 : amount1;
+        
+        // FIX: F-13 — Guard against int128.min negation overflow
+        if (quoteAmount == type(int128).min) return uint256(uint128(type(int128).max));
         
         // Convert to absolute value
         return quoteAmount < 0 
@@ -320,7 +325,8 @@ contract FixerHookV2 is BaseHook {
     function _resolveSwapper(address sender) internal returns (address swapper) {
         if (trustedRouters[sender]) {
             // Trusted router: query the authenticated user
-            try IMsgSender(sender).msgSender() returns (address user) {
+            // FIX: F-14 — Apply gas cap to prevent OOG from malicious router
+            try IMsgSender(sender).msgSender{gas: 50_000}() returns (address user) {
                 if (user != address(0)) {
                     return user;
                 }

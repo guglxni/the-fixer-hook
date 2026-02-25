@@ -1,0 +1,19 @@
+{
+  "chain": "Lasna (Reactive Network)",
+  "chainId": 5318007,
+  "version": "2.6.0",
+  "upgradedAt": "2026-02-25",
+  "upgradeStatus": "executed",
+  "contracts": {
+    "FixerLib": "0xfD870250416F3127b8111fDE1D8dEBDc31D1BCA2",
+    "FixerRegistryUpgradeable_impl_v250": "0x8160B7dba69D0B8b144f25a3022acB99509c79b7",
+    "FixerRegistryUpgradeable_impl_v260": "0x6Cc135698BFE7B109E581f73A814E3aF4e919908",
+    "RegistryProxy": "0xd2f11a95F1ca8cc94FB63926dc3A92655aAc6fF3",
+    "FixerRegistryExtension_v250": "0x2e0379c6226Ae9e2327cF86ABCbC26f68fbE290D",
+    "FixerRegistryExtension_v260": "0x6d192eB2E06A3C48832047D5ccA775c60E87034C",
+    "FixerCredential": "0xB9356961aa61AA1148f39Dd0C748656C3E574596"
+  },
+  "architecture": "Reactive Modular (DELEGATECALL fallback) - No Hook",
+  "stack": ["ERC-8004 Identity", "x402 Payments", "XMTP Communication"],
+  "notes": "Registry + Extension + Credential only. No FixerHookV2 deployed - Lasna has no Uniswap v4 PoolManager. Core (20,507B) + Extension (14,659B) - EIP-170 compliant. v2.6.0 adds XMTP. Upgrade executed via timewarp DELEGATECALL."
+}

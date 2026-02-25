@@ -15,18 +15,17 @@ import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/ut
 // Internal
 import {FixerRegistryStorage} from "./storage/FixerRegistryStorage.sol";
 import {EmergencyModule} from "./modules/EmergencyModule.sol";
-import {AgentTierConstants, ProtocolFeeConstants} from "./types/AgentTypes.sol";
+import {AgentTierConstants, ProtocolFeeConstants, ERC8004Constants} from "./types/AgentTypes.sol";
 import {BPSMath} from "./libraries/BPSMath.sol";
+import {FixerLib} from "./libraries/FixerLib.sol";
 
 // Solady (gas-optimized math)
 import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";
 
 // Interfaces
 import {IFixerRegistry} from "./interfaces/IFixerRegistry.sol";
-import {IAgentRegistry} from "./interfaces/IAgentRegistry.sol";
 
 // OpenZeppelin (EIP-712 for EIP-3009)
-import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {EIP712Upgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
 
 // ============================================================================
@@ -36,27 +35,24 @@ import {EIP712Upgradeable} from "@openzeppelin/contracts-upgradeable/utils/crypt
 /// @title FixerRegistryUpgradeable
 /// @author Aaryan Guglani
 /// @notice UUPS-upgradeable central registry for cross-pool referral rewards in Uniswap v4
-/// @dev v2.2 — Upgradeable version of FixerRegistry with:
-///      - ERC-7201 namespaced storage for safe upgrades
-///      - Emergency module with circuit breakers
-///      - Protocol fee system (5% default, 10% max)
-///      - Agent registry stubs (prepared for v2.2.2)
-///      - Preserves all v1 functionality (referrals, tiers, hooks)
+/// @dev v2.5 — Reactive Modular Architecture:
+///      - Core contract handles: Referrals, ERC20, Tiers, Emergency, Hooks, Admin
+///      - Extension contract handles: ERC-8004 Agents, Delegation, Reputation, EIP-3009
+///      - Library handles: Pure computation (FixerLib)
+///
+///      The core contract's fallback() routes unknown selectors to the extension
+///      via DELEGATECALL, enabling unified ABI access through the proxy while keeping
+///      each contract under the EIP-170 size limit (24,576 bytes).
 ///
 /// Architecture:
-///   ERC1967Proxy → FixerRegistryUpgradeable (implementation)
-///   Storage: FixerRegistryStorage (ERC-7201 namespaced)
+///   ERC1967Proxy → FixerRegistryUpgradeable (Core)
+///                    ├── fallback() → DELEGATECALL → FixerRegistryExtension
+///                    └── FixerLib (external library, DELEGATECALL)
+///   Storage: FixerRegistryStorage (ERC-7201 namespaced, shared)
 ///   Modules: EmergencyModule (circuit breakers, pause)
 ///
 /// Upgrade Path:
-///   FixerRegistry (v1, non-upgradeable) → deploy proxy + migrate
-///   FixerRegistryUpgradeable v2.2.1 → v2.2.2 (agents) → v2.3 (cross-chain)
-///
-/// Decisions Applied:
-///   - FIX Token = ERC20 via ERC20Upgradeable (initializer pattern)
-///   - Registry = UUPS Upgradeable (owner-authorized upgrades)
-///   - Protocol Fee = 5% (500 bps), max 10% (1000 bps) hard cap
-///   - Fee Split = 50% treasury / 30% buyback / 20% stakers
+///   v2.4.0 (monolithic) → v2.5.0 (modular: core + extension)
 contract FixerRegistryUpgradeable is
     Initializable,
     UUPSUpgradeable,
@@ -64,8 +60,7 @@ contract FixerRegistryUpgradeable is
     ERC20Upgradeable,
     ReentrancyGuardUpgradeable,
     EIP712Upgradeable,
-    EmergencyModule,
-    IAgentRegistry
+    EmergencyModule
 {
     using FixerRegistryStorage for *;
 
@@ -77,20 +72,11 @@ contract FixerRegistryUpgradeable is
     uint256 private constant BPS_DENOMINATOR = 10000;
 
     /// @notice Contract version for upgrade tracking
-    uint256 public constant VERSION = 2_003_000; // v2.3.0
+    uint256 public constant VERSION = 2_006_000; // v2.6.0
 
-    /// @notice Maximum agent bonus multiplier (50% = 5000 bps)
-    uint16 public constant MAX_AGENT_BONUS_BPS = 5000;
-
-    /// @notice EIP-3009 typehash for transferWithAuthorization
-    bytes32 public constant TRANSFER_WITH_AUTHORIZATION_TYPEHASH = keccak256(
-        "TransferWithAuthorization(address from,address to,uint256 value,uint256 validAfter,uint256 validBefore,bytes32 nonce)"
-    );
-
-    /// @notice EIP-3009 typehash for receiveWithAuthorization
-    bytes32 public constant RECEIVE_WITH_AUTHORIZATION_TYPEHASH = keccak256(
-        "ReceiveWithAuthorization(address from,address to,uint256 value,uint256 validAfter,uint256 validBefore,bytes32 nonce)"
-    );
+    /// @notice Maximum gross reward after all multipliers (safety cap)
+    /// @dev Prevents uncapped amplification from tier × reputation stacking
+    uint256 public constant MAX_GROSS_REWARD = 5_000e18;
 
     /// @notice Maximum total supply of FIX tokens (1 billion)
     /// @dev Immutable hard cap — cannot be changed even by owner or upgrade
@@ -161,8 +147,8 @@ contract FixerRegistryUpgradeable is
     /// @notice Emitted when a timelocked upgrade is executed
     event UpgradeExecuted(address indexed newImplementation);
 
-    /// @notice EIP-3009: Emitted when a transfer authorization is used
-    event AuthorizationUsed(address indexed authorizer, bytes32 indexed nonce);
+    /// @notice Emitted when the extension contract address is updated
+    event ExtensionUpdated(address indexed oldExtension, address indexed newExtension);
 
     // ========================================================================
     // ERRORS
@@ -183,16 +169,8 @@ contract FixerRegistryUpgradeable is
     error UpgradeAlreadyPending();
     error UpgradeNotAuthorizedViaProposeExecute();
 
-    // x402 agent errors are inherited from IAgentRegistry:
-    //   AgentAlreadyRegistered, AgentNotRegistered, InvalidAgentAddress,
-    //   CannotDelegateToSelf, DelegationAlreadyExists, DelegationNotFound,
-    //   BonusMultiplierTooHigh
-
-    // EIP-3009 authorization errors
-    error AuthorizationExpired();
-    error AuthorizationNotYetValid();
-    error AuthorizationAlreadyUsed();
-    error InvalidSignature();
+    /// @notice Extension contract not set
+    error ExtensionNotSet();
 
     // ========================================================================
     // MODIFIERS
@@ -262,6 +240,32 @@ contract FixerRegistryUpgradeable is
         __EIP712_init("Fixer Token", "1");
     }
 
+    /// @notice Re-initializer for upgrading from v2.3.x to v2.4.0 (ERC-8004 Trustless Agents)
+    /// @dev Sets ERC-8004 registry addresses and default reputation cache TTL.
+    /// @param identity_ ERC-8004 Identity Registry address
+    /// @param reputation_ ERC-8004 Reputation Registry address
+    /// @param validation_ ERC-8004 Validation Registry address
+    function reinitializeV4(
+        address identity_,
+        address reputation_,
+        address validation_
+    ) external reinitializer(4) {
+        FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
+        s.identityRegistry = identity_;
+        s.reputationRegistry = reputation_;
+        s.validationRegistry = validation_;
+        s.reputationCacheTTL = ERC8004Constants.DEFAULT_CACHE_TTL;
+    }
+
+    /// @notice Re-initializer for v2.6.0 (XMTP Agent Infrastructure Stack)
+    /// @dev No new storage initialization needed — XMTP fields default to 0/false.
+    ///      This reinitializer serves as a version checkpoint for the upgrade.
+    function reinitializeV5() external reinitializer(5) {
+        // All new XMTP storage fields in AgentProfile default to zero.
+        // xmtpEnabledCount in MainStorage defaults to 0.
+        // No explicit initialization required.
+    }
+
     // ========================================================================
     // CORE: REFERRAL PROCESSING
     // ========================================================================
@@ -314,7 +318,10 @@ contract FixerRegistryUpgradeable is
         return reward;
     }
 
-    /// @notice Computes net reward after tier multiplier, agent bonus, and protocol fee
+    /// @notice Computes net reward after tier multiplier, reputation bonus, and protocol fee
+    /// @dev Agent bonus is derived exclusively from ERC-8004 reputation scores.
+    ///      If cache is stale (> reputationCacheTTL), degrades to BONUS_LOW (500 BPS grace).
+    ///      Critical: Zero external calls on hot path — all reads from cached storage.
     function _computeNetReward(
         FixerRegistryStorage.MainStorage storage s,
         address referrer,
@@ -326,11 +333,31 @@ contract FixerRegistryUpgradeable is
         uint64 multiplier = s.tierThresholds[s.referrerStats[referrer].tier].multiplierBps;
         uint256 grossReward = BPSMath.applyMultiplier(baseReward, multiplier);
 
-        // Apply x402 agent bonus if referrer is a verified agent
+        // Apply ERC-8004 reputation-derived bonus (if agent)
         FixerRegistryStorage.AgentProfile storage agent = s.agentProfiles[referrer];
-        if (agent.verified && agent.bonusMultiplierBps > 0) {
-            uint256 agentBonus = BPSMath.applyBPS(grossReward, agent.bonusMultiplierBps);
-            grossReward += agentBonus;
+        if (agent.wallet != address(0) && agent.erc8004AgentId != 0) {
+            uint16 effectiveBonus;
+
+            if (
+                s.reputationCacheTTL > 0 &&
+                agent.lastReputationUpdate > 0 &&
+                block.timestamp - agent.lastReputationUpdate > s.reputationCacheTTL
+            ) {
+                // Cache is stale — degrade to grace bonus (500 BPS)
+                effectiveBonus = ERC8004Constants.BONUS_LOW;
+            } else {
+                effectiveBonus = agent.derivedBonusBps;
+            }
+
+            if (effectiveBonus > 0) {
+                uint256 agentBonus = BPSMath.applyBPS(grossReward, effectiveBonus);
+                grossReward += agentBonus;
+            }
+        }
+
+        // FIX: F-10 — Cap gross reward to prevent uncapped tier × reputation amplification
+        if (grossReward > MAX_GROSS_REWARD) {
+            grossReward = MAX_GROSS_REWARD;
         }
 
         // Apply protocol fee
@@ -391,12 +418,17 @@ contract FixerRegistryUpgradeable is
 
     /// @notice Distribute accumulated protocol fees
     /// @dev FINALIZED: 50% treasury / 30% buyback / 20% stakers
-    function distributeFees() external nonReentrant {
+    ///      FIX: F-02 — Added whenNotPausedRewards + circuit breaker check
+    ///      FIX: F-11 — Added onlyOwner access control
+    function distributeFees() external onlyOwner nonReentrant whenNotPausedRewards {
         FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
 
         uint256 fees = s.accumulatedFees;
         if (fees == 0) revert NoFeesToDistribute();
-        if (s.treasury == address(0)) revert FeeAddressNotSet();
+        // FIX: N-02 — Require all three fee addresses to prevent silent loss of shares
+        if (s.treasury == address(0) || s.buybackContract == address(0) || s.stakerRewards == address(0)) {
+            revert FeeAddressNotSet();
+        }
 
         // Clear accumulated fees before distribution (CEI)
         s.accumulatedFees = 0;
@@ -404,6 +436,10 @@ contract FixerRegistryUpgradeable is
         uint256 treasuryShare = BPSMath.applyBPS(fees, ProtocolFeeConstants.TREASURY_SHARE);
         uint256 buybackShare = BPSMath.applyBPS(fees, ProtocolFeeConstants.BUYBACK_SHARE);
         uint256 stakerShare = fees - treasuryShare - buybackShare; // Remainder to avoid rounding dust
+
+        // FIX: F-02 — Check circuit breaker before minting fee tokens
+        uint256 totalMint = treasuryShare + buybackShare + stakerShare;
+        _checkCircuitBreaker(totalMint);
 
         // Mint fee tokens to destinations
         if (treasuryShare > 0 && s.treasury != address(0)) {
@@ -617,7 +653,7 @@ contract FixerRegistryUpgradeable is
         return _calculateReward(s, volume);
     }
 
-    /// @notice Public reward calculator with tier multiplier
+    /// @notice Public reward calculator with tier multiplier (gross, before protocol fee)
     function calculateRewardWithTier(uint256 volume, address referrer) external view returns (uint256) {
         FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
         if (volume < s.minSwapAmount) return 0;
@@ -627,6 +663,55 @@ contract FixerRegistryUpgradeable is
         uint64 multiplier = s.tierThresholds[tier].multiplierBps;
 
         return BPSMath.applyMultiplier(baseReward, multiplier);
+    }
+
+    /// @notice Public reward calculator returning the net reward (after tier, reputation bonus, and protocol fee)
+    /// @dev FIX: N-01 — Mirrors _computeNetReward logic in read-only mode so frontends
+    ///      can show users the actual reward they will receive, not the inflated gross amount.
+    /// @param volume The swap volume
+    /// @param referrer The referrer address (used for tier + ERC-8004 bonus lookup)
+    /// @return netReward The reward the referrer would actually receive after all deductions
+    function calculateNetReward(uint256 volume, address referrer) external view returns (uint256 netReward) {
+        FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
+        if (volume < s.minSwapAmount) return 0;
+
+        uint256 baseReward = _calculateReward(s, volume);
+
+        // Apply referrer tier multiplier
+        uint64 multiplier = s.tierThresholds[s.referrerStats[referrer].tier].multiplierBps;
+        uint256 grossReward = BPSMath.applyMultiplier(baseReward, multiplier);
+
+        // Apply ERC-8004 reputation-derived bonus (read-only)
+        FixerRegistryStorage.AgentProfile storage agent = s.agentProfiles[referrer];
+        if (agent.wallet != address(0) && agent.erc8004AgentId != 0) {
+            uint16 effectiveBonus;
+
+            if (
+                s.reputationCacheTTL > 0 &&
+                agent.lastReputationUpdate > 0 &&
+                block.timestamp - agent.lastReputationUpdate > s.reputationCacheTTL
+            ) {
+                effectiveBonus = ERC8004Constants.BONUS_LOW;
+            } else {
+                effectiveBonus = agent.derivedBonusBps;
+            }
+
+            if (effectiveBonus > 0) {
+                grossReward += BPSMath.applyBPS(grossReward, effectiveBonus);
+            }
+        }
+
+        // Cap gross reward
+        if (grossReward > MAX_GROSS_REWARD) {
+            grossReward = MAX_GROSS_REWARD;
+        }
+
+        // Apply protocol fee (view-only — no accumulation)
+        if (s.protocolFeeBps > 0) {
+            uint256 fee = BPSMath.applyBPS(grossReward, s.protocolFeeBps);
+            return grossReward - fee;
+        }
+        return grossReward;
     }
 
     /// @notice Get accumulated protocol fees
@@ -663,9 +748,8 @@ contract FixerRegistryUpgradeable is
         s.poolInfos[poolId].hookAddress = hook;
         s.poolInfos[poolId].active = true;
 
-        unchecked {
-            s.hookCount += 1;
-        }
+        // FIX: F-19 — Use checked arithmetic (consistent with deregisterHook)
+        s.hookCount += 1;
 
         emit HookRegistered(hook, poolId);
     }
@@ -776,7 +860,9 @@ contract FixerRegistryUpgradeable is
     }
 
     /// @notice Execute a proposed upgrade after the timelock has expired
-    /// @dev Calls UUPSUpgradeable.upgradeToAndCall which triggers _authorizeUpgrade
+    /// @dev Calls UUPSUpgradeable.upgradeToAndCall which triggers _authorizeUpgrade.
+    ///      FIX: F-01 — _authorizeUpgrade now validates and cleans up the proposal,
+    ///      so we don't delete it here (it must be present for validation).
     function executeUpgrade() external onlyOwner {
         FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
         if (!s.pendingUpgrade.active) revert NoUpgradePending();
@@ -787,11 +873,10 @@ contract FixerRegistryUpgradeable is
         }
 
         address newImpl = s.pendingUpgrade.newImplementation;
-        delete s.pendingUpgrade;
 
         emit UpgradeExecuted(newImpl);
 
-        // This calls _authorizeUpgrade internally
+        // This calls _authorizeUpgrade internally, which validates + clears the proposal
         upgradeToAndCall(newImpl, "");
     }
 
@@ -812,233 +897,68 @@ contract FixerRegistryUpgradeable is
     }
 
     /// @notice Authorizes an upgrade to a new implementation
-    /// @dev Only callable via executeUpgrade() — direct upgrades are blocked.
-    ///      The proposal is already deleted in executeUpgrade before this is called,
-    ///      so we only verify onlyOwner here. The timelock is enforced in executeUpgrade.
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
-
-    // ========================================================================
-    // x402 AGENT REGISTRY (Enhancement 2)
-    // ========================================================================
-
-    /// @inheritdoc IAgentRegistry
-    function registerAgent(
-        address agent,
-        bytes32 x402ProofHash,
-        FixerRegistryStorage.AgentPlatform platform
-    ) external onlyOwner whenNotPausedAgents {
-        if (agent == address(0)) revert InvalidAgentAddress();
-
+    /// @dev Enforces the full propose → timelock → execute flow.
+    ///      Direct calls to upgradeToAndCall() are blocked — must go through
+    ///      proposeUpgrade() → wait 48h → executeUpgrade().
+    ///      FIX: F-01 — Previously only checked onlyOwner, allowing timelock bypass.
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {
         FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
-        if (s.agentProfiles[agent].wallet != address(0)) revert AgentAlreadyRegistered();
-
-        s.agentProfiles[agent] = FixerRegistryStorage.AgentProfile({
-            wallet: agent,
-            x402Identity: x402ProofHash,
-            registeredAt: uint64(block.timestamp),
-            platform: platform,
-            x402Volume: 0,
-            verified: true,
-            bonusMultiplierBps: 0
-        });
-
-        s.totalAgents += 1;
-        s.agentPlatformCount[uint8(platform)] += 1;
-
-        emit AgentRegistered(agent, platform, x402ProofHash, msg.sender);
-    }
-
-    /// @inheritdoc IAgentRegistry
-    function deregisterAgent(address agent) external onlyOwner {
-        FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
-        if (s.agentProfiles[agent].wallet == address(0)) revert AgentNotRegistered();
-
-        FixerRegistryStorage.AgentPlatform platform = s.agentProfiles[agent].platform;
-        delete s.agentProfiles[agent];
-
-        s.totalAgents -= 1;
-        s.agentPlatformCount[uint8(platform)] -= 1;
-
-        emit AgentDeregistered(agent);
-    }
-
-    /// @inheritdoc IAgentRegistry
-    function updateAgentProfile(
-        address agent,
-        uint16 bonusMultiplierBps,
-        bool verified
-    ) external onlyOwner {
-        FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
-        if (s.agentProfiles[agent].wallet == address(0)) revert AgentNotRegistered();
-        if (bonusMultiplierBps > MAX_AGENT_BONUS_BPS) revert BonusMultiplierTooHigh();
-
-        s.agentProfiles[agent].bonusMultiplierBps = bonusMultiplierBps;
-        s.agentProfiles[agent].verified = verified;
-
-        emit AgentProfileUpdated(agent, bonusMultiplierBps, verified);
-    }
-
-    /// @inheritdoc IAgentRegistry
-    function updateAgentX402Volume(address agent, uint128 additionalVolume) external onlyOwner {
-        FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
-        if (s.agentProfiles[agent].wallet == address(0)) revert AgentNotRegistered();
-
-        s.agentProfiles[agent].x402Volume += additionalVolume;
-
-        emit AgentX402VolumeUpdated(agent, s.agentProfiles[agent].x402Volume);
-    }
-
-    // ========================================================================
-    // x402 REFERRAL DELEGATION (Enhancement 4 — Marketplace)
-    // ========================================================================
-
-    /// @inheritdoc IAgentRegistry
-    function delegateReferral(address delegate) external {
-        if (delegate == msg.sender) revert CannotDelegateToSelf();
-        if (delegate == address(0)) revert InvalidAgentAddress();
-
-        FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
-        if (s.referralDelegations[msg.sender][delegate]) revert DelegationAlreadyExists();
-
-        s.referralDelegations[msg.sender][delegate] = true;
-
-        emit ReferralDelegated(msg.sender, delegate);
-    }
-
-    /// @inheritdoc IAgentRegistry
-    function revokeDelegation(address delegate) external {
-        FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
-        if (!s.referralDelegations[msg.sender][delegate]) revert DelegationNotFound();
-
-        s.referralDelegations[msg.sender][delegate] = false;
-
-        emit ReferralDelegationRevoked(msg.sender, delegate);
-    }
-
-    // ========================================================================
-    // x402 AGENT VIEW FUNCTIONS
-    // ========================================================================
-
-    /// @inheritdoc IAgentRegistry
-    function isRegisteredAgent(address agent) external view returns (bool) {
-        return FixerRegistryStorage.getStorage().agentProfiles[agent].wallet != address(0);
-    }
-
-    /// @inheritdoc IAgentRegistry
-    function isVerifiedAgent(address agent) external view returns (bool) {
-        FixerRegistryStorage.AgentProfile storage profile =
-            FixerRegistryStorage.getStorage().agentProfiles[agent];
-        return profile.wallet != address(0) && profile.verified;
-    }
-
-    /// @inheritdoc IAgentRegistry
-    function getAgentMultiplierBonus(address agent) external view returns (uint16 bonusBps) {
-        FixerRegistryStorage.AgentProfile storage profile =
-            FixerRegistryStorage.getStorage().agentProfiles[agent];
-        if (profile.wallet != address(0) && profile.verified) {
-            return profile.bonusMultiplierBps;
+        if (!s.pendingUpgrade.active) revert UpgradeNotAuthorizedViaProposeExecute();
+        if (s.pendingUpgrade.newImplementation != newImplementation) revert InvalidParameter();
+        uint256 elapsed = block.timestamp - s.pendingUpgrade.proposedAt;
+        if (elapsed < UPGRADE_TIMELOCK) {
+            revert UpgradeTimelockNotExpired(UPGRADE_TIMELOCK - elapsed);
         }
-        return 0;
-    }
-
-    /// @inheritdoc IAgentRegistry
-    function getAgentProfile(address agent)
-        external
-        view
-        returns (FixerRegistryStorage.AgentProfile memory profile)
-    {
-        return FixerRegistryStorage.getStorage().agentProfiles[agent];
-    }
-
-    /// @inheritdoc IAgentRegistry
-    function isDelegated(address delegator, address delegate) external view returns (bool) {
-        return FixerRegistryStorage.getStorage().referralDelegations[delegator][delegate];
-    }
-
-    /// @inheritdoc IAgentRegistry
-    function getTotalAgents() external view returns (uint64 count) {
-        return FixerRegistryStorage.getStorage().totalAgents;
-    }
-
-    /// @inheritdoc IAgentRegistry
-    function getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform platform)
-        external
-        view
-        returns (uint64 count)
-    {
-        return FixerRegistryStorage.getStorage().agentPlatformCount[uint8(platform)];
+        // Clear proposal after validation — prevents replay
+        delete s.pendingUpgrade;
     }
 
     // ========================================================================
-    // EIP-3009: transferWithAuthorization (Enhancement 6 — FIX as x402 currency)
+    // EXTENSION: REACTIVE MODULAR ARCHITECTURE
     // ========================================================================
 
-    /// @notice Execute a transfer with a signed authorization (EIP-3009)
-    /// @dev Enables gasless FIX transfers for x402 payment settlements.
-    ///      The facilitator submits the pre-signed authorization on behalf of the payer.
-    /// @param from Payer's address (token sender)
-    /// @param to Payee's address (token receiver)
-    /// @param value Amount of FIX tokens to transfer
-    /// @param validAfter Earliest timestamp when the authorization is valid
-    /// @param validBefore Latest timestamp when the authorization is valid
-    /// @param nonce Unique nonce to prevent double-spending
-    /// @param v ECDSA signature component v
-    /// @param r ECDSA signature component r
-    /// @param s ECDSA signature component s
-    function transferWithAuthorization(
-        address from,
-        address to,
-        uint256 value,
-        uint256 validAfter,
-        uint256 validBefore,
-        bytes32 nonce,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external {
-        if (block.timestamp < validAfter) revert AuthorizationNotYetValid();
-        if (block.timestamp > validBefore) revert AuthorizationExpired();
-
-        FixerRegistryStorage.MainStorage storage stor = FixerRegistryStorage.getStorage();
-        bytes32 authKey = keccak256(abi.encodePacked(from, nonce));
-        if (stor.authorizationStates[authKey]) revert AuthorizationAlreadyUsed();
-
-        bytes32 structHash = keccak256(
-            abi.encode(
-                TRANSFER_WITH_AUTHORIZATION_TYPEHASH,
-                from,
-                to,
-                value,
-                validAfter,
-                validBefore,
-                nonce
-            )
-        );
-
-        bytes32 digest = _hashTypedDataV4(structHash);
-        address signer = ECDSA.recover(digest, v, r, s);
-        if (signer != from) revert InvalidSignature();
-
-        stor.authorizationStates[authKey] = true;
-        emit AuthorizationUsed(from, nonce);
-
-        _transfer(from, to, value);
+    /// @notice Set the extension contract address for agent + EIP-3009 functions
+    /// @dev The extension is called via DELEGATECALL from fallback().
+    ///      It shares the same ERC-7201 storage layout and OZ inheritance chain.
+    ///      Must be set before agent registration or EIP-3009 transfers work.
+    /// @param extension_ Address of the deployed FixerRegistryExtension contract
+    function setExtension(address extension_) external onlyOwner {
+        if (extension_ == address(0)) revert InvalidParameter();
+        FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
+        address old = s.extension;
+        s.extension = extension_;
+        emit ExtensionUpdated(old, extension_);
     }
 
-    /// @notice Check if an authorization nonce has been used
-    /// @param authorizer The address that signed the authorization
-    /// @param nonce The nonce to check
-    /// @return Whether the nonce has been used
-    function authorizationState(address authorizer, bytes32 nonce) external view returns (bool) {
-        bytes32 authKey = keccak256(abi.encodePacked(authorizer, nonce));
-        return FixerRegistryStorage.getStorage().authorizationStates[authKey];
+    /// @notice Get the current extension contract address
+    function getExtension() external view returns (address) {
+        return FixerRegistryStorage.getStorage().extension;
     }
 
-    /// @notice Returns the EIP-712 domain separator
-    /// @return The domain separator hash
-    function DOMAIN_SEPARATOR() external view returns (bytes32) {
-        return _domainSeparatorV4();
+    /// @notice Fallback routes unknown selectors to the extension via DELEGATECALL
+    /// @dev This enables the Agent Infrastructure Stack (ERC-8004, EIP-3009, delegation)
+    ///      to live in a separate contract while presenting a unified ABI through the proxy.
+    ///      DELEGATECALL preserves msg.sender, msg.value, and storage context.
+    fallback() external payable {
+        address ext = FixerRegistryStorage.getStorage().extension;
+        if (ext == address(0)) revert ExtensionNotSet();
+
+        assembly {
+            // Copy calldata
+            calldatacopy(0, 0, calldatasize())
+            // Delegatecall to extension
+            let result := delegatecall(gas(), ext, 0, calldatasize(), 0, 0)
+            // Copy returndata
+            returndatacopy(0, 0, returndatasize())
+            // Forward result
+            switch result
+            case 0 { revert(0, returndatasize()) }
+            default { return(0, returndatasize()) }
+        }
     }
+
+    /// @notice Accept ETH (required for fallback to be payable)
+    receive() external payable {}
 
     // ========================================================================
     // ERC20 OVERRIDES

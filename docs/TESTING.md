@@ -2,8 +2,8 @@
 
 > Comprehensive test coverage for the FixerHook Protocol
 
-**Last Updated:** February 6, 2026  
-**Total Tests:** 191 across 19 test suites (all passing)
+**Last Updated:** February 24, 2026
+**Total Tests:** 352 across 34 test suites (all passing)
 
 ---
 
@@ -19,7 +19,11 @@
 | FixerCredentialTest | `test/FixerCredential.t.sol` | Unit | NFT credentials |
 | FixerCredentialFuzzTest | `test/FixerCredential.t.sol` | Fuzz | Mint fuzz |
 | **FixerRegistryUpgradeTest** | `test/FixerRegistryUpgrade.t.sol` | **31** | **v2.2 UUPS + proxy** |
-| **EmergencyModuleTest** | `test/EmergencyModule.t.sol` | **25** | **v2.4 Emergency module** |
+| **EmergencyModuleTest** | `test/EmergencyModule.t.sol` | **29** | **Emergency module** |
+| **HardeningTest** | `test/Hardening.t.sol` | **30** | **Supply cap, timelock, invariants** |
+| **CoverageGapTest** | `test/CoverageGap.t.sol` | **34** | **BPSMath, pool info, fuzz** |
+| **X402AgentRegistryTest** | `test/X402.t.sol` | **44** | **x402 agent & EIP-3009** |
+| **ERC8004RegistrationTest** | `test/ERC8004.t.sol` | **46** | **ERC-8004 identity, reputation, rewards** |
 
 ### v2.2 Test Coverage (FixerRegistryUpgrade.t.sol — 31 tests)
 

@@ -39,8 +39,10 @@ function routeDescription(route: string): string {
     "GET /api/v1/referrers/:addr": "Full referrer profile with earnings, tier, and history",
     "GET /api/v1/optimize/route": "AI-optimized swap route for maximum referral reward",
     "POST /api/v1/referral/intent": "Submit a referral intent with pre-signed hookData",
-    "GET /api/v1/analytics/agent/:id": "Agent-specific analytics dashboard data",
+    "GET /api/v1/agents/analytics/:id": "Agent analytics dashboard: x402 + ERC-8004 + XMTP unified view",
     "POST /api/v1/agents/register": "Register an AI agent as a verified referrer ($1 USDC)",
+    "GET /api/v1/agents/xmtp": "XMTP ecosystem statistics — total enabled agents and adoption rate",
+    "GET /api/v1/agents/xmtp/:addr": "XMTP communication discovery — endpoint URI for agent-to-agent messaging",
   };
   return descriptions[route] ?? route;
 }

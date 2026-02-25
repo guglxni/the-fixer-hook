@@ -1,9 +1,9 @@
 # Security Analysis
 
-> Threat Model and Mitigation Strategies for FixerHook Protocol (v1.0 + v2.2)
+> Threat Model and Mitigation Strategies for FixerHook Protocol (v1.0 + v2.4)
 
-**Last Updated:** February 6, 2026  
-**Covers:** FixerHook v1, FixerRegistryUpgradeable v2.2.1, EmergencyModule
+**Last Updated:** February 24, 2026
+**Covers:** FixerHook v1, FixerRegistryUpgradeable v2.4.0 (ERC-8004 + EIP-3009), EmergencyModule
 
 ---
 

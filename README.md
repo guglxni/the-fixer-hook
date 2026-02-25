@@ -232,26 +232,34 @@ the-fixer-hook/
 │   ├── FixerHook.sol                  # v1 - Original hook (BaseHook + ERC20)
 │   ├── FixerHookV2.sol                # v2 - Lightweight hook (delegates to registry)
 │   ├── FixerRegistry.sol              # v1 - Non-upgradeable central registry
-│   ├── FixerRegistryUpgradeable.sol   # v2.3 - UUPS proxy registry + EIP-3009
+│   ├── FixerRegistryUpgradeable.sol   # v2.6 - UUPS proxy registry + ERC-8004 + EIP-3009 + XMTP
 │   ├── FixerCredential.sol            # v2.1 - Soulbound NFT credentials
 │   ├── storage/
 │   │   └── FixerRegistryStorage.sol   # ERC-7201 namespaced storage
 │   ├── modules/
 │   │   └── EmergencyModule.sol        # Circuit breaker + pause system
 │   ├── libraries/
-│   │   └── BPSMath.sol                # Basis-point math helpers
-│   ├── interfaces/                   # IFixerRegistry, IAgentRegistry, etc.
+│   │   ├── BPSMath.sol                # Basis-point math helpers
+│   │   └── FixerLib.sol               # Shared computation library
+│   ├── interfaces/                    # IFixerRegistry, IAgentRegistry, ERC-8004 interfaces
+│   │   ├── IAgentRegistry.sol         # Agent Infrastructure Stack interface (XMTP + x402 + ERC-8004)
+│   │   ├── IERC8004IdentityRegistry.sol    # ERC-8004 Identity Registry
+│   │   ├── IERC8004ReputationRegistry.sol  # ERC-8004 Reputation Registry
+│   │   └── IERC8004ValidationRegistry.sol  # ERC-8004 Validation Registry
 │   └── types/
-│       └── AgentTypes.sol              # Tier constants, fee constants
+│       └── AgentTypes.sol              # Tier constants, fee constants, ERC8004Constants, XMTPConstants
 │
-├── test/                              # 314 tests across 28 suites
+├── test/                              # 381 tests across 35 suites
 │   ├── FixerHook.t.sol               # v1 hook tests
 │   ├── FixerRegistry.t.sol            # v1 registry tests
 │   ├── FixerRegistryUpgrade.t.sol     # Proxy + upgrade tests
 │   ├── FixerCredential.t.sol         # NFT credential tests
 │   ├── Hardening.t.sol               # Supply cap, timelock, invariants
 │   ├── EmergencyModule.t.sol         # Emergency / circuit breaker tests
-│   └── X402.t.sol                    # x402 agent & EIP-3009 tests
+│   ├── X402.t.sol                    # x402 agent & EIP-3009 tests
+│   ├── ERC8004.t.sol                 # ERC-8004 identity, reputation, rewards
+│   ├── XMTP.t.sol                    # XMTP communication layer tests
+│   └── CoverageGap.t.sol            # BPSMath, pool info, fuzz coverage
 │
 ├── script/
 │   ├── Deploy.s.sol                  # v1 deployment
@@ -267,11 +275,13 @@ the-fixer-hook/
 ├── deployments/                       # Live deployment records (JSON)
 │   ├── base-sepolia.json
 │   ├── arb-sepolia.json
-│   └── unichain-sepolia.json
+│   ├── unichain-sepolia.json
+│   └── lasna.json
 │
-├── x402/                              # Off-chain x402 services
-│   ├── raas-server/                  # RaaS API (Hono + x402 paywall)
-│   └── mcp-server/                   # MCP server for AI agents
+├── x402/                              # Off-chain Agent Infrastructure services
+│   ├── raas-server/                  # RaaS API v2.0.0 (Hono + x402 + XMTP)
+│   ├── mcp-server/                   # MCP server v2.0.0 for AI agents
+│   └── xmtp-bot/                     # XMTP v3 bot service
 │
 ├── docs/                              # Comprehensive documentation
 └── foundry.toml                       # Foundry configuration
@@ -310,7 +320,7 @@ forge test -vvv
 
 Expected output:
 ```
-Ran 28 test suites: 314 tests passed, 0 failed
+Ran 35 test suites: 381 tests passed, 0 failed
 ```
 
 ### 5. Run Tests with Gas Report
@@ -362,19 +372,37 @@ forge test --gas-report
 
 ---
 
-## v2 Architecture: UUPS Upgradeable Registry
+## v2 Architecture: Agent Infrastructure Stack
 
-As the project evolved beyond v1, we built a **UUPS proxy-based upgradeable architecture** with a central registry, emergency controls, and x402 AI agent support:
+As the project evolved beyond v1, we built a **UUPS proxy-based upgradeable architecture** with a central registry, emergency controls, and the **Agent Infrastructure Stack**:
+
+| Layer | Protocol | Role |
+|:-----:|:--------:|:-----|
+| Communication | **XMTP** | Wallet-to-wallet messaging between agents |
+| Payments | **x402** | HTTP 402 micropayments, EIP-3009 gasless transfers |
+| Identity & Trust | **ERC-8004** | NFT identity, reputation scoring, validation |
 
 ![UUPS Proxy Architecture](docs/diagrams/drawio/uups-proxy.png)
 
 > **Learning Point:** The v2 architecture separates concerns - the hook stays lightweight (just routing), while the registry handles all business logic behind a UUPS proxy for upgradeability.
 
+### ERC-8004 "Trustless Agents" (v2.4.0+, XMTP added v2.6.0)
+
+All agent registration is **permissionless** via ERC-8004 NFT ownership proof. Agents register by calling `registerAgent(uint256 agentId, AgentPlatform platform)` — no admin approval needed. Their reputation score (read from the ERC-8004 Reputation Registry) automatically determines their bonus multiplier:
+
+| Score (0-100) | Tier | Bonus | Effect on Platinum Referrer |
+|:---:|:---:|:---:|:---|
+| <= 0 | None | 0% | 2.0x (tier only) |
+| 1-30 | Low | 5% | 2.1x effective |
+| 31-60 | Medium | 15% | 2.3x effective |
+| 61-80 | High | 30% | 2.6x effective |
+| 81-100 | Elite | 50% | 3.0x effective |
+
 ---
 
 ## Live Testnet Deployments
 
-The full Fixer Protocol v2.3 stack is deployed and verified on three L2 testnets:
+The full Fixer Protocol v2.4 stack is deployed and verified on three L2 testnets:
 
 | Network | Registry Proxy | FixerHookV2 | FixerCredential |
 |---------|---------------|-------------|-----------------|
@@ -382,7 +410,7 @@ The full Fixer Protocol v2.3 stack is deployed and verified on three L2 testnets
 | **Arbitrum Sepolia** | [`0xC7206C...B9e`](https://sepolia.arbiscan.io/address/0xC7206C83702B251A5408B28Ce4df195255F42B9e) | [`0x7A5E4C...040`](https://sepolia.arbiscan.io/address/0x7A5E4C1b42d66f459c02b36115d184b907dF0040) | [`0x0F94b6...c79`](https://sepolia.arbiscan.io/address/0x0F94b615c27DAfe6D875aE863a77Ea50D9c30b79) |
 | **Unichain Sepolia** | [`0xC13080...56f`](https://sepolia.uniscan.xyz/address/0xC13080390D3A1aCCdC7E6bbd7A41981db4bcd56f) | [`0x983eA9...040`](https://sepolia.uniscan.xyz/address/0x983eA96dd196f3F8395A051453505A7c9321c040) | [`0x88a31b...5c0`](https://sepolia.uniscan.xyz/address/0x88a31bFDa9B3E24a6bDFE7Ae627CB2C7A134f5c0) |
 
-Each deployment creates a USDC/WETH pool with 0.3% fee tier. The FIX token lives at the Registry Proxy address.
+Each deployment creates a USDC/WETH pool with 0.3% fee tier (except Lasna which has no Uniswap v4). The FIX token lives at the Registry Proxy address. All contracts run **VERSION 2_006_000 (v2.6.0)** with full XMTP communication support.
 
 For complete addresses, interaction instructions, diagrams, and `cast` commands, see the **[Testnet Deployments Guide](./docs/TESTNET_DEPLOYMENTS.md)**.
 
@@ -397,6 +425,7 @@ For deeper dives into specific topics:
 | [System Design](./docs/SYSTEM_DESIGN.md) | Full architecture with diagrams |
 | [Implementation Guide](./docs/IMPLEMENTATION_GUIDE.md) | Step-by-step build instructions |
 | [Integration Guide](./docs/INTEGRATION_GUIDE.md) | How frontends connect |
+| [ERC-8004 Enhancement](./internal/ERC8004_ENHANCEMENT.md) | Agent Infrastructure Stack integration |
 | [Testnet Deployments](./docs/TESTNET_DEPLOYMENTS.md) | Live testnet addresses + interaction guide |
 | [Mainnet Deployments](./docs/MAINNET_DEPLOYMENTS.md) | Mainnet deployment guide (coming soon) |
 | [Security Analysis](./docs/SECURITY.md) | Threat model and mitigations |

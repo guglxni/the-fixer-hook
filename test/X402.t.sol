@@ -5,18 +5,91 @@ import {Test, console} from "forge-std/Test.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {FixerRegistryUpgradeable} from "../src/FixerRegistryUpgradeable.sol";
 import {FixerRegistryStorage} from "../src/storage/FixerRegistryStorage.sol";
+import {FixerRegistryExtension} from "../src/FixerRegistryExtension.sol";
+import {IFixerRegistryFull} from "./helpers/IFixerRegistryFull.sol";
+import {FixerLib} from "../src/libraries/FixerLib.sol";
 import {IAgentRegistry} from "../src/interfaces/IAgentRegistry.sol";
+import {ERC8004Constants} from "../src/types/AgentTypes.sol";
+import {IERC8004IdentityRegistry} from "../src/interfaces/IERC8004IdentityRegistry.sol";
+import {IERC8004ReputationRegistry} from "../src/interfaces/IERC8004ReputationRegistry.sol";
+import {IERC8004ValidationRegistry} from "../src/interfaces/IERC8004ValidationRegistry.sol";
 
-/// @title x402 Enhancement Tests
-/// @notice Comprehensive tests for x402 agent registry, referral delegation,
-///         agent bonus multiplier, and EIP-3009 transferWithAuthorization
-/// @dev Tests the v2.3.0 (x402) features of FixerRegistryUpgradeable
+// ============================================================================
+// MOCK CONTRACTS (Agent Infrastructure Stack)
+// ============================================================================
+
+/// @notice Mock ERC-8004 Identity Registry for X402 tests
+contract X402MockIdentityRegistry is IERC8004IdentityRegistry {
+    mapping(uint256 => address) public owners;
+    mapping(uint256 => address) public agentWallets;
+
+    function setOwner(uint256 tokenId, address owner_) external {
+        owners[tokenId] = owner_;
+    }
+
+    function setAgentWallet(uint256 agentId, address wallet) external {
+        agentWallets[agentId] = wallet;
+    }
+
+    function ownerOf(uint256 tokenId) external view returns (address) {
+        return owners[tokenId];
+    }
+
+    function getAgentWallet(uint256 agentId) external view returns (address) {
+        return agentWallets[agentId];
+    }
+
+    function getMetadata(uint256, string calldata) external pure returns (bytes memory) {
+        return "";
+    }
+}
+
+/// @notice Mock ERC-8004 Reputation Registry for X402 tests
+contract X402MockReputationRegistry is IERC8004ReputationRegistry {
+    mapping(uint256 => int128) public scores;
+    mapping(uint256 => uint8) public scoreDecimals;
+
+    function setScore(uint256 agentId, int128 score, uint8 decimals_) external {
+        scores[agentId] = score;
+        scoreDecimals[agentId] = decimals_;
+    }
+
+    function getSummary(
+        uint256 agentId,
+        address[] calldata,
+        bytes32,
+        bytes32
+    ) external view returns (uint256 count, int128 summaryValue, uint8 decimals_) {
+        return (1, scores[agentId], scoreDecimals[agentId]);
+    }
+
+    function readFeedback(uint256, address, uint256) external pure returns (int128, uint8, bytes32, bytes32, bool) {
+        return (0, 0, bytes32(0), bytes32(0), false);
+    }
+
+    function giveFeedback(uint256, int128, uint8, bytes32, bytes32, bytes32, string calldata, bytes32) external {}
+}
+
+/// @notice Mock ERC-8004 Validation Registry for X402 tests
+contract X402MockValidationRegistry is IERC8004ValidationRegistry {
+    function getSummary(uint256, address[] calldata, bytes32) external pure returns (uint256 count, uint8 averageResponse) {
+        return (1, 100);
+    }
+}
+
+// ============================================================================
+// AGENT INFRASTRUCTURE STACK: AGENT REGISTRATION TESTS
+// ============================================================================
+
+/// @title X402 Agent Registry Tests (Agent Infrastructure Stack)
+/// @notice Tests for ERC-8004 agent registration, deregistration, and view functions
+/// @dev All agent registration uses ERC-8004 NFT ownership proof (permissionless)
 contract X402AgentRegistryTest is Test {
-    // ========================================================================
-    // STATE
-    // ========================================================================
-
     FixerRegistryUpgradeable public registry;
+    IFixerRegistryFull public ext;
+    X402MockIdentityRegistry public identityRegistry;
+    X402MockReputationRegistry public reputationRegistry;
+    X402MockValidationRegistry public validationRegistry;
 
     address public owner = makeAddr("owner");
     address public securityCouncil = makeAddr("securityCouncil");
@@ -27,118 +100,179 @@ contract X402AgentRegistryTest is Test {
     address public agent3 = makeAddr("agent3");
     address public hookAddr = makeAddr("hook");
 
-    bytes32 public constant PROOF_HASH_1 = keccak256("x402-proof-agent1");
-    bytes32 public constant PROOF_HASH_2 = keccak256("x402-proof-agent2");
-    bytes32 public constant PROOF_HASH_3 = keccak256("x402-proof-agent3");
-
-    // ========================================================================
-    // SETUP
-    // ========================================================================
+    uint256 public constant AGENT_ID_1 = 101;
+    uint256 public constant AGENT_ID_2 = 102;
+    uint256 public constant AGENT_ID_3 = 103;
 
     function setUp() public {
-        FixerRegistryUpgradeable implementation = new FixerRegistryUpgradeable();
+        identityRegistry = new X402MockIdentityRegistry();
+        reputationRegistry = new X402MockReputationRegistry();
+        validationRegistry = new X402MockValidationRegistry();
 
+        FixerRegistryUpgradeable implementation = new FixerRegistryUpgradeable();
         bytes memory initData = abi.encodeCall(
             FixerRegistryUpgradeable.initialize,
             (owner, securityCouncil, governance)
         );
-
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
-        registry = FixerRegistryUpgradeable(address(proxy));
+        registry = FixerRegistryUpgradeable(payable(address(proxy)));
 
-        // Register a hook for referral tests
-        vm.startPrank(owner);
-        bytes32 poolId = keccak256("test-pool");
-        registry.registerHook(hookAddr, poolId);
-        vm.stopPrank();
+        // Configure ERC-8004 registries
+        registry.reinitializeV4(
+            address(identityRegistry),
+            address(reputationRegistry),
+            address(validationRegistry)
+        );
+
+        FixerRegistryExtension extensionImpl = new FixerRegistryExtension();
+        vm.prank(owner);
+        registry.setExtension(address(extensionImpl));
+        ext = IFixerRegistryFull(address(proxy));
+
+        // Register hook for referral tests
+        vm.prank(owner);
+        registry.registerHook(hookAddr, keccak256("test-pool"));
+
+        // Set up identities
+        identityRegistry.setOwner(AGENT_ID_1, agent1);
+        identityRegistry.setAgentWallet(AGENT_ID_1, agent1);
+        identityRegistry.setOwner(AGENT_ID_2, agent2);
+        identityRegistry.setAgentWallet(AGENT_ID_2, agent2);
+        identityRegistry.setOwner(AGENT_ID_3, agent3);
+        identityRegistry.setAgentWallet(AGENT_ID_3, agent3);
     }
 
     // ========================================================================
     // VERSION TESTS
     // ========================================================================
 
-    function test_version_is_2_3_0() public view {
-        assertEq(registry.VERSION(), 2_003_000, "Should be v2.3.0");
+    function test_version_is_v2_5_0() public view {
+        assertEq(registry.VERSION(), 2_006_000, "Should be v2.6.0");
     }
 
     // ========================================================================
-    // AGENT REGISTRATION TESTS
+    // AGENT REGISTRATION TESTS (ERC-8004 Permissionless)
     // ========================================================================
 
     function test_registerAgent_success() public {
-        vm.prank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
+        vm.prank(agent1);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
 
-        assertTrue(registry.isRegisteredAgent(agent1), "Agent should be registered");
-        assertTrue(registry.isVerifiedAgent(agent1), "Agent should be verified");
-        assertEq(registry.getTotalAgents(), 1, "Total agents should be 1");
+        assertTrue(ext.isRegisteredAgent(agent1), "Agent should be registered");
+        assertTrue(ext.isVerifiedAgent(agent1), "Agent should be verified");
+        assertEq(ext.getTotalAgents(), 1, "Total agents should be 1");
         assertEq(
-            registry.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.OpenClaw),
+            ext.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.OpenClaw),
             1,
             "OpenClaw agent count should be 1"
         );
     }
 
     function test_registerAgent_profileData() public {
-        vm.prank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.Moltbook);
+        vm.prank(agent1);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.Moltbook);
 
-        FixerRegistryStorage.AgentProfile memory profile = registry.getAgentProfile(agent1);
+        FixerRegistryStorage.AgentProfile memory profile = ext.getAgentProfile(agent1);
         assertEq(profile.wallet, agent1, "Wallet should match");
-        assertEq(profile.x402Identity, PROOF_HASH_1, "x402Identity should match");
+        assertEq(profile.erc8004AgentId, AGENT_ID_1, "erc8004AgentId should match");
         assertEq(profile.registeredAt, block.timestamp, "registeredAt should be now");
         assertEq(uint8(profile.platform), uint8(FixerRegistryStorage.AgentPlatform.Moltbook), "Platform should be Moltbook");
-        assertEq(profile.x402Volume, 0, "x402Volume should be 0");
         assertTrue(profile.verified, "Should be verified");
-        assertEq(profile.bonusMultiplierBps, 0, "bonusMultiplierBps should be 0");
     }
 
     function test_registerAgent_multipleAgents() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
-        registry.registerAgent(agent2, PROOF_HASH_2, FixerRegistryStorage.AgentPlatform.Moltbook);
-        registry.registerAgent(agent3, PROOF_HASH_3, FixerRegistryStorage.AgentPlatform.Custom);
-        vm.stopPrank();
+        vm.prank(agent1);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
 
-        assertEq(registry.getTotalAgents(), 3, "Should have 3 agents");
-        assertEq(registry.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.OpenClaw), 1);
-        assertEq(registry.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.Moltbook), 1);
-        assertEq(registry.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.Custom), 1);
-        assertEq(registry.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.Human), 0);
+        vm.prank(agent2);
+        ext.registerAgent(AGENT_ID_2, FixerRegistryStorage.AgentPlatform.Moltbook);
+
+        vm.prank(agent3);
+        ext.registerAgent(AGENT_ID_3, FixerRegistryStorage.AgentPlatform.Custom);
+
+        assertEq(ext.getTotalAgents(), 3, "Should have 3 agents");
+        assertEq(ext.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.OpenClaw), 1);
+        assertEq(ext.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.Moltbook), 1);
+        assertEq(ext.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.Custom), 1);
+        assertEq(ext.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.Human), 0);
     }
 
     function test_registerAgent_emitsEvent() public {
         vm.expectEmit(true, true, true, true);
         emit IAgentRegistry.AgentRegistered(
             agent1,
-            FixerRegistryStorage.AgentPlatform.OpenClaw,
-            PROOF_HASH_1,
-            owner
+            AGENT_ID_1,
+            FixerRegistryStorage.AgentPlatform.OpenClaw
         );
 
-        vm.prank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
-    }
-
-    function test_registerAgent_revert_nonOwner() public {
         vm.prank(agent1);
-        vm.expectRevert();
-        registry.registerAgent(agent2, PROOF_HASH_2, FixerRegistryStorage.AgentPlatform.OpenClaw);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
     }
 
-    function test_registerAgent_revert_zeroAddress() public {
-        vm.prank(owner);
-        vm.expectRevert(IAgentRegistry.InvalidAgentAddress.selector);
-        registry.registerAgent(address(0), PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
+    function test_registerAgent_permissionless() public {
+        // Anyone can register if they own the NFT — no owner gating
+        vm.prank(agent1);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
+        assertTrue(ext.isRegisteredAgent(agent1));
+    }
+
+    function test_registerAgent_revert_notNFTOwner() public {
+        // agent2 tries to register with agent1's NFT
+        vm.prank(agent2);
+        vm.expectRevert(IAgentRegistry.InvalidAgentIdOwnership.selector);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
+    }
+
+    function test_registerAgent_revert_walletMismatch() public {
+        identityRegistry.setAgentWallet(AGENT_ID_1, agent2);
+
+        vm.prank(agent1);
+        vm.expectRevert(IAgentRegistry.AgentWalletMismatch.selector);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
     }
 
     function test_registerAgent_revert_alreadyRegistered() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
+        vm.prank(agent1);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
 
+        // Same wallet tries again with different ID
+        identityRegistry.setOwner(AGENT_ID_2, agent1);
+        identityRegistry.setAgentWallet(AGENT_ID_2, agent1);
+
+        vm.prank(agent1);
         vm.expectRevert(IAgentRegistry.AgentAlreadyRegistered.selector);
-        registry.registerAgent(agent1, PROOF_HASH_2, FixerRegistryStorage.AgentPlatform.OpenClaw);
-        vm.stopPrank();
+        ext.registerAgent(AGENT_ID_2, FixerRegistryStorage.AgentPlatform.OpenClaw);
+    }
+
+    function test_registerAgent_revert_agentIdAlreadyRegistered() public {
+        vm.prank(agent1);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
+
+        // Transfer NFT to agent2 and try to register same ID
+        identityRegistry.setOwner(AGENT_ID_1, agent2);
+        identityRegistry.setAgentWallet(AGENT_ID_1, agent2);
+
+        vm.prank(agent2);
+        vm.expectRevert(IAgentRegistry.AgentIdAlreadyRegistered.selector);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
+    }
+
+    function test_registerAgent_revert_registryNotConfigured() public {
+        // Deploy fresh registry without ERC-8004 configuration
+        FixerRegistryUpgradeable impl2 = new FixerRegistryUpgradeable();
+        bytes memory initData = abi.encodeCall(
+            FixerRegistryUpgradeable.initialize,
+            (owner, securityCouncil, governance)
+        );
+        ERC1967Proxy proxy2 = new ERC1967Proxy(address(impl2), initData);
+        FixerRegistryUpgradeable reg2 = FixerRegistryUpgradeable(payable(address(proxy2)));
+        FixerRegistryExtension ext2 = new FixerRegistryExtension();
+        vm.prank(owner);
+        reg2.setExtension(address(ext2));
+
+        vm.prank(agent1);
+        vm.expectRevert(IAgentRegistry.ERC8004RegistryNotConfigured.selector);
+        IFixerRegistryFull(address(proxy2)).registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
     }
 
     // ========================================================================
@@ -146,144 +280,42 @@ contract X402AgentRegistryTest is Test {
     // ========================================================================
 
     function test_deregisterAgent_success() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
-        registry.deregisterAgent(agent1);
-        vm.stopPrank();
+        vm.prank(agent1);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
 
-        assertFalse(registry.isRegisteredAgent(agent1), "Agent should not be registered");
-        assertFalse(registry.isVerifiedAgent(agent1), "Agent should not be verified");
-        assertEq(registry.getTotalAgents(), 0, "Total agents should be 0");
-        assertEq(registry.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.OpenClaw), 0);
+        vm.prank(owner);
+        ext.deregisterAgent(agent1);
+
+        assertFalse(ext.isRegisteredAgent(agent1), "Agent should not be registered");
+        assertFalse(ext.isVerifiedAgent(agent1), "Agent should not be verified");
+        assertEq(ext.getTotalAgents(), 0, "Total agents should be 0");
+        assertEq(ext.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.OpenClaw), 0);
     }
 
     function test_deregisterAgent_emitsEvent() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
+        vm.prank(agent1);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
 
         vm.expectEmit(true, true, true, true);
         emit IAgentRegistry.AgentDeregistered(agent1);
 
-        registry.deregisterAgent(agent1);
-        vm.stopPrank();
+        vm.prank(owner);
+        ext.deregisterAgent(agent1);
     }
 
     function test_deregisterAgent_revert_notRegistered() public {
         vm.prank(owner);
         vm.expectRevert(IAgentRegistry.AgentNotRegistered.selector);
-        registry.deregisterAgent(agent1);
+        ext.deregisterAgent(agent1);
     }
 
     function test_deregisterAgent_revert_nonOwner() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
-        vm.stopPrank();
+        vm.prank(agent1);
+        ext.registerAgent(AGENT_ID_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
 
         vm.prank(agent1);
         vm.expectRevert();
-        registry.deregisterAgent(agent1);
-    }
-
-    // ========================================================================
-    // AGENT PROFILE UPDATE TESTS
-    // ========================================================================
-
-    function test_updateAgentProfile_bonusAndVerified() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
-        registry.updateAgentProfile(agent1, 2000, true); // 20% bonus, still verified
-        vm.stopPrank();
-
-        assertEq(registry.getAgentMultiplierBonus(agent1), 2000, "Bonus should be 2000 bps");
-        assertTrue(registry.isVerifiedAgent(agent1), "Should still be verified");
-    }
-
-    function test_updateAgentProfile_unverify() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
-        registry.updateAgentProfile(agent1, 0, false);
-        vm.stopPrank();
-
-        assertFalse(registry.isVerifiedAgent(agent1), "Should not be verified");
-        assertEq(registry.getAgentMultiplierBonus(agent1), 0, "Unverified agent should have 0 bonus");
-    }
-
-    function test_updateAgentProfile_maxBonus() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
-        registry.updateAgentProfile(agent1, 5000, true); // 50% max bonus
-        vm.stopPrank();
-
-        assertEq(registry.getAgentMultiplierBonus(agent1), 5000, "Should be max bonus");
-    }
-
-    function test_updateAgentProfile_emitsEvent() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
-
-        vm.expectEmit(true, true, true, true);
-        emit IAgentRegistry.AgentProfileUpdated(agent1, 3000, true);
-
-        registry.updateAgentProfile(agent1, 3000, true);
-        vm.stopPrank();
-    }
-
-    function test_updateAgentProfile_revert_notRegistered() public {
-        vm.prank(owner);
-        vm.expectRevert(IAgentRegistry.AgentNotRegistered.selector);
-        registry.updateAgentProfile(agent1, 1000, true);
-    }
-
-    function test_updateAgentProfile_revert_bonusTooHigh() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
-
-        vm.expectRevert(IAgentRegistry.BonusMultiplierTooHigh.selector);
-        registry.updateAgentProfile(agent1, 5001, true); // Exceeds 5000 bps max
-        vm.stopPrank();
-    }
-
-    // ========================================================================
-    // AGENT X402 VOLUME TRACKING TESTS
-    // ========================================================================
-
-    function test_updateAgentX402Volume_success() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
-        registry.updateAgentX402Volume(agent1, 1000e6); // 1000 USDC
-        vm.stopPrank();
-
-        FixerRegistryStorage.AgentProfile memory profile = registry.getAgentProfile(agent1);
-        assertEq(profile.x402Volume, 1000e6, "x402Volume should be 1000 USDC");
-    }
-
-    function test_updateAgentX402Volume_accumulates() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
-        registry.updateAgentX402Volume(agent1, 500e6);
-        registry.updateAgentX402Volume(agent1, 300e6);
-        registry.updateAgentX402Volume(agent1, 200e6);
-        vm.stopPrank();
-
-        FixerRegistryStorage.AgentProfile memory profile = registry.getAgentProfile(agent1);
-        assertEq(profile.x402Volume, 1000e6, "x402Volume should accumulate to 1000 USDC");
-    }
-
-    function test_updateAgentX402Volume_emitsEvent() public {
-        vm.startPrank(owner);
-        registry.registerAgent(agent1, PROOF_HASH_1, FixerRegistryStorage.AgentPlatform.OpenClaw);
-
-        vm.expectEmit(true, true, true, true);
-        emit IAgentRegistry.AgentX402VolumeUpdated(agent1, 1000e6);
-
-        registry.updateAgentX402Volume(agent1, 1000e6);
-        vm.stopPrank();
-    }
-
-    function test_updateAgentX402Volume_revert_notRegistered() public {
-        vm.prank(owner);
-        vm.expectRevert(IAgentRegistry.AgentNotRegistered.selector);
-        registry.updateAgentX402Volume(agent1, 1000e6);
+        ext.deregisterAgent(agent1);
     }
 
     // ========================================================================
@@ -291,31 +323,31 @@ contract X402AgentRegistryTest is Test {
     // ========================================================================
 
     function test_isRegisteredAgent_false_unregistered() public view {
-        assertFalse(registry.isRegisteredAgent(agent1));
+        assertFalse(ext.isRegisteredAgent(agent1));
     }
 
     function test_isVerifiedAgent_false_unregistered() public view {
-        assertFalse(registry.isVerifiedAgent(agent1));
+        assertFalse(ext.isVerifiedAgent(agent1));
     }
 
     function test_getAgentMultiplierBonus_zero_unregistered() public view {
-        assertEq(registry.getAgentMultiplierBonus(agent1), 0);
+        assertEq(ext.getAgentMultiplierBonus(agent1), 0);
     }
 
     function test_getAgentProfile_empty_unregistered() public view {
-        FixerRegistryStorage.AgentProfile memory profile = registry.getAgentProfile(agent1);
+        FixerRegistryStorage.AgentProfile memory profile = ext.getAgentProfile(agent1);
         assertEq(profile.wallet, address(0), "Unregistered agent wallet should be zero");
     }
 
     function test_getTotalAgents_initial() public view {
-        assertEq(registry.getTotalAgents(), 0, "Should start with 0 agents");
+        assertEq(ext.getTotalAgents(), 0, "Should start with 0 agents");
     }
 
     function test_getAgentCountByPlatform_initial() public view {
-        assertEq(registry.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.OpenClaw), 0);
-        assertEq(registry.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.Moltbook), 0);
-        assertEq(registry.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.Custom), 0);
-        assertEq(registry.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.Human), 0);
+        assertEq(ext.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.OpenClaw), 0);
+        assertEq(ext.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.Moltbook), 0);
+        assertEq(ext.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.Custom), 0);
+        assertEq(ext.getAgentCountByPlatform(FixerRegistryStorage.AgentPlatform.Human), 0);
     }
 }
 
@@ -325,6 +357,7 @@ contract X402AgentRegistryTest is Test {
 
 contract X402DelegationTest is Test {
     FixerRegistryUpgradeable public registry;
+    IFixerRegistryFull public ext;
 
     address public owner = makeAddr("owner");
     address public securityCouncil = makeAddr("securityCouncil");
@@ -341,16 +374,21 @@ contract X402DelegationTest is Test {
             (owner, securityCouncil, governance)
         );
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
-        registry = FixerRegistryUpgradeable(address(proxy));
+        registry = FixerRegistryUpgradeable(payable(address(proxy)));
+
+        FixerRegistryExtension extensionImpl = new FixerRegistryExtension();
+        vm.prank(owner);
+        registry.setExtension(address(extensionImpl));
+        ext = IFixerRegistryFull(address(proxy));
     }
 
     // ---- Delegate Referral ----
 
     function test_delegateReferral_success() public {
         vm.prank(alice);
-        registry.delegateReferral(bob);
+        ext.delegateReferral(bob);
 
-        assertTrue(registry.isDelegated(alice, bob), "Alice should have delegated to Bob");
+        assertTrue(ext.isDelegated(alice, bob), "Alice should have delegated to Bob");
     }
 
     function test_delegateReferral_emitsEvent() public {
@@ -358,37 +396,37 @@ contract X402DelegationTest is Test {
         emit IAgentRegistry.ReferralDelegated(alice, bob);
 
         vm.prank(alice);
-        registry.delegateReferral(bob);
+        ext.delegateReferral(bob);
     }
 
     function test_delegateReferral_multipleRecipients() public {
         vm.startPrank(alice);
-        registry.delegateReferral(bob);
-        registry.delegateReferral(charlie);
+        ext.delegateReferral(bob);
+        ext.delegateReferral(charlie);
         vm.stopPrank();
 
-        assertTrue(registry.isDelegated(alice, bob), "Delegated to Bob");
-        assertTrue(registry.isDelegated(alice, charlie), "Delegated to Charlie");
+        assertTrue(ext.isDelegated(alice, bob), "Delegated to Bob");
+        assertTrue(ext.isDelegated(alice, charlie), "Delegated to Charlie");
     }
 
     function test_delegateReferral_revert_self() public {
         vm.prank(alice);
         vm.expectRevert(IAgentRegistry.CannotDelegateToSelf.selector);
-        registry.delegateReferral(alice);
+        ext.delegateReferral(alice);
     }
 
     function test_delegateReferral_revert_zeroAddress() public {
         vm.prank(alice);
         vm.expectRevert(IAgentRegistry.InvalidAgentAddress.selector);
-        registry.delegateReferral(address(0));
+        ext.delegateReferral(address(0));
     }
 
     function test_delegateReferral_revert_alreadyExists() public {
         vm.startPrank(alice);
-        registry.delegateReferral(bob);
+        ext.delegateReferral(bob);
 
         vm.expectRevert(IAgentRegistry.DelegationAlreadyExists.selector);
-        registry.delegateReferral(bob);
+        ext.delegateReferral(bob);
         vm.stopPrank();
     }
 
@@ -396,36 +434,36 @@ contract X402DelegationTest is Test {
 
     function test_revokeDelegation_success() public {
         vm.startPrank(alice);
-        registry.delegateReferral(bob);
-        registry.revokeDelegation(bob);
+        ext.delegateReferral(bob);
+        ext.revokeDelegation(bob);
         vm.stopPrank();
 
-        assertFalse(registry.isDelegated(alice, bob), "Delegation should be revoked");
+        assertFalse(ext.isDelegated(alice, bob), "Delegation should be revoked");
     }
 
     function test_revokeDelegation_emitsEvent() public {
         vm.startPrank(alice);
-        registry.delegateReferral(bob);
+        ext.delegateReferral(bob);
 
         vm.expectEmit(true, true, true, true);
         emit IAgentRegistry.ReferralDelegationRevoked(alice, bob);
 
-        registry.revokeDelegation(bob);
+        ext.revokeDelegation(bob);
         vm.stopPrank();
     }
 
     function test_revokeDelegation_revert_notDelegated() public {
         vm.prank(alice);
         vm.expectRevert(IAgentRegistry.DelegationNotFound.selector);
-        registry.revokeDelegation(bob);
+        ext.revokeDelegation(bob);
     }
 
     function test_delegationNotSymmetric() public {
         vm.prank(alice);
-        registry.delegateReferral(bob);
+        ext.delegateReferral(bob);
 
-        assertTrue(registry.isDelegated(alice, bob), "Alice -> Bob should be true");
-        assertFalse(registry.isDelegated(bob, alice), "Bob -> Alice should be false");
+        assertTrue(ext.isDelegated(alice, bob), "Alice -> Bob should be true");
+        assertFalse(ext.isDelegated(bob, alice), "Bob -> Alice should be false");
     }
 }
 
@@ -433,8 +471,13 @@ contract X402DelegationTest is Test {
 // AGENT BONUS MULTIPLIER IN REWARD COMPUTATION TESTS
 // ============================================================================
 
+/// @notice Tests that ERC-8004 reputation-derived bonuses affect reward computation
 contract X402AgentBonusTest is Test {
     FixerRegistryUpgradeable public registry;
+    IFixerRegistryFull public ext;
+    X402MockIdentityRegistry public identityRegistry;
+    X402MockReputationRegistry public reputationRegistry;
+    X402MockValidationRegistry public validationRegistry;
 
     address public owner = makeAddr("owner");
     address public securityCouncil = makeAddr("securityCouncil");
@@ -446,31 +489,49 @@ contract X402AgentBonusTest is Test {
     address public normalReferrer = makeAddr("normalReferrer");
     address public swapper = makeAddr("swapper");
 
+    uint256 public constant AGENT_ID = 42;
+
     function setUp() public {
+        identityRegistry = new X402MockIdentityRegistry();
+        reputationRegistry = new X402MockReputationRegistry();
+        validationRegistry = new X402MockValidationRegistry();
+
         FixerRegistryUpgradeable implementation = new FixerRegistryUpgradeable();
         bytes memory initData = abi.encodeCall(
             FixerRegistryUpgradeable.initialize,
             (owner, securityCouncil, governance)
         );
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
-        registry = FixerRegistryUpgradeable(address(proxy));
+        registry = FixerRegistryUpgradeable(payable(address(proxy)));
+
+        // Configure ERC-8004 registries
+        registry.reinitializeV4(
+            address(identityRegistry),
+            address(reputationRegistry),
+            address(validationRegistry)
+        );
+
+        FixerRegistryExtension extensionImpl = new FixerRegistryExtension();
+        vm.prank(owner);
+        registry.setExtension(address(extensionImpl));
+        ext = IFixerRegistryFull(address(proxy));
 
         // Register hook
-        vm.startPrank(owner);
+        vm.prank(owner);
         registry.registerHook(hookAddr, poolId);
 
-        // Register agent with 20% bonus
-        registry.registerAgent(
-            agentReferrer,
-            keccak256("x402-proof"),
-            FixerRegistryStorage.AgentPlatform.OpenClaw
-        );
-        registry.updateAgentProfile(agentReferrer, 2000, true); // 20% bonus
-        vm.stopPrank();
+        // Set up agent identity with elite reputation (85 = 5000 BPS bonus)
+        identityRegistry.setOwner(AGENT_ID, agentReferrer);
+        identityRegistry.setAgentWallet(AGENT_ID, agentReferrer);
+        reputationRegistry.setScore(AGENT_ID, 85, 0); // Elite tier
+
+        // Register agent via ERC-8004
+        vm.prank(agentReferrer);
+        ext.registerAgent(AGENT_ID, FixerRegistryStorage.AgentPlatform.OpenClaw);
     }
 
     function test_agentReferrer_getsBonus() public {
-        // Record a referral for agent referrer
+        // Record a referral for agent referrer (has elite reputation bonus)
         vm.prank(hookAddr);
         uint256 agentReward = registry.recordReferral(agentReferrer, swapper, 10_000e18, poolId);
 
@@ -478,30 +539,20 @@ contract X402AgentBonusTest is Test {
         vm.prank(hookAddr);
         uint256 normalReward = registry.recordReferral(normalReferrer, swapper, 10_000e18, poolId);
 
-        // Agent should earn more due to 20% bonus
+        // Agent should earn more due to reputation-derived bonus
         assertGt(agentReward, normalReward, "Agent should earn more than normal referrer");
     }
 
-    function test_agentReferrer_noBonus_whenZeroBps() public {
-        // Set bonus to 0
-        vm.prank(owner);
-        registry.updateAgentProfile(agentReferrer, 0, true);
-
-        // Record referrals
-        vm.prank(hookAddr);
-        uint256 agentReward = registry.recordReferral(agentReferrer, swapper, 10_000e18, poolId);
-
-        vm.prank(hookAddr);
-        uint256 normalReward = registry.recordReferral(normalReferrer, swapper, 10_000e18, poolId);
-
-        // With 0 bonus bps, rewards should be equal
-        assertEq(agentReward, normalReward, "0 bonus should yield same reward");
+    function test_agentReferrer_bonusDerivedFromReputation() public {
+        // Agent has elite reputation (85 = 5000 BPS = 50% bonus)
+        uint16 bonus = ext.getReputationBonus(agentReferrer);
+        assertEq(bonus, ERC8004Constants.BONUS_ELITE, "Should have elite bonus from reputation");
     }
 
-    function test_agentReferrer_noBonus_whenUnverified() public {
-        // Unverify the agent
-        vm.prank(owner);
-        registry.updateAgentProfile(agentReferrer, 2000, false);
+    function test_agentReferrer_noBonus_whenZeroReputation() public {
+        // Set reputation to 0
+        reputationRegistry.setScore(AGENT_ID, 0, 0);
+        ext.refreshAgentReputation(agentReferrer);
 
         vm.prank(hookAddr);
         uint256 agentReward = registry.recordReferral(agentReferrer, swapper, 10_000e18, poolId);
@@ -509,16 +560,18 @@ contract X402AgentBonusTest is Test {
         vm.prank(hookAddr);
         uint256 normalReward = registry.recordReferral(normalReferrer, swapper, 10_000e18, poolId);
 
-        assertEq(agentReward, normalReward, "Unverified agent should have no bonus");
+        // With 0 reputation, rewards should be equal
+        assertEq(agentReward, normalReward, "0 reputation should yield same reward");
     }
 }
 
 // ============================================================================
-// EIP-3009 TRANSFER WITH AUTHORIZATION TESTS
+// EIP-3009 TRANSFER WITH AUTHORIZATION TESTS (x402 Payment Layer)
 // ============================================================================
 
 contract X402TransferWithAuthorizationTest is Test {
     FixerRegistryUpgradeable public registry;
+    IFixerRegistryFull public ext;
 
     address public owner = makeAddr("owner");
     address public securityCouncil = makeAddr("securityCouncil");
@@ -542,7 +595,12 @@ contract X402TransferWithAuthorizationTest is Test {
             (owner, securityCouncil, governance)
         );
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
-        registry = FixerRegistryUpgradeable(address(proxy));
+        registry = FixerRegistryUpgradeable(payable(address(proxy)));
+
+        FixerRegistryExtension extensionImpl = new FixerRegistryExtension();
+        vm.prank(owner);
+        registry.setExtension(address(extensionImpl));
+        ext = IFixerRegistryFull(address(proxy));
 
         // Register hook and give signer some FIX tokens via referral
         vm.startPrank(owner);
@@ -567,7 +625,7 @@ contract X402TransferWithAuthorizationTest is Test {
     ) internal view returns (uint8 v, bytes32 r, bytes32 s) {
         bytes32 structHash = keccak256(
             abi.encode(
-                registry.TRANSFER_WITH_AUTHORIZATION_TYPEHASH(),
+                ext.TRANSFER_WITH_AUTHORIZATION_TYPEHASH(),
                 from,
                 to,
                 value,
@@ -580,7 +638,7 @@ contract X402TransferWithAuthorizationTest is Test {
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
-                registry.DOMAIN_SEPARATOR(),
+                ext.DOMAIN_SEPARATOR(),
                 structHash
             )
         );
@@ -602,7 +660,7 @@ contract X402TransferWithAuthorizationTest is Test {
 
         // Facilitator submits the auth
         vm.prank(facilitator);
-        registry.transferWithAuthorization(
+        ext.transferWithAuthorization(
             signer, recipient, amount, validAfter, validBefore, nonce, v, r, s
         );
 
@@ -614,18 +672,18 @@ contract X402TransferWithAuthorizationTest is Test {
         uint256 amount = 1e18;
         bytes32 nonce = bytes32(uint256(42));
 
-        assertFalse(registry.authorizationState(signer, nonce), "Nonce should not be used yet");
+        assertFalse(ext.authorizationState(signer, nonce), "Nonce should not be used yet");
 
         (uint8 v, bytes32 r, bytes32 s) = _signTransferAuth(
             signer, recipient, amount, block.timestamp - 1, block.timestamp + 3600, nonce
         );
 
         vm.prank(facilitator);
-        registry.transferWithAuthorization(
+        ext.transferWithAuthorization(
             signer, recipient, amount, block.timestamp - 1, block.timestamp + 3600, nonce, v, r, s
         );
 
-        assertTrue(registry.authorizationState(signer, nonce), "Nonce should be used after transfer");
+        assertTrue(ext.authorizationState(signer, nonce), "Nonce should be used after transfer");
     }
 
     function test_transferWithAuthorization_revert_replay() public {
@@ -640,14 +698,14 @@ contract X402TransferWithAuthorizationTest is Test {
 
         // First transfer succeeds
         vm.prank(facilitator);
-        registry.transferWithAuthorization(
+        ext.transferWithAuthorization(
             signer, recipient, amount, validAfter, validBefore, nonce, v, r, s
         );
 
         // Replay should fail
         vm.prank(facilitator);
-        vm.expectRevert(FixerRegistryUpgradeable.AuthorizationAlreadyUsed.selector);
-        registry.transferWithAuthorization(
+        vm.expectRevert(FixerRegistryExtension.AuthorizationAlreadyUsed.selector);
+        ext.transferWithAuthorization(
             signer, recipient, amount, validAfter, validBefore, nonce, v, r, s
         );
     }
@@ -665,8 +723,8 @@ contract X402TransferWithAuthorizationTest is Test {
         );
 
         vm.prank(facilitator);
-        vm.expectRevert(FixerRegistryUpgradeable.AuthorizationExpired.selector);
-        registry.transferWithAuthorization(
+        vm.expectRevert(FixerLib.AuthorizationExpired.selector);
+        ext.transferWithAuthorization(
             signer, recipient, amount, validAfter, validBefore, nonce, v, r, s
         );
     }
@@ -682,8 +740,8 @@ contract X402TransferWithAuthorizationTest is Test {
         );
 
         vm.prank(facilitator);
-        vm.expectRevert(FixerRegistryUpgradeable.AuthorizationNotYetValid.selector);
-        registry.transferWithAuthorization(
+        vm.expectRevert(FixerLib.AuthorizationNotYetValid.selector);
+        ext.transferWithAuthorization(
             signer, recipient, amount, validAfter, validBefore, nonce, v, r, s
         );
     }
@@ -696,25 +754,22 @@ contract X402TransferWithAuthorizationTest is Test {
 
         // Sign with a DIFFERENT private key
         uint256 wrongPK = 0xB0B;
-        (uint8 v, bytes32 r, bytes32 s) = _signTransferAuth(
-            signer, recipient, amount, validAfter, validBefore, nonce
-        );
 
         // Tamper: sign with wrong key
         bytes32 structHash = keccak256(
             abi.encode(
-                registry.TRANSFER_WITH_AUTHORIZATION_TYPEHASH(),
+                ext.TRANSFER_WITH_AUTHORIZATION_TYPEHASH(),
                 signer, recipient, amount, validAfter, validBefore, nonce
             )
         );
         bytes32 digest = keccak256(
-            abi.encodePacked("\x19\x01", registry.DOMAIN_SEPARATOR(), structHash)
+            abi.encodePacked("\x19\x01", ext.DOMAIN_SEPARATOR(), structHash)
         );
-        (v, r, s) = vm.sign(wrongPK, digest);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(wrongPK, digest);
 
         vm.prank(facilitator);
-        vm.expectRevert(FixerRegistryUpgradeable.InvalidSignature.selector);
-        registry.transferWithAuthorization(
+        vm.expectRevert(FixerLib.InvalidSignature.selector);
+        ext.transferWithAuthorization(
             signer, recipient, amount, validAfter, validBefore, nonce, v, r, s
         );
     }
@@ -730,7 +785,7 @@ contract X402TransferWithAuthorizationTest is Test {
             signer, recipient, amount, validAfter, validBefore, nonce1
         );
         vm.prank(facilitator);
-        registry.transferWithAuthorization(
+        ext.transferWithAuthorization(
             signer, recipient, amount, validAfter, validBefore, nonce1, v1, r1, s1
         );
 
@@ -740,7 +795,7 @@ contract X402TransferWithAuthorizationTest is Test {
             signer, recipient, amount, validAfter, validBefore, nonce2
         );
         vm.prank(facilitator);
-        registry.transferWithAuthorization(
+        ext.transferWithAuthorization(
             signer, recipient, amount, validAfter, validBefore, nonce2, v2, r2, s2
         );
 
@@ -748,128 +803,43 @@ contract X402TransferWithAuthorizationTest is Test {
     }
 
     function test_DOMAIN_SEPARATOR_nonZero() public view {
-        bytes32 ds = registry.DOMAIN_SEPARATOR();
+        bytes32 ds = ext.DOMAIN_SEPARATOR();
         assertTrue(ds != bytes32(0), "DOMAIN_SEPARATOR should not be zero");
     }
 }
 
 // ============================================================================
-// REINITIALIZE v3 UPGRADE PATH TEST
+// REINITIALIZE UPGRADE PATH TESTS
 // ============================================================================
 
 contract X402ReinitializeTest is Test {
-    function test_reinitializeV3_setsEIP712() public {
+    function test_reinitialize_setsEIP712() public {
         FixerRegistryUpgradeable implementation = new FixerRegistryUpgradeable();
         bytes memory initData = abi.encodeCall(
             FixerRegistryUpgradeable.initialize,
             (address(this), address(this), address(0))
         );
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
-        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(address(proxy));
+        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(payable(address(proxy)));
+
+        FixerRegistryExtension extensionImpl = new FixerRegistryExtension();
+        registry.setExtension(address(extensionImpl));
+        IFixerRegistryFull ext_ = IFixerRegistryFull(address(proxy));
 
         // DOMAIN_SEPARATOR should already be set from initialize
-        bytes32 ds = registry.DOMAIN_SEPARATOR();
+        bytes32 ds = ext_.DOMAIN_SEPARATOR();
         assertTrue(ds != bytes32(0), "DOMAIN_SEPARATOR should be set from initialize");
     }
 
-    function test_version_2_3_0() public {
+    function test_version_v2_5_0() public {
         FixerRegistryUpgradeable implementation = new FixerRegistryUpgradeable();
         bytes memory initData = abi.encodeCall(
             FixerRegistryUpgradeable.initialize,
             (address(this), address(this), address(0))
         );
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
-        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(address(proxy));
+        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(payable(address(proxy)));
 
-        assertEq(registry.VERSION(), 2_003_000, "Version should be 2.3.0");
-    }
-}
-
-// ============================================================================
-// FUZZ TESTS
-// ============================================================================
-
-contract X402FuzzTest is Test {
-    FixerRegistryUpgradeable public registry;
-
-    address public owner = makeAddr("owner");
-    address public securityCouncil = makeAddr("securityCouncil");
-    address public governance = makeAddr("governance");
-
-    function setUp() public {
-        FixerRegistryUpgradeable implementation = new FixerRegistryUpgradeable();
-        bytes memory initData = abi.encodeCall(
-            FixerRegistryUpgradeable.initialize,
-            (owner, securityCouncil, governance)
-        );
-        ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
-        registry = FixerRegistryUpgradeable(address(proxy));
-    }
-
-    function testFuzz_registerAgent_arbitraryPlatform(uint8 platformRaw) public {
-        vm.assume(platformRaw <= uint8(type(FixerRegistryStorage.AgentPlatform).max));
-        address agent = makeAddr(string(abi.encodePacked("fuzz-agent-", platformRaw)));
-
-        vm.prank(owner);
-        registry.registerAgent(
-            agent,
-            keccak256(abi.encodePacked("proof-", platformRaw)),
-            FixerRegistryStorage.AgentPlatform(platformRaw)
-        );
-
-        assertTrue(registry.isRegisteredAgent(agent));
-        assertEq(registry.getTotalAgents(), 1);
-    }
-
-    function testFuzz_updateAgentProfile_bonusBounds(uint16 bonusBps) public {
-        bonusBps = uint16(bound(bonusBps, 0, 5000)); // MAX_AGENT_BONUS_BPS
-
-        address agent = makeAddr("fuzz-agent");
-        vm.startPrank(owner);
-        registry.registerAgent(
-            agent,
-            keccak256("proof"),
-            FixerRegistryStorage.AgentPlatform.OpenClaw
-        );
-        registry.updateAgentProfile(agent, bonusBps, true);
-        vm.stopPrank();
-
-        assertEq(registry.getAgentMultiplierBonus(agent), bonusBps);
-    }
-
-    function testFuzz_updateAgentProfile_revert_bonusTooHigh(uint16 bonusBps) public {
-        vm.assume(bonusBps > 5000);
-
-        address agent = makeAddr("fuzz-agent");
-        vm.startPrank(owner);
-        registry.registerAgent(
-            agent,
-            keccak256("proof"),
-            FixerRegistryStorage.AgentPlatform.OpenClaw
-        );
-
-        vm.expectRevert(IAgentRegistry.BonusMultiplierTooHigh.selector);
-        registry.updateAgentProfile(agent, bonusBps, true);
-        vm.stopPrank();
-    }
-
-    function testFuzz_x402Volume_accumulates(uint128 vol1, uint128 vol2) public {
-        // Bound to prevent overflow
-        vol1 = uint128(bound(vol1, 0, type(uint128).max / 2));
-        vol2 = uint128(bound(vol2, 0, type(uint128).max / 2));
-
-        address agent = makeAddr("fuzz-agent");
-        vm.startPrank(owner);
-        registry.registerAgent(
-            agent,
-            keccak256("proof"),
-            FixerRegistryStorage.AgentPlatform.Moltbook
-        );
-        registry.updateAgentX402Volume(agent, vol1);
-        registry.updateAgentX402Volume(agent, vol2);
-        vm.stopPrank();
-
-        FixerRegistryStorage.AgentProfile memory profile = registry.getAgentProfile(agent);
-        assertEq(profile.x402Volume, vol1 + vol2, "Volume should accumulate");
+        assertEq(registry.VERSION(), 2_006_000, "Version should be 2.5.0");
     }
 }

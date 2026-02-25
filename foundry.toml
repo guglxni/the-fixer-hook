@@ -4,9 +4,16 @@ out = "out"
 libs = ["lib"]
 solc = "0.8.26"
 optimizer = true
-optimizer_runs = 200
+optimizer_runs = 1
 via_ir = true
 evm_version = "cancun"
+
+# Yul optimizer tuning for contract size reduction
+[profile.default.optimizer_details]
+yul = true
+
+[profile.default.optimizer_details.yulDetails]
+stackAllocation = true
 
 # Remappings - use v4-core from v4-periphery for version compatibility
 remappings = [
@@ -39,6 +46,7 @@ bracket_spacing = true
 base_sepolia = "${BASE_SEPOLIA_RPC}"
 arb_sepolia = "${ARB_SEPOLIA_RPC}"
 unichain_sepolia = "${UNICHAIN_SEPOLIA_RPC}"
+lasna = "${LASNA_RPC}"
 base = "${BASE_RPC}"
 arb = "${ARB_RPC}"
 localhost = "http://127.0.0.1:8545"

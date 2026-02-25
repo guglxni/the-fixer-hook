@@ -139,7 +139,7 @@ contract DeployTestnet is Script {
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
         console.log("Proxy:", address(proxy));
 
-        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(address(proxy));
+        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(payable(address(proxy)));
         require(registry.owner() == deployer, "Owner mismatch");
         require(registry.VERSION() == 2_003_000, "Version mismatch");
 
@@ -198,7 +198,7 @@ contract DeployTestnet is Script {
     }
 
     function _registerHook(address registryProxy, address hook) internal {
-        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(registryProxy);
+        FixerRegistryUpgradeable registry = FixerRegistryUpgradeable(payable(registryProxy));
         bytes32 storedPoolId = FixerHookV2(hook).getPoolId();
         registry.registerHook(address(hook), storedPoolId);
         console.log("Hook registered for pool:", vm.toString(storedPoolId));

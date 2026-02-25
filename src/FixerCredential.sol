@@ -114,11 +114,11 @@ contract FixerCredential is IFixerCredential, ERC721, Ownable {
         // Require at least one referral
         if (stats.referralCount == 0) revert NoReferralsYet();
         
-        // Mint token
+        // Assign token ID
         tokenId = _nextTokenId++;
-        _safeMint(referrer, tokenId);
-        
-        // Store credential data
+
+        // FIX: F-06 — Set all state BEFORE _safeMint to prevent reentrancy
+        // via onERC721Received callback bypassing the AlreadyMinted check.
         _credentials[tokenId] = Credential({
             tier: stats.tier,
             totalVolume: stats.totalVolume,
@@ -127,9 +127,10 @@ contract FixerCredential is IFixerCredential, ERC721, Ownable {
             lastUpdated: uint64(block.timestamp),
             locked: true  // Soulbound by default
         });
-        
-        // Map referrer to token ID
         _referrerToTokenId[referrer] = tokenId;
+        
+        // Mint token (may call onERC721Received — state is already set)
+        _safeMint(referrer, tokenId);
         
         emit CredentialMinted(referrer, tokenId, stats.tier);
         emit Locked(tokenId);
@@ -345,7 +346,31 @@ contract FixerCredential is IFixerCredential, ERC721, Ownable {
     // ========================================================================
     // TRANSFER RESTRICTIONS (SOULBOUND)
     // ========================================================================
-    
+
+    /// @notice Override approve to enforce soulbound (ERC-5192 compliance)
+    /// @dev FIX: F-17 — Approvals should revert for locked tokens per ERC-5192.
+    ///      Previously approvals succeeded but transfers failed — confusing UX.
+    function approve(address spender, uint256 id) public override {
+        if (_credentials[id].locked) {
+            revert TokenLocked();
+        }
+        super.approve(spender, id);
+    }
+
+    /// @notice Override setApprovalForAll to enforce soulbound
+    /// @dev Reverts if caller owns any locked tokens. Since all credentials are
+    ///      soulbound by default, this effectively blocks setApprovalForAll.
+    function setApprovalForAll(address operator, bool approved) public override {
+        // If approving (not revoking), check that the caller has a locked credential
+        if (approved) {
+            uint256 tokenId = _referrerToTokenId[msg.sender];
+            if (tokenId != 0 && _credentials[tokenId].locked) {
+                revert TokenLocked();
+            }
+        }
+        super.setApprovalForAll(operator, approved);
+    }
+
     /// @notice Override transfer to enforce soulbound
     function transferFrom(address from, address to, uint256 id) public override {
         // Allow minting (from = 0) but block transfers if locked

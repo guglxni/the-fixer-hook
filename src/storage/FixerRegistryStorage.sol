@@ -16,7 +16,7 @@ pragma solidity 0.8.26;
 /// - Slot Group 3: Protocol fee params (packed into 1 slot, FINALIZED: 5% start, 10% max)
 /// - Slot Group 4: Global counters (packed into 1 slot)
 /// - Mappings: Hook auth, pool info, referrer stats, agent registry, teams
-/// - Gap: 35 reserved slots for future extensions
+/// - Gap: 40 reserved slots for future extensions (reduced from 45 by ERC-8004 v2.4)
 library FixerRegistryStorage {
     // ========================================================================
     // ERC-7201 STORAGE LOCATION
@@ -136,16 +136,30 @@ library FixerRegistryStorage {
         Custom      // 3 — Any other agent framework
     }
 
-    /// @notice x402-verified agent profile stored on-chain
-    /// @dev Created via registerAgent() after x402 payment verification off-chain
+    /// @notice Agent profile stored on-chain (ERC-8004 verified via Identity NFT ownership)
+    /// @dev Created via registerAgent(uint256 agentId, AgentPlatform platform) — permissionless.
+    ///      v2.4: Extended with ERC-8004 fields. Appending to mapping-based struct is storage-safe —
+    ///      existing entries get zero-default values for new fields.
+    ///      v2.6: Extended with XMTP fields for Agent Infrastructure Stack completeness.
     struct AgentProfile {
-        address wallet;              // The agent's Ethereum address
-        bytes32 x402Identity;        // Hash of x402 client identity (payment proof)
-        uint64 registeredAt;         // Timestamp when agent registered
-        AgentPlatform platform;      // Which platform the agent runs on
-        uint128 x402Volume;          // Total x402 payments made (trust signal)
-        bool verified;               // Whether identity was verified via x402 proof
-        uint16 bonusMultiplierBps;   // Agent-specific bonus multiplier (0 = no bonus)
+        // --- Existing v2.3 fields (DO NOT reorder) ---
+        address wallet;                  // The agent's Ethereum address
+        bytes32 x402Identity;            // Hash of x402 client identity (payment proof)
+        uint64 registeredAt;             // Timestamp when agent registered
+        AgentPlatform platform;          // Which platform the agent runs on
+        uint128 x402Volume;              // Total x402 payments made (trust signal)
+        bool verified;                   // Whether identity was verified
+        uint16 bonusMultiplierBps;       // Agent-specific bonus multiplier (0 = no bonus)
+        // --- ERC-8004 Extension Fields (v2.4, appended safely) ---
+        uint256 erc8004AgentId;          // ERC-8004 NFT token ID (0 = not ERC-8004 registered)
+        int128 cachedReputationScore;    // Cached reputation value from ERC-8004 Reputation Registry
+        uint8 cachedReputationDecimals;  // Decimals for interpreting cachedReputationScore
+        uint16 derivedBonusBps;          // Bonus BPS auto-computed from reputation score
+        uint64 lastReputationUpdate;     // Timestamp of last reputation cache refresh
+        // --- XMTP Communication Fields (v2.6, appended safely) ---
+        bool xmtpEnabled;                // Whether this agent is reachable via XMTP
+        bytes32 xmtpPublicKeyHash;       // keccak256 of the agent's XMTP installation key
+        string xmtpEndpointUri;          // Full XMTP endpoint URI (e.g., "xmtp://0x.../inbox")
     }
 
     /// @notice Pending UUPS upgrade proposal (timelock)
@@ -245,9 +259,40 @@ library FixerRegistryStorage {
         mapping(bytes32 => bool) authorizationStates;
 
         // ═══════════════════════════════════════════════════════════════
-        // GAP: Reserve slots for future upgrades (45 slots)
+        // ERC-8004 REGISTRY CONFIGURATION (v2.4 — Trustless Agents)
         // ═══════════════════════════════════════════════════════════════
-        uint256[45] __gap;
+        /// @notice ERC-8004 Identity Registry address (verifies NFT ownership + agentWallet)
+        address identityRegistry;
+        /// @notice ERC-8004 Reputation Registry address (reads reputation, writes feedback)
+        address reputationRegistry;
+        /// @notice ERC-8004 Validation Registry address (checks third-party scores)
+        address validationRegistry;
+        /// @notice Reverse mapping: ERC-8004 agent NFT ID => wallet address
+        mapping(uint256 => address) agentIdToWallet;
+        /// @notice Count of ERC-8004 registered agents + reputation cache TTL (packed)
+        uint64 erc8004AgentCount;
+        uint64 reputationCacheTTL;           // Default: 3600 (1 hour)
+
+        // ═══════════════════════════════════════════════════════════════
+        // EXTENSION CONTRACT (v2.5 — Reactive Modular Architecture)
+        // ═══════════════════════════════════════════════════════════════
+        /// @notice Extension contract for agent + EIP-3009 functions (delegatecall target)
+        /// @dev Set via setExtension(). Core contract's fallback() routes unknown selectors
+        ///      to this address via DELEGATECALL. Same ERC-7201 storage layout ensures
+        ///      unified state access across core and extension.
+        address extension;
+
+        // ═══════════════════════════════════════════════════════════════
+        // XMTP COMMUNICATION STATE (v2.6 — Agent Infrastructure Stack)
+        // ═══════════════════════════════════════════════════════════════
+        /// @notice Count of agents with XMTP communication enabled
+        uint64 xmtpEnabledCount;
+
+        // ═══════════════════════════════════════════════════════════════
+        // GAP: Reserve slots for future upgrades (38 slots)
+        // Reduced from 39 — consumed 1 slot for XMTP state
+        // ═══════════════════════════════════════════════════════════════
+        uint256[38] __gap;
     }
 
     // ========================================================================

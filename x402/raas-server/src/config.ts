@@ -27,12 +27,17 @@ export const config = {
  * Example: "1000" = $0.001 USDC
  */
 export const PRICING = {
-  "GET /api/v1/pools":               "1000",     // $0.001
-  "GET /api/v1/pools/:id/stats":     "5000",     // $0.005
-  "GET /api/v1/referrers/top":       "10000",    // $0.01
-  "GET /api/v1/referrers/:addr":     "5000",     // $0.005
-  "GET /api/v1/optimize/route":      "20000",    // $0.02
-  "POST /api/v1/referral/intent":    "50000",    // $0.05
-  "GET /api/v1/analytics/agent/:id": "10000",    // $0.01
-  "POST /api/v1/agents/register":    "1000000",  // $1.00
+  // Core referral endpoints
+  "GET /api/v1/pools":                "1000",     // $0.001
+  "GET /api/v1/pools/:id/stats":      "5000",     // $0.005
+  "GET /api/v1/referrers/top":        "10000",    // $0.01
+  "GET /api/v1/referrers/:addr":      "5000",     // $0.005
+  "GET /api/v1/optimize/route":       "20000",    // $0.02
+  "POST /api/v1/referral/intent":     "50000",    // $0.05
+  // Agent identity & analytics
+  "GET /api/v1/agents/analytics/:id": "10000",    // $0.01
+  "POST /api/v1/agents/register":     "1000000",  // $1.00
+  // XMTP communication discovery
+  "GET /api/v1/agents/xmtp":          "1000",     // $0.001
+  "GET /api/v1/agents/xmtp/:addr":    "5000",     // $0.005
 } as const;

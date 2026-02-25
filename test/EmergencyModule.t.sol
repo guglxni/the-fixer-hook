@@ -37,7 +37,7 @@ contract EmergencyModuleTest is Test {
             (owner, securityCouncil, governance)
         );
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
-        registry = FixerRegistryUpgradeable(address(proxy));
+        registry = FixerRegistryUpgradeable(payable(address(proxy)));
 
         // Register hook for referral tests
         vm.prank(owner);
@@ -272,10 +272,10 @@ contract EmergencyModuleTest is Test {
         );
 
         // Record referrals that generate > 100k FIX total
-        // Each referral at 20_000e18 volume with 100% rate generates ~19_000e18 FIX (minus 5% fee)
-        // After circuit breaker triggers, rewards get paused and subsequent calls revert
+        // FIX: F-10 — MAX_GROSS_REWARD caps each referral at 5,000e18 gross (~4,750 net after 5% fee)
+        // Need ~22 referrals to exceed 100k threshold, using 25 for margin
         bool triggered = false;
-        for (uint256 i = 0; i < 10; i++) {
+        for (uint256 i = 0; i < 25; i++) {
             address swapper = makeAddr(string(abi.encodePacked("sw", i)));
             vm.prank(hookAddr);
             try registry.recordReferral(user1, swapper, 20_000e18, poolId) {

@@ -39,7 +39,7 @@ library BPSMath {
     /// @notice Apply a multiplier expressed in BPS (e.g., 12500 = 1.25x)
     /// @param amount The base amount
     /// @param multiplierBps The multiplier in basis points (10000 = 1.0x)
-    /// @return result The scaled value
+    /// @return result The scaled value (rounded down, consistent with applyBPS)
     function applyMultiplier(uint256 amount, uint256 multiplierBps) internal pure returns (uint256 result) {
         result = FixedPointMathLib.mulDiv(amount, multiplierBps, BPS_DENOMINATOR);
     }

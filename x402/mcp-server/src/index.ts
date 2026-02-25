@@ -52,7 +52,7 @@ import { base } from "viem/chains";
 const RPC_URL = process.env.RPC_URL ?? "https://mainnet.base.org";
 const REGISTRY_ADDRESS = process.env.REGISTRY_ADDRESS as Address;
 
-// Minimal ABI for read-only calls
+// Minimal ABI for read-only calls (v2.6.0 — includes ERC-8004 + XMTP)
 const REGISTRY_ABI = [
   {
     name: "getReferrerStats",
@@ -128,6 +128,14 @@ const REGISTRY_ABI = [
           { name: "x402Volume", type: "uint128" },
           { name: "verified", type: "bool" },
           { name: "bonusMultiplierBps", type: "uint16" },
+          { name: "erc8004AgentId", type: "uint256" },
+          { name: "cachedReputationScore", type: "int128" },
+          { name: "cachedReputationDecimals", type: "uint8" },
+          { name: "derivedBonusBps", type: "uint16" },
+          { name: "lastReputationUpdate", type: "uint64" },
+          { name: "xmtpEnabled", type: "bool" },
+          { name: "xmtpPublicKeyHash", type: "bytes32" },
+          { name: "xmtpEndpointUri", type: "string" },
         ],
       },
     ],
@@ -155,6 +163,43 @@ const REGISTRY_ABI = [
         ],
       },
     ],
+  },
+  // XMTP Communication (v2.6)
+  {
+    name: "isXMTPEnabled",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "agent", type: "address" }],
+    outputs: [{ name: "", type: "bool" }],
+  },
+  {
+    name: "getXMTPPublicKeyHash",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "agent", type: "address" }],
+    outputs: [{ name: "", type: "bytes32" }],
+  },
+  {
+    name: "getXMTPEndpoint",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "agent", type: "address" }],
+    outputs: [{ name: "", type: "string" }],
+  },
+  {
+    name: "getXMTPEnabledCount",
+    type: "function",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint64" }],
+  },
+  // ERC-8004 Identity
+  {
+    name: "getERC8004AgentId",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "agent", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
   },
   {
     name: "VERSION",
@@ -199,7 +244,7 @@ async function readContract(functionName: string, args: unknown[] = []) {
 
 const server = new McpServer({
   name: "fixerhook",
-  version: "1.0.0",
+  version: "2.0.0",
 });
 
 // ---------------------------------------------------------------------------
@@ -400,12 +445,13 @@ server.tool(
       };
     }
 
-    const [profile, stats, totalAgents, globalStats] = (await Promise.all([
+    const [profile, stats, totalAgents, globalStats, xmtpCount] = (await Promise.all([
       readContract("getAgentProfile", [addr]),
       readContract("getReferrerStats", [addr]),
       readContract("getTotalAgents"),
       readContract("getGlobalStats"),
-    ])) as [any, any, bigint, [bigint, bigint, bigint]];
+      readContract("getXMTPEnabledCount"),
+    ])) as [any, any, bigint, [bigint, bigint, bigint], bigint];
 
     return {
       content: [
@@ -420,7 +466,21 @@ server.tool(
                 registeredAt: new Date(
                   Number(profile.registeredAt) * 1000
                 ).toISOString(),
-                x402Volume: formatUnits(profile.x402Volume, 6) + " USDC",
+              },
+              x402: {
+                identity: profile.x402Identity,
+                volume: formatUnits(profile.x402Volume, 6) + " USDC",
+              },
+              erc8004: {
+                agentId: profile.erc8004AgentId.toString(),
+                isRegistered: profile.erc8004AgentId > 0n,
+                reputationScore: Number(profile.cachedReputationScore),
+                derivedBonusBps: Number(profile.derivedBonusBps),
+              },
+              xmtp: {
+                enabled: profile.xmtpEnabled,
+                endpointUri: profile.xmtpEndpointUri || null,
+                publicKeyHash: profile.xmtpPublicKeyHash,
               },
               performance: {
                 totalVolume: formatUnits(stats.totalVolume, 18),
@@ -430,9 +490,123 @@ server.tool(
               },
               ecosystem: {
                 totalAgents: Number(totalAgents),
+                xmtpEnabledAgents: Number(xmtpCount),
                 totalPools: Number(globalStats[0]),
                 totalProtocolVolume: formatUnits(globalStats[2], 18),
               },
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// Tool: fixer_xmtp_lookup
+// ---------------------------------------------------------------------------
+server.tool(
+  "fixer_xmtp_lookup",
+  "Look up an agent's XMTP communication endpoint for agent-to-agent messaging. Returns the XMTP URI if enabled.",
+  {
+    agentAddress: z.string().describe("Ethereum address of the AI agent (0x...)"),
+  },
+  async ({ agentAddress }) => {
+    const addr = agentAddress as Address;
+    const isAgent = (await readContract("isVerifiedAgent", [addr])) as boolean;
+
+    if (!isAgent) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({
+              error: "Agent not found or not verified",
+            }),
+          },
+        ],
+      };
+    }
+
+    const xmtpEnabled = (await readContract("isXMTPEnabled", [addr])) as boolean;
+
+    if (!xmtpEnabled) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({
+              agent: addr,
+              xmtpEnabled: false,
+              message: "This agent has not enabled XMTP communication",
+            }),
+          },
+        ],
+      };
+    }
+
+    const [endpoint, keyHash] = (await Promise.all([
+      readContract("getXMTPEndpoint", [addr]),
+      readContract("getXMTPPublicKeyHash", [addr]),
+    ])) as [string, string];
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify(
+            {
+              agent: addr,
+              xmtpEnabled: true,
+              endpointUri: endpoint,
+              publicKeyHash: keyHash,
+              instructions: [
+                "Use the endpointUri to initiate an XMTP conversation",
+                "Messages are end-to-end encrypted via the XMTP protocol",
+                "Verify identity using the publicKeyHash on-chain",
+              ],
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// Tool: fixer_xmtp_stats
+// ---------------------------------------------------------------------------
+server.tool(
+  "fixer_xmtp_stats",
+  "Get XMTP adoption statistics for the FixerHook agent ecosystem.",
+  {},
+  async () => {
+    const [totalAgents, xmtpCount] = (await Promise.all([
+      readContract("getTotalAgents"),
+      readContract("getXMTPEnabledCount"),
+    ])) as [bigint, bigint];
+
+    const adoptionRate =
+      Number(totalAgents) > 0
+        ? ((Number(xmtpCount) / Number(totalAgents)) * 100).toFixed(1)
+        : "0.0";
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify(
+            {
+              xmtpEnabledAgents: Number(xmtpCount),
+              totalRegisteredAgents: Number(totalAgents),
+              adoptionRate: `${adoptionRate}%`,
+              protocol: "XMTP",
+              description:
+                "End-to-end encrypted agent-to-agent and human-to-agent messaging",
             },
             null,
             2

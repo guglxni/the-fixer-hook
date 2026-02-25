@@ -1,4 +1,4 @@
-# Contributing to The Referral Hook
+# Contributing to The Fixer Hook
 
 Thank you for your interest in contributing! This document provides guidelines.
 
@@ -6,8 +6,8 @@ Thank you for your interest in contributing! This document provides guidelines.
 
 ```bash
 # Clone and install
-git clone https://github.com/your-org/the-referral-hook.git
-cd the-referral-hook
+git clone https://github.com/guglxni/the-fixer-hook.git
+cd the-fixer-hook
 forge install
 
 # Build
@@ -41,9 +41,24 @@ forge test -vvv
 - All new features must have tests
 - Maintain 90%+ code coverage
 - Include fuzz tests for validation logic
+- ERC-8004 agent features should follow the mock registry pattern used in `test/ERC8004.t.sol`
+- Agent registration tests must use `registerAgent(uint256 agentId, AgentPlatform platform)` (ERC-8004 permissionless)
+
+## Architecture Notes
+
+The project follows the **Agent Infrastructure Stack** pattern:
+
+| Layer | Protocol | Role |
+|:-----:|:--------:|:-----|
+| Communication | **XMTP** | Wallet-to-wallet messaging between agents |
+| Payments | **x402** | HTTP 402 micropayments, EIP-3009 gasless transfers |
+| Identity & Trust | **ERC-8004** | NFT identity, reputation scoring, validation |
+
+All agent registration is ERC-8004-only. See `internal/ERC8004_ENHANCEMENT.md` for full details.
 
 ## Security
 
 - Never commit private keys
 - Report vulnerabilities privately
 - Follow checks-effects-interactions pattern
+- All external calls to ERC-8004 registries must use `try/catch`

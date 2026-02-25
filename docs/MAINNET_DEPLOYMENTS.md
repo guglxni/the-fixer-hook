@@ -1,9 +1,9 @@
 # Mainnet Deployments
 
-> Fixer Protocol v2.3 — Mainnet deployment guide and addresses (Coming Soon)
+> Fixer Protocol v2.6 — Mainnet deployment guide and addresses (Coming Soon)
 
-**Status:** 🚧 Planned for Q2-Q3 2026
-**Version:** 2.3.0 (VERSION constant: `2003000`)
+**Status:** Planned for Q2-Q3 2026
+**Version:** 2.6.0 (VERSION constant: `2_006_000`)
 
 ---
 
@@ -36,7 +36,7 @@ Before deploying to mainnet, ensure:
 - [ ] Upgrade timelock (48 hours) tested on testnet
 - [ ] Emergency pause functionality verified
 - [ ] FIX token supply cap (1B) enforced
-- [ ] All 314 tests passing
+- [ ] All 381 tests passing (35 suites)
 - [ ] Gas optimization complete (`via_ir = true`)
 - [ ] Multisig wallets configured for security council
 - [ ] Monitoring and alerting systems in place
@@ -139,7 +139,7 @@ After mainnet deployment:
    ```bash
    # Check VERSION
    cast call $PROXY "VERSION()(uint256)" --rpc-url $RPC
-   # Should return: 2003000
+   # Should return: 2006000
 
    # Check ownership
    cast call $PROXY "owner()(address)" --rpc-url $RPC

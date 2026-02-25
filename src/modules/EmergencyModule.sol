@@ -31,6 +31,10 @@ abstract contract EmergencyModule {
     /// @dev Prevents owner/council from disabling circuit breaker by setting threshold to max
     uint256 public constant MIN_CIRCUIT_BREAKER = 100_000e18; // 100k FIX/hour minimum
 
+    /// @notice Maximum allowed circuit breaker threshold
+    /// @dev FIX: F-15 — Prevents setting threshold so high it effectively disables the breaker
+    uint256 public constant MAX_CIRCUIT_BREAKER = 50_000_000e18; // 50M FIX/hour maximum
+
     /// @notice Maximum FIX tokens that can be minted per day (10 million)
     /// @dev Provides a second layer of defense beyond the hourly circuit breaker
     uint256 public constant MAX_DAILY_MINT = 10_000_000e18;
@@ -71,6 +75,8 @@ abstract contract EmergencyModule {
     error ZeroAddress();
     error CircuitBreakerActive();
     error ThresholdBelowMinimum();
+    error ThresholdAboveMaximum();
+    error NothingPaused();
 
     // ========================================================================
     // MODIFIERS
@@ -216,33 +222,49 @@ abstract contract EmergencyModule {
     }
 
     /// @notice Emergency: pause everything at once
+    /// @dev FIX: F-03 — Only overwrite timestamps for states not already paused,
+    ///      preventing the security council from resetting the 7-day DAO clock.
     function pauseAll() external onlySecurityCouncil {
         FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
         uint64 now_ = uint64(block.timestamp);
 
-        s.emergency.pausedReferrals = true;
-        s.emergency.pausedAgents = true;
-        s.emergency.pausedRewards = true;
-        s.emergency.pausedReferralsAt = now_;
-        s.emergency.pausedAgentsAt = now_;
-        s.emergency.pausedRewardsAt = now_;
-
-        emit ReferralsPaused(msg.sender, block.timestamp);
-        emit AgentsPaused(msg.sender, block.timestamp);
-        emit RewardsPaused(msg.sender, block.timestamp);
+        if (!s.emergency.pausedReferrals) {
+            s.emergency.pausedReferrals = true;
+            s.emergency.pausedReferralsAt = now_;
+            emit ReferralsPaused(msg.sender, block.timestamp);
+        }
+        if (!s.emergency.pausedAgents) {
+            s.emergency.pausedAgents = true;
+            s.emergency.pausedAgentsAt = now_;
+            emit AgentsPaused(msg.sender, block.timestamp);
+        }
+        if (!s.emergency.pausedRewards) {
+            s.emergency.pausedRewards = true;
+            s.emergency.pausedRewardsAt = now_;
+            emit RewardsPaused(msg.sender, block.timestamp);
+        }
     }
 
     /// @notice Resume everything at once
     /// @dev Uses the earliest (longest paused) timestamp for DAO threshold check
+    ///      FIX: F-16 — Reverts if nothing is paused instead of falling through
     function resumeAll() external {
         FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
 
+        // FIX: F-16 — Guard against calling when nothing is paused
+        if (!s.emergency.pausedReferrals && !s.emergency.pausedAgents && !s.emergency.pausedRewards) {
+            revert NothingPaused();
+        }
+
         // Use the earliest pause timestamp (longest paused state) for DAO check
-        uint64 earliest = s.emergency.pausedReferralsAt;
-        if (s.emergency.pausedAgentsAt != 0 && (earliest == 0 || s.emergency.pausedAgentsAt < earliest)) {
+        uint64 earliest = type(uint64).max;
+        if (s.emergency.pausedReferrals && s.emergency.pausedReferralsAt < earliest) {
+            earliest = s.emergency.pausedReferralsAt;
+        }
+        if (s.emergency.pausedAgents && s.emergency.pausedAgentsAt < earliest) {
             earliest = s.emergency.pausedAgentsAt;
         }
-        if (s.emergency.pausedRewardsAt != 0 && (earliest == 0 || s.emergency.pausedRewardsAt < earliest)) {
+        if (s.emergency.pausedRewards && s.emergency.pausedRewardsAt < earliest) {
             earliest = s.emergency.pausedRewardsAt;
         }
         _validateResumeAuth(s, earliest);
@@ -314,9 +336,11 @@ abstract contract EmergencyModule {
 
     /// @notice Update the circuit breaker threshold
     /// @param newThreshold New maximum FIX tokens per hour
-    /// @dev Cannot be set below MIN_CIRCUIT_BREAKER to prevent disabling
+    /// @dev Cannot be set below MIN_CIRCUIT_BREAKER or above MAX_CIRCUIT_BREAKER
+    ///      FIX: F-15 — Added upper bound check
     function setCircuitBreakerThreshold(uint256 newThreshold) external onlySecurityCouncilOrGovernance {
         if (newThreshold < MIN_CIRCUIT_BREAKER) revert ThresholdBelowMinimum();
+        if (newThreshold > MAX_CIRCUIT_BREAKER) revert ThresholdAboveMaximum();
 
         FixerRegistryStorage.MainStorage storage s = FixerRegistryStorage.getStorage();
         uint256 oldThreshold = s.emergency.circuitBreakerThreshold;
@@ -391,17 +415,24 @@ abstract contract EmergencyModule {
     // ========================================================================
 
     /// @notice Validates that the caller has authority to resume
-    /// @dev Security council can resume within 7 days; after that only DAO
+    /// @dev Security council can resume within 7 days; after that only DAO.
+    ///      FIX: F-04 — If governance is not yet set (address(0)), allow security
+    ///      council to resume even after 7 days to prevent permanent lock.
     /// @param s The main storage reference
     /// @param pausedAt_ The per-state timestamp when this specific function was paused
     function _validateResumeAuth(FixerRegistryStorage.MainStorage storage s, uint64 pausedAt_) internal view {
         FixerRegistryStorage.EmergencyState storage em = s.emergency;
 
         if (block.timestamp - pausedAt_ > PAUSE_DAO_THRESHOLD) {
-            // After 7 days, only governance can resume
-            if (msg.sender != em.governance) revert DAOVoteRequiredForResume();
+            if (em.governance == address(0)) {
+                // FIX: F-04 — Governance not configured yet, allow security council
+                if (msg.sender != em.securityCouncil) revert NotSecurityCouncil();
+            } else {
+                // After 7 days with governance set, only governance can resume
+                if (msg.sender != em.governance) revert DAOVoteRequiredForResume();
+            }
         } else {
-            // Within 7 days, security council can resume
+            // Within 7 days, security council or governance can resume
             if (
                 msg.sender != em.securityCouncil &&
                 msg.sender != em.governance

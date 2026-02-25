@@ -1,0 +1,197 @@
+<mxfile host="app.diagrams.net" agent="Claude" version="26.0.0">
+  <diagram name="UUPS Proxy Architecture" id="research-uups-01">
+    <mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1400" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- TITLE                                                          -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="title" value="Figure 6: UUPS Proxy Architecture with 48-Hour Upgrade Timelock" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="100" y="20" width="1100" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="ERC-1967 proxy pattern with ERC-7201 namespaced storage and owner-gated timelock upgrade flow" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="200" y="54" width="900" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 1: Proxy Architecture (left)                           -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="proxy-section-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#FAF5FF;strokeColor=#D8B4FE;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="580" height="460" as="geometry" />
+        </mxCell>
+        <mxCell id="proxy-section-label" value="ERC-1967 Proxy Architecture" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#7C3AED;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="75" y="97" width="240" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Caller -->
+        <mxCell id="caller" value="&lt;b&gt;External Caller&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#64748B;&quot;&gt;FixerHookV2, EOA, or Admin&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F0F9FF;strokeColor=#0EA5E9;strokeWidth=1.5;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="210" y="130" width="230" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ERC1967Proxy -->
+        <mxCell id="proxy-box" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#7C3AED;strokeColor=#6D28D9;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="220" width="500" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="proxy-title" value="&lt;b&gt;ERC1967Proxy&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#F5F3FF;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="250" y="228" width="200" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="proxy-addr" value="(Stable contract address -- never changes)" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#C4B5FD;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="200" y="252" width="300" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Proxy storage slots -->
+        <mxCell id="slot-impl" value="&lt;b&gt;Slot 0x360...bce&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;IMPLEMENTATION_SLOT&lt;br&gt;= address(FixerRegistryUpgradeable)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#EDE9FE;strokeColor=#C4B5FD;strokeWidth=1;fontSize=10;fontColor=#5B21B6;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="120" y="280" width="220" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="slot-admin" value="&lt;b&gt;Slot 0xb53...278&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;ADMIN_SLOT&lt;br&gt;= not used (UUPS pattern)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#EDE9FE;strokeColor=#C4B5FD;strokeWidth=1;fontSize=10;fontColor=#5B21B6;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="360" y="280" width="220" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="proxy-fallback" value="&lt;font style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;fallback()&lt;/b&gt; -- delegatecall to implementation&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#C4B5FD;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="200" y="350" width="300" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: caller to proxy -->
+        <mxCell id="a-caller-proxy" value="call" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7C3AED;strokeWidth=2;fontSize=11;fontColor=#7C3AED;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;" edge="1" source="caller" target="proxy-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Implementation -->
+        <mxCell id="impl-box" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#5B21B6;strokeColor=#4C1D95;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="420" width="500" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="impl-title" value="&lt;b&gt;FixerRegistryUpgradeable&lt;/b&gt; (Implementation)" style="text;html=1;align=center;verticalAlign=middle;fontSize=14;fontColor=#F5F3FF;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="150" y="428" width="400" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="impl-detail" value="&lt;font style=&quot;font-size:10px;&quot;&gt;Code-only (no state stored here)&lt;br&gt;constructor calls _disableInitializers()&lt;br&gt;_authorizeUpgrade() restricted to owner via proposeExecute pattern&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#C4B5FD;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="120" y="455" width="460" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="impl-version" value="VERSION = 2_004_000 (v2.4.0)" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#E9D5FF;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="200" y="505" width="300" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: proxy to impl -->
+        <mxCell id="a-proxy-impl" value="delegatecall" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A78BFA;strokeWidth=2;fontSize=11;fontColor=#7C3AED;fontStyle=1;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;dashed=1;" edge="1" source="proxy-box" target="impl-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 2: ERC-7201 Storage Namespace (right side)             -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="storage-section-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="680" y="90" width="580" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="storage-section-label" value="ERC-7201 Namespaced Storage" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#92400E;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="695" y="97" width="240" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ns-slot" value="&lt;b&gt;Storage Namespace:&lt;/b&gt; fixer.registry.storage.main" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#78350F;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="700" y="122" width="400" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="ns-formula" value="&lt;b&gt;Slot:&lt;/b&gt; keccak256(abi.encode(uint256(keccak256(&quot;fixer.registry.storage.main&quot;)) - 1)) &amp; ~bytes32(uint256(0xff))" style="text;html=1;align=left;verticalAlign=middle;fontSize=9;fontColor=#92400E;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="700" y="140" width="540" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Storage layout boxes -->
+        <mxCell id="sg1" value="&lt;b&gt;Slot Group 1&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;minSwapAmount (128)&lt;br&gt;rewardRateBps (64)&lt;br&gt;__reserved (64)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FFFFFF;strokeColor=#FBBF24;strokeWidth=1;fontSize=10;fontColor=#78350F;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="700" y="168" width="130" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="sg2" value="&lt;b&gt;Slot Group 2&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;maxRewardAmount (128)&lt;br&gt;minRewardAmount (128)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FFFFFF;strokeColor=#FBBF24;strokeWidth=1;fontSize=10;fontColor=#78350F;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="840" y="168" width="140" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="sg3" value="&lt;b&gt;Slot Group 3&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;protocolFeeBps (64)&lt;br&gt;maxProtocolFeeBps (64)&lt;br&gt;accumulatedFees (128)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FFFFFF;strokeColor=#FBBF24;strokeWidth=1;fontSize=10;fontColor=#78350F;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="990" y="168" width="150" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="sg4" value="&lt;b&gt;Slot Group 4&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;hookCount (64)&lt;br&gt;totalReferrals (64)&lt;br&gt;totalVolume (128)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FFFFFF;strokeColor=#FBBF24;strokeWidth=1;fontSize=10;fontColor=#78350F;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="168" width="100" height="72" as="geometry" />
+        </mxCell>
+
+        <mxCell id="sg-maps" value="&lt;b&gt;Mappings&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;authorizedHooks, poolInfos, referrerStats,&lt;br&gt;referrerPoolVolume, tierThresholds,&lt;br&gt;agentProfiles, referralDelegations,&lt;br&gt;authorizationStates (EIP-3009)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FFFFFF;strokeColor=#FBBF24;strokeWidth=1;fontSize=10;fontColor=#78350F;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="700" y="255" width="260" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="sg-emergency" value="&lt;b&gt;EmergencyState&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;pausedReferrals, pausedAgents,&lt;br&gt;pausedRewards, circuitBreaker,&lt;br&gt;securityCouncil, governance&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FFFFFF;strokeColor=#DC2626;strokeWidth=1;fontSize=10;fontColor=#78350F;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="975" y="255" width="200" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="sg-gap" value="&lt;b&gt;__gap[45]&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;Reserved for&lt;br&gt;future upgrades&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=10;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="255" width="60" height="72" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SECTION 3: 48-Hour Upgrade Timelock Flow (bottom)              -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="timelock-section-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#F0FDF4;strokeColor=#86EFAC;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="680" y="400" width="580" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="timelock-section-label" value="48-Hour Upgrade Timelock Flow" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#15803D;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="695" y="407" width="240" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Step 1: Propose -->
+        <mxCell id="tl-propose" value="&lt;b&gt;1. proposeUpgrade()&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#BBF7D0;&quot;&gt;Owner submits new&lt;br&gt;implementation address&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#166534;strokeColor=#14532D;strokeWidth=1.5;fontSize=12;fontColor=#F0FDF4;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="700" y="440" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="tl-propose-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;Stores: UpgradeProposal {&lt;br&gt;  newImplementation,&lt;br&gt;  proposedAt: block.timestamp,&lt;br&gt;  active: true&lt;br&gt;}&lt;br&gt;Reverts if upgrade already pending&lt;br&gt;&lt;b&gt;emit UpgradeProposed(...)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#166534;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="700" y="515" width="200" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Timelock box -->
+        <mxCell id="tl-wait" value="&lt;b&gt;WAIT 48 HOURS&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;UPGRADE_TIMELOCK&lt;br&gt;= 48 hours = 172,800s&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=2;fontSize=14;fontColor=#92400E;fontFamily=Inter,system-ui,sans-serif;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="720" y="630" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="tl-wait-note" value="&lt;font style=&quot;font-size:9px;&quot;&gt;Users can exit positions&lt;br&gt;during this window&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontStyle=2;fontColor=#92400E;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="720" y="702" width="180" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- Step 2: Execute or Cancel -->
+        <mxCell id="tl-execute" value="&lt;b&gt;2a. executeUpgrade()&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#BBF7D0;&quot;&gt;After 48h: calls&lt;br&gt;upgradeToAndCall(newImpl, &quot;&quot;)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#166534;strokeColor=#14532D;strokeWidth=1.5;fontSize=12;fontColor=#F0FDF4;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="950" y="440" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="tl-execute-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;Checks: elapsed &gt;= 48 hours&lt;br&gt;Deletes pendingUpgrade&lt;br&gt;Calls UUPSUpgradeable.upgradeToAndCall()&lt;br&gt;  which calls _authorizeUpgrade()&lt;br&gt;&lt;b&gt;emit UpgradeExecuted(newImpl)&lt;/b&gt;&lt;br&gt;&lt;br&gt;Reverts with UpgradeTimelockNotExpired&lt;br&gt;if called too early&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#166534;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="950" y="515" width="230" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="tl-cancel" value="&lt;b&gt;2b. cancelUpgrade()&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#FECDD3;&quot;&gt;Owner can abort at any time&lt;br&gt;delete pendingUpgrade&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#DC2626;strokeColor=#B91C1C;strokeWidth=1.5;fontSize=12;fontColor=#FEF2F2;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="960" y="640" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tl-cancel-detail" value="&lt;font style=&quot;font-size:9px;&quot;&gt;&lt;b&gt;emit UpgradeCancelled(...)&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontColor=#DC2626;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="960" y="702" width="200" height="16" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows for timelock flow -->
+        <mxCell id="tla1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#15803D;strokeWidth=2;endArrow=blockThin;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="tl-propose" target="tl-wait" parent="1">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="800" y="618" /><mxPoint x="810" y="618" /></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="tla2" value="&gt;= 48h" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#15803D;strokeWidth=2;fontSize=10;fontColor=#15803D;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="tl-wait" target="tl-execute" parent="1">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="920" y="630" /><mxPoint x="920" y="475" /></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="tla3" value="any time" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#DC2626;strokeWidth=2;fontSize=10;fontColor=#DC2626;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="tl-wait" target="tl-cancel" parent="1">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="930" y="700" /><mxPoint x="930" y="670" /></Array></mxGeometry>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- SAFETY PROPERTIES                                              -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <mxCell id="safety-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="760" width="1200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="safety-title" value="&lt;b&gt;Safety Properties&lt;/b&gt;" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="768" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="s1-text" value="&lt;b&gt;Storage Isolation:&lt;/b&gt; ERC-7201 namespaced storage prevents slot collisions between proxy, implementation, and OZ modules." style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="793" width="800" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="s2-text" value="&lt;b&gt;Upgrade Guard:&lt;/b&gt; _authorizeUpgrade() is onlyOwner + can only be reached through executeUpgrade() after 48h timelock." style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="813" width="800" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-text" value="&lt;b&gt;Initializer Protection:&lt;/b&gt; constructor calls _disableInitializers(). initialize() is restricted to proxy deployment via initializer modifier." style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="833" width="800" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="s4-text" value="&lt;b&gt;Storage Gap:&lt;/b&gt; 45 reserved uint256 slots (__gap[45]) ensure future upgrades can add state variables without corrupting mappings." style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="853" width="800" height="18" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

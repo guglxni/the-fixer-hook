@@ -1,8 +1,8 @@
 # System Design Document
 
-> The FixerHook Protocol — Technical Architecture Specification (v1.0 + v2.2)
+> The FixerHook Protocol — Technical Architecture Specification (v1.0 + v2.4)
 
-**Last Updated:** February 6, 2026
+**Last Updated:** February 24, 2026
 
 ---
 
@@ -348,8 +348,8 @@ if (hookData.length >= 32) {
 | v2.0 | Cross-pool referral tracking | Complete |
 | v2.1 | NFT-based referral credentials | Complete |
 | v2.2 | UUPS Upgradeable Registry | **Complete** |
-| v2.4 | Emergency Module | **Complete** |
-| v2.3 | Reactive Network + Hyperlane cross-chain | Planned |
+| v2.3 | x402 + EIP-3009 Agent Payments | **Complete** |
+| v2.4 | ERC-8004 Trustless Agents + Emergency Module | **Complete** |
 | v2.5 | Staking (veFIX) + Governance + Protocol Fees | Planned |
 | v2.6 | Referrer Teams | Planned |
 | v2.7 | AI Agent Marketplace | Planned |

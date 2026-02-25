@@ -33,7 +33,7 @@ contract Upgrade is Script {
         address deployer = vm.addr(deployerPrivateKey);
         address proxyAddress = vm.envAddress("PROXY_ADDRESS");
 
-        FixerRegistryUpgradeable proxy = FixerRegistryUpgradeable(proxyAddress);
+        FixerRegistryUpgradeable proxy = FixerRegistryUpgradeable(payable(proxyAddress));
 
         console.log("=== FixerRegistry Upgrade ===");
         console.log("Proxy:", proxyAddress);
