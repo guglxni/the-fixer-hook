@@ -1,290 +1,274 @@
 # Testing Strategy
 
-> Comprehensive test coverage for the FixerHook Protocol
+> The Fixer Hook Protocol — Test Suite Documentation (v2.6.0)
 
-**Last Updated:** February 24, 2026
-**Total Tests:** 352 across 34 test suites (all passing)
+**Last Updated:** February 26, 2026 | **381 tests across 35 suites** | **Solidity 0.8.26**
 
 ---
 
-## Current Test Suite Summary
+## Table of Contents
 
-| Test Suite | File | Tests | Category |
-|------------|------|-------|----------|
-| FixerHookTest | `test/FixerHook.t.sol` | Unit | v1.0 Hook logic |
-| FixerHookV1_1FuzzTest | `test/FixerHookV1_1.t.sol` | Fuzz | Decimal combinations |
-| FixerHookV1_2Test | `test/FixerHookV1_2.t.sol` | Unit | Advanced hook scenarios |
-| FixerRegistryTest | `test/FixerRegistry.t.sol` | Unit | v1 Registry logic |
-| FixerRegistryFuzzTest | `test/FixerRegistry.t.sol` | Fuzz | Referral + tier fuzz |
-| FixerCredentialTest | `test/FixerCredential.t.sol` | Unit | NFT credentials |
-| FixerCredentialFuzzTest | `test/FixerCredential.t.sol` | Fuzz | Mint fuzz |
-| **FixerRegistryUpgradeTest** | `test/FixerRegistryUpgrade.t.sol` | **31** | **v2.2 UUPS + proxy** |
-| **EmergencyModuleTest** | `test/EmergencyModule.t.sol` | **29** | **Emergency module** |
-| **HardeningTest** | `test/Hardening.t.sol` | **30** | **Supply cap, timelock, invariants** |
-| **CoverageGapTest** | `test/CoverageGap.t.sol` | **34** | **BPSMath, pool info, fuzz** |
-| **X402AgentRegistryTest** | `test/X402.t.sol` | **44** | **x402 agent & EIP-3009** |
-| **ERC8004RegistrationTest** | `test/ERC8004.t.sol` | **46** | **ERC-8004 identity, reputation, rewards** |
+1. [Overview](#overview)
+2. [Test Suite Breakdown](#test-suite-breakdown)
+3. [Test Categories](#test-categories)
+4. [Running Tests](#running-tests)
+5. [Coverage Targets](#coverage-targets)
+6. [Fuzz Testing](#fuzz-testing)
 
-### v2.2 Test Coverage (FixerRegistryUpgrade.t.sol — 31 tests)
+---
 
-| Area | Tests | Description |
-|------|-------|-------------|
-| Initialization | 5 | Owner, name, symbol, fee defaults, emergency state |
-| Referrals | 5 | Record referral, reward bounds, self-referral block, unauthorized hook |
-| Protocol Fees | 4 | Default 5%, fee deduction, max cap enforcement, accumulated fees |
-| Hooks | 3 | Authorize/deauthorize, unauthorized revert |
-| Upgrades | 4 | Owner upgrade, non-owner revert, state preservation, post-upgrade referrals |
-| Tiers | 4 | Bronze → Silver → Gold → Platinum progression, view functions |
-| Admin | 4 | Set reward params, protocol fee, fee addresses, min swap amount |
-| Fee Distribution | 2 | 50/30/20 split, zero-fee revert |
+## Overview
 
-### v2.4 Test Coverage (EmergencyModule.t.sol — 25 tests)
+The test suite validates all contracts, modules, and integrations across 12 test files:
 
-| Area | Tests | Description |
-|------|-------|-------------|
-| Pause/Resume | 9 | All 3 states (referrals, agents, rewards) pause + resume |
-| Pause Guards | 3 | Paused state blocks `recordReferral()` |
-| Double-Pause | 3 | Already-paused reverts with `*AlreadyPaused` errors |
-| DAO Threshold | 2 | 7-day DAO requirement for resume, council can resume before |
-| Pause All | 2 | `pauseAll()` and `resumeAll()` |
-| Circuit Breaker | 3 | Trigger on excessive minting, hourly counter reset |
-| Admin | 2 | Set circuit breaker threshold, set security council |
-| Access Control | 1 | Non-council pause revert |
+| Test File | Tests | Focus Area |
+|-----------|:-----:|------------|
+| `FixerHook.t.sol` | ~8 | v1 hook: encoding, permissions, validation logic |
+| `FixerHookV1_1.t.sol` | ~30 | v1.1 dynamic rewards: volume math, thresholds, per-pool config, fuzz |
+| `FixerHookV1_2.t.sol` | ~25 | v1.2 tiered referrals: tier thresholds, multipliers, upgrade logic |
+| `FixerRegistry.t.sol` | ~30 | v2 registry: init, hook auth, referral recording, cross-pool volume |
+| `FixerRegistryUpgrade.t.sol` | ~25 | UUPS proxy: initialization, 48h timelock, state preservation, versioning |
+| `FixerCredential.t.sol` | ~25 | Soulbound NFT: minting, transfer restrictions, SVG, refresh, ERC-5192 |
+| `EmergencyModule.t.sol` | ~30 | Pause/resume states, DAO threshold, circuit breaker, access control |
+| `ERC8004.t.sol` | ~50 | Agent registration, reputation caching, bonus computation, feedback |
+| `X402.t.sol` | ~40 | EIP-3009 transferWithAuthorization, agent delegation, platform types |
+| `XMTP.t.sol` | ~20 | enableXMTP, disableXMTP, endpoint updates, counter tracking, validation |
+| `CoverageGap.t.sol` | ~35 | BPSMath, pool info, resumeRewards/Referrals, DAO threshold, fuzz |
+| `Hardening.t.sol` | ~25 | MAX_SUPPLY cap, circuit breaker limits, daily ceiling, timelock, BPSMath |
+
+**Test helper:** `test/helpers/IFixerRegistryFull.sol` — combined interface for calling Extension functions through the proxy's DELEGATECALL fallback.
+
+**Total: 381 tests, 35 suites, 0 failures**
+
+---
+
+## Test Suite Breakdown
+
+### FixerHook.t.sol — v1 Core Hook
+
+Tests the original monolithic hook (BaseHook + ERC20):
+- hookData encoding/decoding round-trip
+- Hook permission configuration (only afterSwap = true)
+- Referrer validation (zero address, self-referral)
+- REWARD_AMOUNT constant verification
+- Token metadata (name, symbol, decimals)
+
+### FixerHookV1_1.t.sol — Dynamic Rewards
+
+Tests volume-based reward calculation:
+- `rewardRateBps` → reward math (10 BPS = 0.1% of volume)
+- Min/max reward clamping (1–1,000 FIX per swap)
+- Per-pool configuration (`PoolRewardConfig`)
+- Volume threshold enforcement (`minSwapAmount`)
+- Quote token index selection
+- **Fuzz tests:** random volumes, edge values, overflow
+
+### FixerHookV1_2.t.sol — Tier System
+
+Tests referrer tier promotions and multipliers:
+- Bronze→Silver→Gold→Platinum threshold qualification
+- Volume + referral count requirements
+- Multiplier application (1.0x→2.0x)
+- Tier downgrade prevention (monotonic progression)
+- Edge cases: exactly at threshold, just below
+
+### FixerRegistry.t.sol — Central Registry
+
+Tests the non-upgradeable v1 registry:
+- Initialization parameters
+- Hook authorization (register/deregister)
+- `recordReferral()` full flow
+- Cross-pool volume tracking
+- Tier upgrades from recorded referrals
+- Admin functions: setRewardRate, setMinSwapAmount
+
+### FixerRegistryUpgrade.t.sol — UUPS Proxy
+
+Tests upgrade mechanisms:
+- Proxy initialization (5-phase initializer chain)
+- State preservation across upgrades
+- **48h timelock flow:** propose → wait → execute
+- `cancelUpgrade()` by owner
+- Direct `upgradeToAndCall()` rejection
+- Version tracking (VERSION constant)
+- `_authorizeUpgrade()` validation
+
+### FixerCredential.t.sol — Soulbound NFT
+
+Tests credential lifecycle:
+- Minting (requires ≥1 referral)
+- One-per-referrer enforcement
+- **Soulbound transfer restriction:** transferFrom, safeTransferFrom, approve, setApprovalForAll all revert `TokenLocked()`
+- On-chain SVG generation with tier-based colors
+- `refresh()` updates metadata from registry
+- `tokenURI()` returns valid base64-encoded JSON
+- ERC-165 interface support (ERC-721, ERC-5192, ERC-4906)
+
+### EmergencyModule.t.sol — Emergency Controls
+
+Tests all safety mechanisms:
+- Independent pause states (referrals, agents, rewards)
+- Pause timestamps and duration tracking
+- Security council instant pause
+- **DAO governance threshold:** resume blocked after 7 days paused
+- Circuit breaker trigger and auto-pause
+- `pauseAll()` / `resumeAll()` atomicity
+- `NothingPaused()` revert on unnecessary resume
+- Access control (onlyOwner, onlySecurityCouncil)
+
+### ERC8004.t.sol — Agent Infrastructure
+
+Tests ERC-8004 integration (50+ tests):
+- Agent registration via NFT ownership proof
+- `FixerLib.validateAgent()` identity verification
+- Reputation fetching and caching (1h TTL)
+- Bonus BPS computation (0→500→1500→3000→5000)
+- Stale cache degradation (50% reduction)
+- `refreshAgentReputation()` force update
+- `submitReferralFeedback()` to reputation registry
+- Agent deregistration
+- Rewards integration: tier × reputation multiplicative stacking
+- `MAX_GROSS_REWARD` (5,000 FIX) enforcement
+
+### X402.t.sol — Agent Payments
+
+Tests x402/EIP-3009 integration:
+- Agent registration across platforms (Human, OpenClaw, Moltbook, Custom)
+- `transferWithAuthorization()` gasless FIX transfers
+- EIP-712 signature validation
+- Nonce management (single-use, rejection on replay)
+- Time-bounded validity (validAfter/validBefore)
+- Agent delegation: `delegateReferral()` / `revokeDelegation()`
+- Platform type enumeration
+
+### XMTP.t.sol — Communication Layer
+
+Tests XMTP on-chain endpoint directory:
+- `enableXMTP()` with public key hash and endpoint URI
+- `disableXMTP()` clears state
+- `updateXMTPEndpoint()` for URI changes
+- `getXMTPEnabledCount()` counter accuracy
+- Validation: non-agent blocked, zero key rejected, long URI rejected (>256 bytes)
+- View functions: `isXMTPEnabled`, `getXMTPPublicKeyHash`, `getXMTPEndpoint`
+
+### CoverageGap.t.sol — Gap Coverage
+
+Fills residual coverage gaps:
+- `resumeRewards()` and `resumeReferrals()` edge cases
+- DAO governance threshold boundary conditions
+- `NothingPaused()` revert scenarios
+- `BPSMath` library: `applyBPS()`, `deductFee()`, `applyMultiplier()`
+- Pool info registration and queries
+- **Fuzz tests:** random BPS values, volume amounts, fee calculations
+
+### Hardening.t.sol — Invariant Enforcement
+
+Tests hard limits and safety constants:
+- `MAX_SUPPLY` (1B FIX) enforcement in `_update()` override
+- `MIN_CIRCUIT_BREAKER_LIMIT` (100K FIX) prevents disabling
+- `MAX_CIRCUIT_BREAKER_LIMIT` (50M FIX) prevents excessive allowance
+- `MAX_DAILY_MINT` (10M FIX) daily ceiling
+- Upgrade timelock (48h) cannot be bypassed
+- `BPSMath` integration with Solady `FixedPointMathLib.mulDiv`
 
 ---
 
 ## Test Categories
 
-| Category | Purpose | Priority |
-|----------|---------|----------|
-| Unit Tests | Individual function behavior | High |
-| Integration Tests | Full swap flow with hook | High |
-| Fuzz Tests | Edge cases via randomization | Medium |
-| Invariant Tests | System-wide properties | Medium |
+### Unit Tests
+- Individual function behavior validation
+- Input/output verification for pure/view functions
+- Edge case handling (zero values, max values, boundary conditions)
 
----
+### Integration Tests
+- End-to-end referral flow: hook → registry → mint
+- Proxy + Extension DELEGATECALL routing
+- Agent registration → reputation → reward bonus
 
-## Unit Tests
+### Fuzz Tests
+- Random volume values for reward calculation
+- Random BPS values for fee computation
+- Boundary testing with uint128/uint256 ranges
+- Configuration: 256 runs, 15 invariant depth
 
-### 1. Configuration Tests
-
-```solidity
-function test_HookPermissions() public {
-    Hooks.Permissions memory perms = hook.getHookPermissions();
-    
-    assertTrue(perms.afterSwap, "afterSwap should be enabled");
-    assertFalse(perms.beforeSwap, "beforeSwap should be disabled");
-    assertFalse(perms.afterSwapReturnDelta, "no delta modifications");
-}
-
-function test_TokenMetadata() public {
-    assertEq(hook.name(), "Referral Token");
-    assertEq(hook.symbol(), "REF");
-    assertEq(hook.decimals(), 18);
-}
-
-function test_RewardAmount() public {
-    assertEq(hook.REWARD_AMOUNT(), 10 * 1e18);
-}
-```
-
-### 2. Validation Logic Tests
-
-```solidity
-function test_RejectsZeroAddress() public {
-    address referrer = address(0);
-    
-    // Simulate afterSwap with zero address referrer
-    bytes memory hookData = abi.encode(referrer);
-    
-    // Balance should not change
-    uint256 balBefore = hook.balanceOf(referrer);
-    // ... call hook
-    uint256 balAfter = hook.balanceOf(referrer);
-    
-    assertEq(balBefore, balAfter, "Zero address should not receive tokens");
-}
-
-function test_RejectsSelfReferral() public {
-    address user = makeAddr("user");
-    
-    // User tries to refer themselves
-    bytes memory hookData = abi.encode(user);
-    
-    vm.prank(user, user); // Set tx.origin = user
-    
-    // Should not mint
-    assertEq(hook.balanceOf(user), 0);
-}
-
-function test_AcceptsValidReferral() public {
-    address referrer = makeAddr("referrer");
-    address user = makeAddr("user");
-    
-    bytes memory hookData = abi.encode(referrer);
-    
-    vm.prank(user, user);
-    
-    // Should mint 10 REF
-    assertEq(hook.balanceOf(referrer), 10e18);
-}
-```
-
-### 3. Empty Data Tests
-
-```solidity
-function test_EmptyHookDataSkipsProcessing() public {
-    bytes memory hookData = "";
-    
-    // Should complete without error
-    // No tokens minted
-}
-
-function test_NoReferralNormalSwap() public {
-    // Swap without hookData should work normally
-}
-```
-
----
-
-## Fuzz Tests
-
-```solidity
-function testFuzz_ValidReferrerReceivesReward(
-    address referrer,
-    address user
-) public {
-    // Assume valid inputs
-    vm.assume(referrer != address(0));
-    vm.assume(referrer != user);
-    vm.assume(referrer.code.length == 0); // EOA
-    
-    bytes memory hookData = abi.encode(referrer);
-    
-    uint256 balBefore = hook.balanceOf(referrer);
-    
-    vm.prank(user, user);
-    // ... execute swap with hook
-    
-    uint256 balAfter = hook.balanceOf(referrer);
-    
-    assertEq(balAfter - balBefore, 10e18);
-}
-
-function testFuzz_SelfReferralAlwaysBlocked(address user) public {
-    vm.assume(user != address(0));
-    
-    bytes memory hookData = abi.encode(user);
-    
-    vm.prank(user, user);
-    // ... execute swap
-    
-    assertEq(hook.balanceOf(user), 0, "Self-referral should be blocked");
-}
-```
-
----
-
-## Invariant Tests
-
-```solidity
-contract ReferralInvariants is Test {
-    ReferralHook hook;
-    
-    function invariant_TotalSupplyMatchesBalances() public {
-        // Sum of all balances == totalSupply
-    }
-    
-    function invariant_RewardAmountConstant() public {
-        assertEq(hook.REWARD_AMOUNT(), 10e18);
-    }
-    
-    function invariant_NoNegativeBalances() public {
-        // All balanceOf returns >= 0
-    }
-}
-```
-
----
-
-## Gas Benchmarks
-
-```solidity
-function test_GasWithReferral() public {
-    bytes memory hookData = abi.encode(referrer);
-    
-    uint256 gasBefore = gasleft();
-    // ... swap with referral
-    uint256 gasUsed = gasBefore - gasleft();
-    
-    emit log_named_uint("Gas with referral", gasUsed);
-}
-
-function test_GasWithoutReferral() public {
-    bytes memory hookData = "";
-    
-    uint256 gasBefore = gasleft();
-    // ... swap without referral
-    uint256 gasUsed = gasBefore - gasleft();
-    
-    emit log_named_uint("Gas without referral", gasUsed);
-}
-```
+### Access Control Tests
+- `onlyOwner` modifier enforcement on admin functions
+- `onlyAuthorizedHook` enforcement on `recordReferral()`
+- `onlySecurityCouncil` enforcement on emergency functions
+- Unauthorized caller rejection
 
 ---
 
 ## Running Tests
 
 ```bash
-# All tests
+# Run all tests
 forge test -vvv
 
-# Specific test
-forge test --match-test test_ValidReferral -vvv
+# Run specific test file
+forge test --match-path test/ERC8004.t.sol -vvv
 
-# With gas report
+# Run specific test function
+forge test --match-test testAgentRegistration -vvv
+
+# Run with gas report
 forge test --gas-report
 
-# Fuzz with more runs
-forge test --fuzz-runs 1000
-
-# Coverage
+# Run with coverage
 forge coverage
+
+# Run fuzz tests with more runs
+forge test --fuzz-runs 1024
+```
+
+Expected output:
+```
+Ran 35 test suites: 381 tests passed, 0 failed
 ```
 
 ---
 
 ## Coverage Targets
 
-| Component | Target | Current | Notes |
-|-----------|--------|---------|-------|
-| FixerHook._afterSwap | 100% | ~100% | Core v1 logic |
-| FixerRegistryUpgradeable | 95%+ | ~90% | 31 tests |
-| EmergencyModule | 95%+ | ~95% | 25 tests |
-| FixerRegistry (v1) | 90%+ | ~90% | Legacy tests |
-| FixerCredential | 90%+ | ~90% | NFT tests |
-| AgentTypes | 100% | 100% | Constants only |
+| Component | Target | Notes |
+|-----------|:------:|-------|
+| FixerHookV2 | >95% | All afterSwap paths covered |
+| FixerRegistryUpgradeable | >90% | Complex state machine with many branches |
+| FixerRegistryExtension | >85% | Agent functions + DELEGATECALL routing |
+| FixerCredential | >95% | Simpler contract with clear boundaries |
+| EmergencyModule | >95% | All pause/resume/circuit paths |
+| FixerLib | >90% | External library — all public functions |
+| BPSMath | >95% | Pure math — fully deterministic |
 
 ---
 
-## Test File Structure
+## Fuzz Testing
 
-![Testing Coverage](diagrams/drawio/testing-coverage.png)
+### Configuration (foundry.toml)
 
----
+```toml
+[fuzz]
+runs = 256
+max_test_rejects = 65536
 
-## Continuous Integration
-
-```yaml
-# .github/workflows/test.yml
-name: Tests
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: foundry-rs/foundry-toolchain@v1
-      - run: forge build
-      - run: forge test -vvv
+[invariant]
+runs = 256
+depth = 15
+fail_on_revert = false
 ```
+
+### Key Fuzz Targets
+
+| Test | Fuzzed Input | Property |
+|------|-------------|----------|
+| Reward calculation | volume (uint128) | Reward ∈ [minReward, MAX_GROSS_REWARD] |
+| BPS application | bps (uint256) | Result ≤ input amount |
+| Fee deduction | fee (uint64) | Net ≤ gross |
+| Tier multiplier | volume (uint128) | Multiplier monotonically increases with tier |
+| Circuit breaker | mint amount (uint128) | Sum never exceeds hourly limit without pause |
+
+---
+
+<p align="center">
+  <em>Document Version: 3.0.0 | Last Updated: February 26, 2026</em>
+</p>

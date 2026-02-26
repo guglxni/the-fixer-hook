@@ -372,47 +372,98 @@ forge test --gas-report
 
 ---
 
-## v2 Architecture: Agent Infrastructure Stack
+## v2.6 Architecture: Reactive Modular Design
 
-As the project evolved beyond v1, we built a **UUPS proxy-based upgradeable architecture** with a central registry, emergency controls, and the **Agent Infrastructure Stack**:
+As the project evolved beyond v1, we built a **UUPS proxy-based upgradeable architecture** with a central registry, emergency controls, and the **Agent Infrastructure Stack**.
+
+### Core + Extension (DELEGATECALL Fallback)
+
+To stay under the EIP-170 contract size limit (24,576 bytes), the registry uses a **two-contract split**:
+
+| Component | Size | Role |
+|-----------|------|------|
+| **FixerLib** | 2.3 KB | External library (ERC-8004 validation, reputation, EIP-3009 auth) |
+| **FixerRegistryUpgradeable** (Core) | 20.5 KB | UUPS proxy: FIX token, referrals, tiers, emergency, hooks, admin |
+| **FixerRegistryExtension** | 14.7 KB | ERC-8004 agents, XMTP, delegation, reputation, EIP-3009 transfers |
+| **FixerHookV2** | 4.5 KB | Lightweight afterSwap observer (CREATE2-mined address) |
+| **FixerCredential** | 11.8 KB | Soulbound ERC-721 NFT with on-chain SVG |
+
+The Core contract's `fallback()` routes unknown selectors to the Extension via `DELEGATECALL`. Both share the same **ERC-7201 namespaced storage layout** — no storage collision risk across upgrades.
+
+```
+User → ERC1967Proxy → FixerRegistryUpgradeable (Core)
+                         ├── Known selectors → handled directly
+                         └── Unknown selectors → fallback() → DELEGATECALL → Extension
+```
+
+### Agent Infrastructure Stack
 
 | Layer | Protocol | Role |
 |:-----:|:--------:|:-----|
-| Communication | **XMTP** | Wallet-to-wallet messaging between agents |
-| Payments | **x402** | HTTP 402 micropayments, EIP-3009 gasless transfers |
-| Identity & Trust | **ERC-8004** | NFT identity, reputation scoring, validation |
+| Communication | **XMTP** | Wallet-to-wallet messaging, on-chain endpoint discovery |
+| Payments | **x402 / EIP-3009** | HTTP 402 micropayments, gasless FIX token transfers |
+| Identity & Trust | **ERC-8004** | NFT-based agent identity, reputation scoring, validation |
+
+### Off-Chain Services
+
+| Service | Stack | Description |
+|---------|-------|-------------|
+| **RaaS API** | Hono + x402 | REST API for pool/referrer/agent queries — gated by USDC micropayments |
+| **MCP Server** | Model Context Protocol | Tool server for AI agents (Claude, ChatGPT) to query on-chain data |
+| **XMTP Bot** | XMTP v3 | Wallet-to-wallet messaging bot for agent communication |
 
 ![UUPS Proxy Architecture](docs/diagrams/drawio/uups-proxy.png)
 
-> **Learning Point:** The v2 architecture separates concerns - the hook stays lightweight (just routing), while the registry handles all business logic behind a UUPS proxy for upgradeability.
+> **Learning Point:** The v2 architecture separates concerns — the hook stays lightweight (just routing), while the registry handles all business logic behind a UUPS proxy. The DELEGATECALL extension pattern lets us ship 35 KB+ of logic through a single proxy address.
 
-### ERC-8004 "Trustless Agents" (v2.4.0+, XMTP added v2.6.0)
+### Token Economics
+
+| Parameter | Value |
+|-----------|-------|
+| **Token** | FIX ("Fixer Token"), ERC-20, 18 decimals |
+| **Max Supply** | 1,000,000,000 FIX (hard cap enforced in `_update()`) |
+| **Reward Rate** | 0.1% of swap volume (10 BPS), min 1 FIX, max 1,000 FIX per swap |
+| **Max Gross Reward** | 5,000 FIX (caps tier × reputation amplification) |
+| **Protocol Fee** | 5% of rewards (50% treasury / 30% buyback / 20% stakers) |
+| **Circuit Breaker** | 1M FIX/hour auto-pause, 10M FIX daily mint ceiling |
+
+### Referrer Tier System
+
+| Tier | Volume Threshold | Multiplier | Team Size |
+|:----:|:----------------:|:----------:|:---------:|
+| Bronze | 0 | 1.0x | 5 |
+| Silver | 10,000 | 1.25x | 10 |
+| Gold | 100,000 | 1.5x | 25 |
+| Platinum | 1,000,000 | 2.0x | 50 |
+
+### ERC-8004 Reputation Bonuses
 
 All agent registration is **permissionless** via ERC-8004 NFT ownership proof. Agents register by calling `registerAgent(uint256 agentId, AgentPlatform platform)` — no admin approval needed. Their reputation score (read from the ERC-8004 Reputation Registry) automatically determines their bonus multiplier:
 
 | Score (0-100) | Tier | Bonus | Effect on Platinum Referrer |
 |:---:|:---:|:---:|:---|
-| <= 0 | None | 0% | 2.0x (tier only) |
-| 1-30 | Low | 5% | 2.1x effective |
-| 31-60 | Medium | 15% | 2.3x effective |
-| 61-80 | High | 30% | 2.6x effective |
-| 81-100 | Elite | 50% | 3.0x effective |
+| ≤ 0 | None | 0% | 2.0x (tier only) |
+| 1–30 | Low | +5% | 2.1x effective |
+| 31–60 | Medium | +15% | 2.3x effective |
+| 61–80 | High | +30% | 2.6x effective |
+| 81–100 | Elite | +50% | 3.0x effective |
+
+### UUPS Upgrade Security
+
+All upgrades follow a **48-hour timelock**: `proposeUpgrade()` → wait 48h → `executeUpgrade()`. Direct `upgradeToAndCall()` is blocked. The security council can cancel malicious proposals.
 
 ---
 
-## Live Testnet Deployments
+## Emergency & Safety
 
-The full Fixer Protocol v2.4 stack is deployed and verified on three L2 testnets:
-
-| Network | Registry Proxy | FixerHookV2 | FixerCredential |
-|---------|---------------|-------------|-----------------|
-| **Base Sepolia** | [`0x43c75D09...F94`](https://sepolia.basescan.org/address/0x43c75D09d7e53Ee1c768353708EDC3Bab4317F94) | [`0xb66603...040`](https://sepolia.basescan.org/address/0xb66603495944EA622F1c8e312b0d50A8A2F30040) | [`0xd2fD5c...3ef`](https://sepolia.basescan.org/address/0xd2fD5c0CaAbE15379a81b3d23081914D69FDA3ef) |
-| **Arbitrum Sepolia** | [`0xC7206C...B9e`](https://sepolia.arbiscan.io/address/0xC7206C83702B251A5408B28Ce4df195255F42B9e) | [`0x7A5E4C...040`](https://sepolia.arbiscan.io/address/0x7A5E4C1b42d66f459c02b36115d184b907dF0040) | [`0x0F94b6...c79`](https://sepolia.arbiscan.io/address/0x0F94b615c27DAfe6D875aE863a77Ea50D9c30b79) |
-| **Unichain Sepolia** | [`0xC13080...56f`](https://sepolia.uniscan.xyz/address/0xC13080390D3A1aCCdC7E6bbd7A41981db4bcd56f) | [`0x983eA9...040`](https://sepolia.uniscan.xyz/address/0x983eA96dd196f3F8395A051453505A7c9321c040) | [`0x88a31b...5c0`](https://sepolia.uniscan.xyz/address/0x88a31bFDa9B3E24a6bDFE7Ae627CB2C7A134f5c0) |
-
-Each deployment creates a USDC/WETH pool with 0.3% fee tier (except Lasna which has no Uniswap v4). The FIX token lives at the Registry Proxy address. All contracts run **VERSION 2_006_000 (v2.6.0)** with full XMTP communication support.
-
-For complete addresses, interaction instructions, diagrams, and `cast` commands, see the **[Testnet Deployments Guide](./docs/TESTNET_DEPLOYMENTS.md)**.
+| Mechanism | Details |
+|-----------|---------|
+| **3 Independent Pauses** | Referrals, Agents, Rewards — each with separate timestamps |
+| **Security Council** | Can pause instantly; DAO required to resume after 7 days |
+| **Circuit Breaker** | 1M FIX/hour auto-pause (configurable: 100K–50M range) |
+| **Daily Mint Ceiling** | 10M FIX per day hard cap |
+| **Reentrancy Guard** | On all state-mutating functions |
+| **Max Gross Reward** | 5,000 FIX per swap prevents amplification exploits |
 
 ---
 

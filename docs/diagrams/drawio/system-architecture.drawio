@@ -1,36 +1,51 @@
 <mxfile host="app.diagrams.net" agent="Claude" version="26.0.0">
-  <diagram name="System Architecture" id="system-arch-01">
-    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+  <diagram name="System Architecture v2.6" id="system-arch-v26">
+    <mxGraphModel dx="1400" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1400" pageHeight="1200" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
         <!-- Title -->
-        <mxCell id="title" value="The Fixer Hook — System Architecture" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="100" y="30" width="900" height="40" as="geometry" />
+        <mxCell id="title" value="The Fixer Hook v2.6 — Reactive Modular Architecture" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="50" y="20" width="1100" height="40" as="geometry" />
         </mxCell>
 
         <!-- ═══════════════════════════════════════════ -->
         <!-- LAYER 1: Client Layer                      -->
         <!-- ═══════════════════════════════════════════ -->
         <mxCell id="layer1-group" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;dashed=0;" vertex="1" parent="1">
-          <mxGeometry x="100" y="100" width="900" height="120" as="geometry" />
+          <mxGeometry x="50" y="80" width="1100" height="110" as="geometry" />
         </mxCell>
         <mxCell id="layer1-label" value="Client Layer" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="120" y="108" width="120" height="20" as="geometry" />
+          <mxGeometry x="70" y="88" width="120" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="client-wallet" value="User Wallet" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="280" y="140" width="180" height="60" as="geometry" />
+        <mxCell id="client-wallet" value="User Wallet" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="100" y="120" width="150" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="dapp-frontend" value="DApp Frontend" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="640" y="140" width="180" height="60" as="geometry" />
+        <mxCell id="dapp-frontend" value="DApp Frontend" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="300" y="120" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ai-agent" value="AI Agent" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#DBEAFE;strokeColor=#3B82F6;strokeWidth=1;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="500" y="120" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="offchain-label" value="Off-Chain Services" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=2;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="700" y="105" width="120" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="raas-api" value="RaaS API&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;Hono + x402&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=1;fontSize=12;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="700" y="120" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mcp-server" value="MCP Server&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;AI Tools&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=1;fontSize=12;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="840" y="120" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="xmtp-bot" value="XMTP Bot&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;Messaging&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=1;fontSize=12;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="980" y="120" width="120" height="50" as="geometry" />
         </mxCell>
 
-        <!-- Arrow: Layer 1 -> Layer 2 -->
-        <mxCell id="arrow-l1-l2a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;fontSize=12;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="client-wallet" target="swap-router" parent="1">
+        <!-- Arrows: Client -> Gateway -->
+        <mxCell id="arrow-l1-l2a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="client-wallet" target="swap-router" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="arrow-l1-l2b" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;fontSize=12;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="dapp-frontend" target="pool-manager" parent="1">
+        <mxCell id="arrow-l1-l2b" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="dapp-frontend" target="pool-manager" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
@@ -38,91 +53,127 @@
         <!-- LAYER 2: Gateway Layer                     -->
         <!-- ═══════════════════════════════════════════ -->
         <mxCell id="layer2-group" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;dashed=0;" vertex="1" parent="1">
-          <mxGeometry x="100" y="260" width="900" height="120" as="geometry" />
+          <mxGeometry x="50" y="220" width="600" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="layer2-label" value="Gateway Layer" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="120" y="268" width="140" height="20" as="geometry" />
+        <mxCell id="layer2-label" value="Uniswap v4 Gateway" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="70" y="228" width="160" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="swap-router" value="Uniswap SwapRouter" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="250" y="300" width="200" height="60" as="geometry" />
+        <mxCell id="swap-router" value="SwapRouter" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="100" y="260" width="180" height="44" as="geometry" />
         </mxCell>
-        <mxCell id="pool-manager" value="PoolManager" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="640" y="300" width="200" height="60" as="geometry" />
+        <mxCell id="pool-manager" value="PoolManager" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="360" y="260" width="180" height="44" as="geometry" />
         </mxCell>
 
-        <!-- Arrow: Layer 2 -> Layer 3 -->
-        <mxCell id="arrow-l2-l3a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="swap-router" target="fixer-v1" parent="1">
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- LAYER 3: Hook Layer (4.5 KB)               -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="layer3-group" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F0F9FF;strokeColor=#0EA5E9;strokeWidth=1.5;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="50" y="350" width="600" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="layer3-label" value="Hook Layer (4.5 KB)" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#0369A1;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="70" y="358" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="fixer-v2" value="FixerHookV2&lt;br&gt;&lt;font style=&quot;font-size:11px;color:#64748B;&quot;&gt;afterSwap observer · CREATE2-mined&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=15;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="390" width="380" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: PoolManager -> Hook -->
+        <mxCell id="arrow-pm-hook" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0EA5E9;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" source="pool-manager" target="fixer-v2" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="arrow-l2-l3b" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="pool-manager" target="fixer-v2" parent="1">
+        <mxCell id="arrow-pm-hook-label" value="afterSwap(hookData)" style="edgeLabel;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#0369A1;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" connectable="0" parent="arrow-pm-hook">
+          <mxGeometry x="-0.2" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- LAYER 4: Registry Core + Extension         -->
+        <!-- ═══════════════════════════════════════════ -->
+        <mxCell id="layer4-group" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F0FDF4;strokeColor=#22C55E;strokeWidth=1.5;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="50" y="480" width="1100" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="layer4-label" value="Registry Layer (UUPS Proxy + DELEGATECALL Extension)" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#15803D;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="70" y="488" width="420" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ERC1967 Proxy -->
+        <mxCell id="proxy" value="ERC1967Proxy&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;User-facing address&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#BBF7D0;strokeColor=#22C55E;strokeWidth=2;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="520" width="200" height="48" as="geometry" />
+        </mxCell>
+
+        <!-- Core -->
+        <mxCell id="registry-core" value="FixerRegistryUpgradeable (Core 20.5 KB)&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#64748B;&quot;&gt;FIX Token · Tiers · Referrals · Emergency · UUPS&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#DCFCE7;strokeColor=#22C55E;strokeWidth=1.5;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="600" width="420" height="56" as="geometry" />
+        </mxCell>
+
+        <!-- Extension -->
+        <mxCell id="registry-ext" value="FixerRegistryExtension (14.7 KB)&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#64748B;&quot;&gt;ERC-8004 Agents · EIP-3009 · XMTP · Delegation&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#DBEAFE;strokeColor=#3B82F6;strokeWidth=1.5;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="600" width="380" height="56" as="geometry" />
+        </mxCell>
+
+        <!-- FixerLib -->
+        <mxCell id="fixer-lib" value="FixerLib (2.3 KB)&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;External library · validateAgent · computeBonus&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F5F3FF;strokeColor=#8B5CF6;strokeWidth=1;fontSize=12;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="960" y="600" width="170" height="56" as="geometry" />
+        </mxCell>
+
+        <!-- Proxy arrows -->
+        <mxCell id="arrow-proxy-core" value="delegatecall" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#22C55E;strokeWidth=1.5;endArrow=blockThin;endFill=1;fontSize=10;fontColor=#15803D;fontFamily=Inter,system-ui,sans-serif;" edge="1" source="proxy" target="registry-core" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-core-ext" value="fallback() → DELEGATECALL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3B82F6;strokeWidth=1.5;dashed=1;dashPattern=8 4;endArrow=blockThin;endFill=1;fontSize=10;fontColor=#2563EB;fontFamily=Inter,system-ui,sans-serif;" edge="1" source="registry-core" target="registry-ext" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-ext-lib" value="CALL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#8B5CF6;strokeWidth=1;dashed=1;dashPattern=4 4;endArrow=open;endFill=0;fontSize=10;fontColor=#7C3AED;fontFamily=Inter,system-ui,sans-serif;" edge="1" source="registry-ext" target="fixer-lib" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Hook -> Proxy arrow -->
+        <mxCell id="arrow-hook-proxy" value="recordReferral()" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#22C55E;strokeWidth=1.5;endArrow=blockThin;endFill=1;fontSize=10;fontColor=#15803D;fontFamily=Inter,system-ui,sans-serif;" edge="1" source="fixer-v2" target="proxy" parent="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
         <!-- ═══════════════════════════════════════════ -->
-        <!-- LAYER 3: Hook Layer                        -->
+        <!-- LAYER 5: Credential + Security             -->
         <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="layer3-group" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;dashed=0;" vertex="1" parent="1">
-          <mxGeometry x="100" y="420" width="900" height="120" as="geometry" />
+        <mxCell id="layer5-group" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FFF7ED;strokeColor=#F97316;strokeWidth=1.5;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="50" y="720" width="1100" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="layer3-label" value="Hook Layer" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="120" y="428" width="120" height="20" as="geometry" />
+        <mxCell id="layer5-label" value="Credential &amp; Security Layer" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#C2410C;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="70" y="728" width="220" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="fixer-v1" value="FixerHook (v1)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=16;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="250" y="460" width="200" height="60" as="geometry" />
+        <mxCell id="credential" value="FixerCredential&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;Soulbound ERC-5192 NFT&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FFEDD5;strokeColor=#F97316;strokeWidth=1;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="758" width="220" height="44" as="geometry" />
         </mxCell>
-        <mxCell id="fixer-v2" value="FixerHookV2" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=16;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="640" y="460" width="200" height="60" as="geometry" />
+        <mxCell id="emergency-mod" value="EmergencyModule&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;3 pause states · Circuit breaker&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FEE2E2;strokeColor=#EF4444;strokeWidth=1;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="758" width="240" height="44" as="geometry" />
         </mxCell>
-
-        <!-- Arrow: Layer 3 -> Layer 4 -->
-        <mxCell id="arrow-l3-l4a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="fixer-v1" target="registry" parent="1">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="bpsmath" value="BPSMath&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;Fee calculations&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F5F3FF;strokeColor=#8B5CF6;strokeWidth=1;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="620" y="758" width="160" height="44" as="geometry" />
         </mxCell>
-        <mxCell id="arrow-l3-l4b" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="fixer-v2" target="credential" parent="1">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="erc7201" value="ERC-7201 Storage&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;Namespaced slots · 38 gaps&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=14;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="820" y="758" width="200" height="44" as="geometry" />
         </mxCell>
 
         <!-- ═══════════════════════════════════════════ -->
-        <!-- LAYER 4: Registry Layer                    -->
+        <!-- LAYER 6: Multi-Chain Deployments           -->
         <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="layer4-group" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;dashed=0;" vertex="1" parent="1">
-          <mxGeometry x="100" y="580" width="900" height="120" as="geometry" />
+        <mxCell id="layer6-group" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="50" y="850" width="1100" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="layer4-label" value="Registry Layer" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="120" y="588" width="140" height="20" as="geometry" />
+        <mxCell id="layer6-label" value="Multi-Chain Deployments" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="70" y="858" width="200" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="registry" value="FixerRegistryUpgradeable&lt;br&gt;&lt;font style=&quot;font-size:12px;font-style:italic;color:#94A3B8;&quot;&gt;UUPS Proxy&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="200" y="616" width="260" height="64" as="geometry" />
+        <mxCell id="chain-base" value="Base Sepolia&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;84532 · Full Stack&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=12;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="80" y="885" width="170" height="34" as="geometry" />
         </mxCell>
-        <mxCell id="credential" value="FixerCredential&lt;br&gt;&lt;font style=&quot;font-size:12px;font-style:italic;color:#94A3B8;&quot;&gt;Soulbound NFT&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="620" y="616" width="260" height="64" as="geometry" />
+        <mxCell id="chain-arb" value="Arb Sepolia&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;421614 · Full Stack&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=12;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="290" y="885" width="170" height="34" as="geometry" />
         </mxCell>
-
-        <!-- Arrow: Layer 4 -> Layer 5 -->
-        <mxCell id="arrow-l4-l5a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="registry" target="emergency-mod" parent="1">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="chain-uni" value="Unichain Sepolia&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;1301 · Full Stack&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1;fontSize=12;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="500" y="885" width="170" height="34" as="geometry" />
         </mxCell>
-        <mxCell id="arrow-l4-l5b" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;endArrow=blockThin;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="credential" target="pause-sys" parent="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- LAYER 5: Security Layer                    -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="layer5-group" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;dashed=0;" vertex="1" parent="1">
-          <mxGeometry x="100" y="740" width="900" height="120" as="geometry" />
-        </mxCell>
-        <mxCell id="layer5-label" value="Security Layer" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="120" y="748" width="140" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="emergency-mod" value="EmergencyModule" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#E2E8F0;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="150" y="780" width="200" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="circuit-breaker" value="Circuit Breaker" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#E2E8F0;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="450" y="780" width="200" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="pause-sys" value="Pause System" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#E2E8F0;strokeColor=#94A3B8;strokeWidth=1;fontSize=16;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="750" y="780" width="200" height="60" as="geometry" />
+        <mxCell id="chain-lasna" value="Lasna (Reactive)&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#94A3B8;&quot;&gt;5318007 · No Hook&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=1;fontSize=12;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="710" y="885" width="170" height="34" as="geometry" />
         </mxCell>
 
       </root>

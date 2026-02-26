@@ -1,386 +1,320 @@
 # Deployment Guide
 
-> Deploy the FixerHook Protocol — Hook, Upgradeable Registry, and Proxy Infrastructure
+> The Fixer Hook Protocol — Deployment Procedures (v2.6.0)
 
-**Last Updated:** February 25, 2026
-**Covers:** FixerHookV2 + FixerRegistryUpgradeable v2.6.0 (UUPS proxy), Hook mining, Upgrade process
+**Last Updated:** February 26, 2026 | **Version:** 2.6.0
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Prerequisites](#prerequisites)
+3. [Network Configuration](#network-configuration)
+4. [What Gets Deployed](#what-gets-deployed)
+5. [Deployment Process](#deployment-process)
+6. [Chain-Specific Scripts](#chain-specific-scripts)
+7. [Post-Deployment Verification](#post-deployment-verification)
+8. [Upgrade Process](#upgrade-process)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Overview
 
-Uniswap v4 hooks require deployment to addresses with specific bits set based on enabled permissions. This guide covers the address mining and deployment process for the full Fixer Protocol v2.6 stack.
+The Fixer Protocol deploys **6–7 contracts** per chain (7 on chains with Uniswap v4, 6 on Lasna which has no PoolManager):
 
-For live testnet deployment addresses and interaction instructions, see [Testnet Deployments](./TESTNET_DEPLOYMENTS.md).
+| # | Contract | Purpose | Size |
+|:-:|----------|---------|:----:|
+| 1 | **FixerLib** | External computation library | 2.3 KB |
+| 2 | **FixerRegistryUpgradeable** (implementation) | Core logic: FIX token, referrals, tiers, emergency | 20.5 KB |
+| 3 | **ERC1967Proxy** | Transparent proxy users interact with | 130 B |
+| 4 | **FixerRegistryExtension** | Agent module: ERC-8004, XMTP, EIP-3009, delegation | 14.7 KB |
+| 5 | **FixerCredential** | Soulbound NFT with on-chain SVG | 11.8 KB |
+| 6 | **FixerHookV2** | afterSwap hook (CREATE2-mined address) | 4.5 KB |
+| — | *Post-deploy calls* | `setExtension()`, `registerHook()`, pool init | — |
 
-![Deployment Pipeline](diagrams/drawio/deployment-pipeline.png)
-
----
-
-## Address Requirements
-
-### Permission Bits
-
-Uniswap v4 uses the **lowest 14 bits** of the hook address as permission flags. The Fixer Hook only enables `afterSwap`:
-
-| Permission | Bit Position | Flag Value |
-|------------|--------------|------------|
-| afterSwap | 6 | `0x0040` |
-
-The hook address must have **exactly** bit 6 set and **no other permission bits** set in the lowest 14 bits. This is enforced by the `HookMiner` using a 14-bit mask:
-
-```solidity
-uint160 internal constant ALL_HOOK_MASK = uint160((1 << 14) - 1); // 0x3FFF
-// Check: address & 0x3FFF == flags (exact match, not subset)
-```
+On Lasna (Reactive Network), FixerHookV2 (#6) is **not deployed** — there is no Uniswap v4 PoolManager.
 
 ---
 
-## Hook Mining
+## Prerequisites
 
-### CREATE2 with Deterministic Deployer
+### Tools
 
-Foundry's `new Contract{salt}()` syntax uses the deterministic CREATE2 deployer at a fixed address. The `HookMiner` must use this address (not the EOA deployer) when computing addresses:
+```bash
+# Foundry
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
 
-```solidity
-// Foundry's deterministic CREATE2 deployer
-address constant CREATE2_DEPLOYER = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
-
-library HookMiner {
-    uint160 internal constant ALL_HOOK_MASK = uint160((1 << 14) - 1);
-
-    function find(
-        address deployer,      // Must be CREATE2_DEPLOYER, not EOA
-        uint160 flags,
-        bytes memory creationCode,
-        bytes memory constructorArgs
-    ) internal pure returns (address hookAddress, bytes32 salt) {
-        bytes memory initCode = abi.encodePacked(creationCode, constructorArgs);
-        bytes32 initCodeHash = keccak256(initCode);
-
-        for (uint256 i = 0; i < 100000; i++) {
-            salt = bytes32(i);
-            hookAddress = computeAddress(deployer, salt, initCodeHash);
-
-            // EXACT match — no extra permission bits allowed
-            if (uint160(hookAddress) & ALL_HOOK_MASK == flags) {
-                return (hookAddress, salt);
-            }
-        }
-        revert("HookMiner: No valid address found within iteration limit");
-    }
-}
+# Verify
+forge --version   # >= 0.2.0
+cast --version
 ```
 
-### Common Pitfalls
+### Environment
 
-| Pitfall | Cause | Fix |
-|---------|-------|-----|
-| Hook address mismatch | Using EOA address instead of CREATE2 deployer | Pass `0x4e59b44847b379578588920cA78FbF26c0B4956C` to `HookMiner.find()` |
-| `HookAddressNotValid` from PoolManager | Extra permission bits set in address | Use exact flag matching (`& ALL_HOOK_MASK == flags`) instead of subset matching (`& flags == flags`) |
-| Contract size > 24576 bytes | FixerRegistryUpgradeable exceeds EIP-170 limit | Set `via_ir = true` in `foundry.toml` |
+```bash
+cp .env.example .env
+# Fill in:
+# PRIVATE_KEY=0x...          (deployer wallet)
+# BASE_SEPOLIA_RPC=https://sepolia.base.org
+# ARB_SEPOLIA_RPC=https://sepolia-rollup.arbitrum.io/rpc
+# UNICHAIN_SEPOLIA_RPC=https://sepolia.unichain.org
+# LASNA_RPC=https://lasna-rpc.rnk.dev/
+```
+
+### Deployer Wallet
+
+The deployer becomes the initial `owner` of all contracts. Ensure it has:
+- Sufficient native gas tokens on the target chain
+- Private key securely stored (not committed to git)
 
 ---
 
 ## Network Configuration
 
-### Verified Testnet Addresses
+### Testnets (Live)
 
-| Network | Chain ID | PoolManager | RPC |
-|---------|----------|-------------|-----|
-| Base Sepolia | 84532 | `0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408` | `https://sepolia.base.org` |
-| Arbitrum Sepolia | 421614 | `0xFB3e0C6F74eB1a21CC1Da29aeC80D2Dfe6C9a317` | `https://sepolia-rollup.arbitrum.io/rpc` |
-| Unichain Sepolia | 1301 | `0x00B036B58a818B1BC34d502D3fE730Db729e62AC` | `https://sepolia.unichain.org` |
-| Lasna (Reactive) | 5318007 | _N/A (no Uniswap v4)_ | `https://lasna-rpc.rnk.dev/` |
+| Chain | ID | RPC | PoolManager |
+|-------|:--:|-----|-------------|
+| Base Sepolia | 84532 | `https://sepolia.base.org` | `0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408` |
+| Arbitrum Sepolia | 421614 | `https://sepolia-rollup.arbitrum.io/rpc` | `0xFB3e0C6F74eB1a21CC1Da29aeC80D2Dfe6C9a317` |
+| Unichain Sepolia | 1301 | `https://sepolia.unichain.org` | `0x00B036B58a818B1BC34d502D3fE730Db729e62AC` |
+| Lasna (Reactive) | 5318007 | `https://lasna-rpc.rnk.dev/` | _None_ |
 
-### Mainnet Addresses
+### Mainnet (Planned)
 
-| Network | Chain ID | PoolManager | Notes |
-|---------|----------|-------------|-------|
-| Ethereum | 1 | `0x000000000004444c5dc75cB358380D2e3dE08A90` | High gas costs |
-| Base | 8453 | Verify before deploy | Recommended for low gas |
-| Arbitrum | 42161 | `0x360E68fa3A5b8061C76533c66db9FB32Ccc0614C` | Recommended for low gas |
+| Chain | ID | PoolManager |
+|-------|:--:|-------------|
+| Ethereum | 1 | `0x000000000004444c5dc75cB358380D2e3dE08A90` |
+| Base | 8453 | `0x7C5f5A4bBd8fD63184577525326123B519429bDc` |
+| Arbitrum One | 42161 | `0x360E68faCcca8cA495c1B759Fd9EEe466db9FB32` |
+| Unichain | 130 | TBD |
 
----
-
-## Environment Setup
-
-Create `.env` file (see `.env.example`):
-
-```bash
-# Required
-PRIVATE_KEY=0x...              # Deployer private key (never commit!)
-
-# Testnet RPCs
-BASE_SEPOLIA_RPC=https://sepolia.base.org
-ARB_SEPOLIA_RPC=https://sepolia-rollup.arbitrum.io/rpc
-UNICHAIN_SEPOLIA_RPC=https://sepolia.unichain.org
-
-# Optional (defaults to deployer address)
-SECURITY_COUNCIL=0x...         # Multisig for emergency pause
-GOVERNANCE=0x...               # DAO governance address
-
-# Block explorer API keys (for --verify)
-BASESCAN_API_KEY=...
-ARBISCAN_API_KEY=...
-UNISCAN_API_KEY=...
-```
-
-### foundry.toml RPC Configuration
+### foundry.toml RPC Aliases
 
 ```toml
 [rpc_endpoints]
 base_sepolia = "${BASE_SEPOLIA_RPC}"
 arb_sepolia = "${ARB_SEPOLIA_RPC}"
 unichain_sepolia = "${UNICHAIN_SEPOLIA_RPC}"
-
-[etherscan]
-base_sepolia = { key = "${BASESCAN_API_KEY}", url = "https://api-sepolia.basescan.org/api", chain = 84532 }
-arb_sepolia = { key = "${ARBISCAN_API_KEY}", url = "https://api-sepolia.arbiscan.io/api", chain = 421614 }
-unichain_sepolia = { key = "${UNISCAN_API_KEY}", url = "https://api-sepolia.uniscan.xyz/api", chain = 1301 }
+lasna = "${LASNA_RPC}"
 ```
 
 ---
 
-## Deployment Scripts
+## What Gets Deployed
 
-### Chain-Specific Scripts (Recommended)
+### Full Stack (Base / Arb / Unichain Sepolia)
 
-Each chain has a dedicated deployment script with hardcoded, verified addresses:
+```
+Transaction 1: Deploy FixerLib (CREATE2)
+Transaction 2: Deploy FixerRegistryUpgradeable implementation
+Transaction 3: Deploy ERC1967Proxy + initialize()
+Transaction 4: Deploy FixerRegistryExtension
+Transaction 5: Call proxy.setExtension(extension)
+Transaction 6: Deploy FixerHookV2 (CREATE2-mined address with correct permission bits)
+Transaction 7: Call proxy.registerHook(hookAddress)
+Transaction 8: Deploy FixerCredential
+Transaction 9: Initialize pool with PoolManager (optional)
+```
 
-| Script | Network | Token Pair |
-|--------|---------|-----------|
-| `script/DeployBaseSepolia.s.sol` | Base Sepolia | USDC / WETH |
-| `script/DeployArbSepolia.s.sol` | Arbitrum Sepolia | USDC / WETH |
-| `script/DeployUnichainSepolia.s.sol` | Unichain Sepolia | USDC / WETH |
+### Reactive Network (Lasna) — No Hook
 
-### Generic Script
+```
+Transaction 1: Deploy FixerLib (CREATE2)
+Transaction 2: Deploy FixerRegistryUpgradeable implementation
+Transaction 3: Deploy ERC1967Proxy + initialize()
+Transaction 4: Deploy FixerRegistryExtension
+Transaction 5: Call proxy.setExtension(extension)
+Transaction 6: Deploy FixerCredential
+```
 
-`script/DeployTestnet.s.sol` reads all addresses from environment variables and optionally deploys mock tokens if `TOKEN0`/`TOKEN1` are not set.
+No FixerHookV2, no hook registration, no pool initialization.
 
-### Deployment Commands
+---
+
+## Deployment Process
+
+### Step 1: Build
 
 ```bash
-# Dry run (simulation only)
-forge script script/DeployBaseSepolia.s.sol --rpc-url base_sepolia -vvvv
+forge build
+```
 
-# Deploy to network (broadcast transactions)
+Ensure all contracts compile without errors. Optimizer: enabled, 1 run, via_ir=true, Cancun EVM.
+
+### Step 2: Hook Address Mining
+
+FixerHookV2 requires a CREATE2-mined address where the lowest 14 bits encode the hook permissions. The `HookMiner.sol` script finds a valid salt:
+
+```bash
+# This is done automatically in the deployment scripts
+# HookMiner.find(deployer, CREATE2_DEPLOYER, creationCode, FLAGS)
+```
+
+The mined address must have bit 7 set (afterSwap = true) and all other permission bits clear.
+
+### Step 3: Deploy
+
+```bash
+# Base Sepolia
 forge script script/DeployBaseSepolia.s.sol \
   --rpc-url base_sepolia --broadcast -vvvv
 
-# Deploy + verify on block explorer
-forge script script/DeployBaseSepolia.s.sol \
-  --rpc-url base_sepolia --broadcast --verify -vvvv
+# Arbitrum Sepolia
+forge script script/DeployArbSepolia.s.sol \
+  --rpc-url arb_sepolia --broadcast -vvvv
+
+# Unichain Sepolia
+forge script script/DeployUnichainSepolia.s.sol \
+  --rpc-url unichain_sepolia --broadcast -vvvv
+
+# Lasna (Reactive Network) — no hook
+forge script script/DeployLasna.s.sol \
+  --rpc-url lasna --broadcast -vvvv
 ```
 
-### What Gets Deployed
+### Step 4: Record Addresses
 
-Each deployment script executes 5 transactions in order:
+After deployment, save all addresses to `deployments/<chain>-v2.json`:
 
-1. **Deploy Implementation** — `new FixerRegistryUpgradeable()` — the UUPS logic contract
-2. **Deploy Proxy** — `new ERC1967Proxy(impl, initData)` — calls `initialize()` atomically
-3. **Deploy Hook** — `new FixerHookV2{salt}(...)` — CREATE2-mined for correct flag bits
-4. **Register Hook** — `registry.registerHook(hook, poolId)` — authorizes hook to record referrals
-5. **Deploy Credential** — `new FixerCredential(registry, owner)` — soulbound NFT
+| Address to Record | Source |
+|-------------------|--------|
+| FixerLib | CREATE2 deployment |
+| Registry Implementation | Contract creation |
+| Registry Proxy (ERC1967) | Proxy creation |
+| FixerRegistryExtension | Contract creation |
+| FixerHookV2 | CREATE2 deployment (skip on Lasna) |
+| FixerCredential | Contract creation |
+
+### Step 5: Verify Contracts
+
+```bash
+# Free verification via Blockscout (no API key needed)
+python3 scripts/verify_blockscout.py base-sepolia
+python3 scripts/verify_blockscout.py arb-sepolia
+
+# Unichain uses forge CLI:
+forge verify-contract --rpc-url unichain_sepolia <ADDR> <PATH> \
+  --verifier blockscout \
+  --verifier-url "https://unichain-sepolia.blockscout.com/api/"
+
+# Lasna: Reactscan has no programmatic verification API
+```
+
+---
+
+## Chain-Specific Scripts
+
+| Script | Chain | Notes |
+|--------|-------|-------|
+| `DeployBaseSepolia.s.sol` | Base Sepolia | Full stack + USDC/WETH pool init |
+| `DeployArbSepolia.s.sol` | Arbitrum Sepolia | Full stack + USDC/WETH pool init |
+| `DeployUnichainSepolia.s.sol` | Unichain Sepolia | Full stack + USDC/WETH pool init |
+| `DeployLasna.s.sol` | Lasna (Reactive) | Registry + Extension + Credential only |
+| `DeployTestnet.s.sol` | Generic | Env-configured for any chain |
+| `DeployUpgradeable.s.sol` | Generic | UUPS proxy deployment |
+| `DeployV2.s.sol` | Generic | FixerHookV2 + FixerRegistry |
+| `DeployX402.s.sol` | Generic | v2.3 x402 enhancement |
 
 ---
 
 ## Post-Deployment Verification
 
-Run these checks after deployment to confirm everything is correctly wired:
-
 ```bash
-# Set variables for your deployment
-PROXY=0x...    # Registry proxy address
-HOOK=0x...     # FixerHookV2 address
-RPC=...        # RPC URL
+# Replace <PROXY>, <HOOK>, <RPC> with actual values
 
-# 1. Registry version (expect: 2006000)
-cast call $PROXY "VERSION()(uint256)" --rpc-url $RPC
+# VERSION — expect 2006000 (v2.6.0)
+cast call <PROXY> "VERSION()(uint256)" --rpc-url <RPC>
 
-# 2. Ownership
-cast call $PROXY "owner()(address)" --rpc-url $RPC
+# Owner — expect deployer address
+cast call <PROXY> "owner()(address)" --rpc-url <RPC>
 
-# 3. FIX token metadata
-cast call $PROXY "name()(string)" --rpc-url $RPC     # "Fixer Token"
-cast call $PROXY "symbol()(string)" --rpc-url $RPC    # "FIX"
+# FIX token metadata
+cast call <PROXY> "name()(string)" --rpc-url <RPC>     # "Fixer Token"
+cast call <PROXY> "symbol()(string)" --rpc-url <RPC>    # "FIX"
 
-# 4. Hook authorized in registry
-cast call $PROXY "isAuthorizedHook(address)(bool)" $HOOK --rpc-url $RPC  # true
+# Extension address — should not be address(0)
+cast call <PROXY> "getExtension()(address)" --rpc-url <RPC>
 
-# 5. Pool ID stored correctly
-cast call $HOOK "getPoolId()(bytes32)" --rpc-url $RPC
+# Hook authorization — expect true
+cast call <PROXY> "isAuthorizedHook(address)(bool)" <HOOK> --rpc-url <RPC>
 
-# 6. Hook references the correct registry
-cast call $HOOK "registry()(address)" --rpc-url $RPC  # Should match $PROXY
+# XMTP enabled count — expect 0 initially
+cast call <PROXY> "getXMTPEnabledCount()(uint64)" --rpc-url <RPC>
+
+# Hook pool ID
+cast call <HOOK> "getPoolId()(bytes32)" --rpc-url <RPC>
 ```
-
-### Addresses to Record
-
-After deployment, save these in `deployments/<network>.json`:
-- **Implementation** — The raw `FixerRegistryUpgradeable` logic contract
-- **Proxy** — The `ERC1967Proxy` (this is what users interact with)
-- **FixerHookV2** — The hook contract (CREATE2-mined address)
-- **FixerCredential** — The soulbound NFT contract
-- **Pool ID** — The Uniswap v4 pool identifier
-
-> **Important:** All interactions go through the **proxy** address, never the implementation directly.
 
 ---
 
 ## Upgrade Process
 
-### Overview
+### UUPS + 48-Hour Timelock
 
-The registry uses UUPS proxy pattern with a **48-hour timelock**. Upgrades are a three-step process:
+All upgrades follow a **two-phase process**:
 
-1. `proposeUpgrade(newImplementation)` — starts the timelock
-2. Wait 48 hours
-3. `executeUpgrade()` — applies the upgrade
-
-### Pre-Upgrade Checklist
-
-- [ ] New implementation compiled and tested locally
-- [ ] Storage layout compatibility verified (no slot conflicts with ERC-7201 namespaced storage)
-- [ ] All tests passing (`forge test`)
-- [ ] Upgrade script dry-run successful
-- [ ] 48-hour timelock period completed
-
-### Upgrade Commands
+#### Phase 1: Propose + Deploy New Contracts
 
 ```bash
-# Step 1: Propose the upgrade
-cast send $PROXY \
-  "proposeUpgrade(address)" <NEW_IMPLEMENTATION> \
-  --private-key $PRIVATE_KEY --rpc-url $RPC
-
-# Step 2: Wait 48 hours, then execute
-cast send $PROXY \
-  "executeUpgrade()" \
-  --private-key $PRIVATE_KEY --rpc-url $RPC
-
-# Or cancel if needed
-cast send $PROXY \
-  "cancelUpgrade()" \
-  --private-key $PRIVATE_KEY --rpc-url $RPC
+PROXY_ADDRESS=0x... forge script script/UpgradeV260Propose.s.sol \
+  --rpc-url <chain> --broadcast -vvvv
 ```
 
-### Post-Upgrade Verification
+This:
+1. Deploys new FixerRegistryUpgradeable implementation
+2. Deploys new FixerRegistryExtension (if changed)
+3. Calls `proposeUpgrade(newImplementation)` on the proxy
+4. Starts the 48-hour timelock
+
+#### Phase 2: Execute (After 48h)
 
 ```bash
-# Verify version bumped
-cast call $PROXY "VERSION()(uint256)" --rpc-url $RPC
-
-# Verify state preserved
-cast call $PROXY "getGlobalStats()(uint256,uint256,uint256)" --rpc-url $RPC
-
-# Verify hook still authorized
-cast call $PROXY "isAuthorizedHook(address)(bool)" $HOOK --rpc-url $RPC
+PROXY_ADDRESS=0x... NEW_EXTENSION=0x... forge script script/UpgradeV260Execute.s.sol \
+  --rpc-url <chain> --broadcast -vvvv
 ```
 
-### Rollback
+This:
+1. Calls `executeUpgrade(newImplementation)`
+2. Internally calls `upgradeToAndCall()` — which validates via `_authorizeUpgrade()`
+3. Calls `setExtension(newExtension)` if extension changed
+4. Runs reinitializer for new version
 
-UUPS proxies do not support direct rollback. If an upgrade has issues:
-1. Deploy the previous implementation version as a new contract
-2. Use `proposeUpgrade()` + `executeUpgrade()` to point back (requires 48h wait)
-3. This requires the owner to still have upgrade authority
+#### Emergency: Cancel Upgrade
 
----
+```bash
+cast send <PROXY> "cancelUpgrade()" --private-key <KEY> --rpc-url <RPC>
+```
 
-## Deployment Checklist
-
-### v2.6 (Full Stack + XMTP)
-
-- [ ] PoolManager address verified on-chain (`cast code <addr>`) — or N/A for Lasna
-- [ ] CREATE2 deployer exists at `0x4e59b44...B4956C` on target chain
-- [ ] Private key has sufficient gas balance
-- [ ] `via_ir = true` set in foundry.toml (contract size under 24576 bytes)
-- [ ] Dry run completes without errors
-- [ ] All 5 transactions confirm on-chain
-- [ ] `VERSION()` returns `2006000`
-- [ ] `owner()` returns deployer address
-- [ ] `isAuthorizedHook()` returns `true` for deployed hook
-- [ ] Hook address has correct permission bits (bit 6 only in lowest 14 bits)
-- [ ] `registry()` on hook matches proxy address
-- [ ] Deployment record saved to `deployments/<network>.json`
-
----
-
-## Gas Considerations
-
-| Network | Deployment Gas (5 txs) | Cost (est.) |
-|---------|------------------------|-------------|
-| Base Sepolia | ~12M gas | ~0.01 ETH |
-| Arbitrum Sepolia | ~12M gas | ~0.01 ETH |
-| Unichain Sepolia | ~12M gas | < 0.001 ETH |
-| Ethereum (L1) | ~12M gas | 0.5-5 ETH |
-
-**Recommendation:** Deploy on L2 (Base, Arbitrum, Unichain) for cost-effective deployments and referral operations.
+Cancels a pending proposal before the 48h timelock expires.
 
 ---
 
 ## Troubleshooting
 
-### "Hook address mismatch" during deployment
+### Common Issues
 
-**Cause:** `HookMiner.find()` computed the address using a different deployer than Foundry uses.
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| "Hook address validation failing" | CREATE2 salt produces wrong permission bits | Re-run HookMiner with correct flags |
+| "Contract too large" | Exceeds EIP-170 limit (24,576 B) | Ensure `via_ir=true` and optimizer runs=1 in foundry.toml |
+| "Already initialized" | Calling initialize() on already-initialized proxy | Use reinitialize() with next version number |
+| "Upgrade timelock not expired" | Executing upgrade before 48h | Wait for `block.timestamp >= proposedAt + 172800` |
+| Slow compilation | `via_ir` pipeline is slow | Disable for development (`via_ir = false`), enable for deployment |
+| "EvmError: OutOfGas" in deployment | Complex constructor or init | Increase gas limit: `--gas-limit 30000000` |
+| Blockscout verification failing | Wrong constructor args or compiler settings | Ensure exact match of solc version (0.8.26), optimizer config, via_ir flag |
 
-**Solution:** Pass `0x4e59b44847b379578588920cA78FbF26c0B4956C` (Foundry's deterministic CREATE2 deployer) as the `deployer` parameter to `HookMiner.find()`.
+### Gas Considerations
 
-### "HookAddressNotValid" from PoolManager
-
-**Cause:** The mined hook address has extra permission bits set beyond `afterSwap`. Uniswap v4 requires the address flag bits to **exactly match** the hook's declared permissions.
-
-**Solution:** Use exact flag matching in HookMiner:
-```solidity
-// Wrong (subset matching — allows extra bits):
-if (uint160(hookAddress) & flags == flags)
-
-// Correct (exact matching — no extra bits):
-uint160 ALL_HOOK_MASK = uint160((1 << 14) - 1);
-if (uint160(hookAddress) & ALL_HOOK_MASK == flags)
-```
-
-### "Contract code size exceeds 24576 bytes"
-
-**Cause:** `FixerRegistryUpgradeable` is a large contract with ERC-20, tier logic, fee distribution, and agent management.
-
-**Solution:** Enable the Yul IR pipeline in `foundry.toml`:
-```toml
-via_ir = true
-```
-
-### "vm.envUint: failed parsing $PRIVATE_KEY"
-
-**Cause:** Private key in `.env` is missing the `0x` prefix.
-
-**Solution:** Ensure the key starts with `0x`:
-```bash
-PRIVATE_KEY=0x7122...e2c9    # Correct
-PRIVATE_KEY=7122...e2c9      # Wrong — missing 0x
-```
-
-### "Contract verification failed"
-
-**Solution:** Check constructor arguments are correctly encoded, and that the block explorer API key is valid:
-```bash
-# Verify manually
-forge verify-contract \
-  <ADDRESS> \
-  src/FixerHookV2.sol:FixerHookV2 \
-  --chain-id <CHAIN_ID> \
-  --constructor-args $(cast abi-encode \
-    "constructor(address,address,address,address,uint24,int24,uint256)" \
-    $POOL_MANAGER $REGISTRY $TOKEN0 $TOKEN1 3000 60 0)
-```
+- **via_ir optimization:** Required for production deployments (reduces contract size ~20%)
+- **Optimizer runs: 1** — optimizes for deployment cost over call cost (appropriate for single-deploy contracts)
+- **Cancun EVM:** Required for TSTORE/TLOAD in reentrancy guard
 
 ---
 
-## References
-
-- [Live Testnet Deployments](./TESTNET_DEPLOYMENTS.md) — All deployed addresses and interaction guide
-- [Integration Guide](./INTEGRATION_GUIDE.md) — Frontend integration with hookData encoding
-- [Uniswap v4 Hook Deployment](https://docs.uniswap.org/)
-- [Foundry Deployment Scripts](https://book.getfoundry.sh/tutorials/solidity-scripting)
-- [CREATE2 Address Computation](https://eips.ethereum.org/EIPS/eip-1014)
-- [EIP-170: Contract Code Size Limit](https://eips.ethereum.org/EIPS/eip-170)
+<p align="center">
+  <em>Document Version: 3.0.0 | Last Updated: February 26, 2026</em>
+</p>
