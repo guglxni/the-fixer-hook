@@ -46,7 +46,7 @@ forge test -vvv
 
 ## Architecture Notes
 
-The project follows the **Agent Infrastructure Stack** pattern:
+The project follows the **Agent Infrastructure Stack** pattern with a **DELEGATECALL Extension** architecture:
 
 | Layer | Protocol | Role |
 |:-----:|:--------:|:-----|
@@ -54,7 +54,16 @@ The project follows the **Agent Infrastructure Stack** pattern:
 | Payments | **x402** | HTTP 402 micropayments, EIP-3009 gasless transfers |
 | Identity & Trust | **ERC-8004** | NFT identity, reputation scoring, validation |
 
-All agent registration is ERC-8004-only. See `internal/ERC8004_ENHANCEMENT.md` for full details.
+**Contract Architecture:**
+- **FixerRegistryUpgradeable** (20.5KB) — Core logic behind ERC1967Proxy
+- **FixerRegistryExtension** (14.7KB) — Agent/XMTP/EIP-3009 functions via DELEGATECALL
+- **FixerLib** (2.3KB) — External library for tier math and reward calculations
+- **FixerHookV2** (4.5KB) — Lightweight per-pool `afterSwap` hook
+- **FixerCredential** — Soulbound ERC-721 (ERC-5192)
+
+All agent registration is ERC-8004-only (permissionless, no staking). See `internal/ERC8004_ENHANCEMENT.md` for full details.
+
+**Test baseline:** 381 tests, 35 suites, 0 failures, >95% coverage.
 
 ## Security
 

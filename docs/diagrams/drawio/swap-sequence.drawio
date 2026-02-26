@@ -5,7 +5,7 @@
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
-        <mxCell id="title" value="Swap with Referral -- Sequence Diagram" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1E293B;fontFamily=Inter;" vertex="1" parent="1">
+        <mxCell id="title" value="Swap with Referral -- Sequence Diagram (v2.6)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1E293B;fontFamily=Inter;" vertex="1" parent="1">
           <mxGeometry x="200" y="20" width="800" height="40" as="geometry" />
         </mxCell>
 
@@ -29,8 +29,8 @@
           <mxGeometry x="940" y="80" width="140" height="44" as="geometry" />
         </mxCell>
 
-        <mxCell id="p-registry" value="FixerRegistry" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=16;fontColor=#1E293B;fontFamily=Inter;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="1160" y="80" width="140" height="44" as="geometry" />
+        <mxCell id="p-registry" value="FixerRegistryUpgradeable" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;fontSize=14;fontColor=#1E293B;fontFamily=Inter;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="80" width="200" height="44" as="geometry" />
         </mxCell>
 
         <mxCell id="ll-user" value="" style="endArrow=none;dashed=1;html=1;dashPattern=6 4;strokeColor=#94A3B8;strokeWidth=1;" edge="1" parent="1">
@@ -187,7 +187,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="msg8-lbl" value="Calculate reward, _mint()" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#1E293B;fontFamily=Inter;fontStyle=2;" vertex="1" parent="1">
+        <mxCell id="msg8-lbl" value="Tier multiplier + ERC-8004 bonus, _mint() via FixerLib" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#1E293B;fontFamily=Inter;fontStyle=2;" vertex="1" parent="1">
           <mxGeometry x="1296" y="592" width="230" height="30" as="geometry" />
         </mxCell>
 

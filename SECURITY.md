@@ -42,15 +42,18 @@
 
 | Contract | Path | Version |
 |----------|------|---------|
-| FixerRegistryUpgradeable | `src/FixerRegistryUpgradeable.sol` | v2.4.0 |
-| EmergencyModule | `src/modules/EmergencyModule.sol` | v2.4.0 |
-| FixerHookV2 | `src/FixerHookV2.sol` | v2.0.0 |
-| FixerRegistryStorage | `src/storage/FixerRegistryStorage.sol` | v2.4.0 |
+| FixerRegistryUpgradeable | `src/FixerRegistryUpgradeable.sol` | v2.6.0 |
+| FixerRegistryExtension | `src/FixerRegistryExtension.sol` | v2.6.0 |
+| FixerLib | `src/libraries/FixerLib.sol` | v2.6.0 |
+| EmergencyModule | `src/modules/EmergencyModule.sol` | v2.6.0 |
+| FixerHookV2 | `src/FixerHookV2.sol` | v2.6.0 |
+| FixerCredential | `src/FixerCredential.sol` | v2.6.0 |
+| FixerRegistryStorage | `src/storage/FixerRegistryStorage.sol` | v2.6.0 |
 | BPSMath | `src/libraries/BPSMath.sol` | v1.0.0 |
-| IAgentRegistry | `src/interfaces/IAgentRegistry.sol` | v2.4.0 |
-| IERC8004IdentityRegistry | `src/interfaces/IERC8004IdentityRegistry.sol` | v2.4.0 |
-| IERC8004ReputationRegistry | `src/interfaces/IERC8004ReputationRegistry.sol` | v2.4.0 |
-| IERC8004ValidationRegistry | `src/interfaces/IERC8004ValidationRegistry.sol` | v2.4.0 |
+| IAgentRegistry | `src/interfaces/IAgentRegistry.sol` | v2.6.0 |
+| IERC8004IdentityRegistry | `src/interfaces/IERC8004IdentityRegistry.sol` | v2.6.0 |
+| IERC8004ReputationRegistry | `src/interfaces/IERC8004ReputationRegistry.sol` | v2.6.0 |
+| IERC8004ValidationRegistry | `src/interfaces/IERC8004ValidationRegistry.sol` | v2.6.0 |
 
 ### In-Scope Vulnerability Categories
 
@@ -64,6 +67,9 @@
 - **ERC-8004 Identity:** NFT ownership spoofing, registration bypass, wallet mismatch exploits
 - **Reputation Gaming:** Cache manipulation, stale score exploitation, bonus tier inflation
 - **External Call Safety:** Revert-based DoS on ERC-8004 registry calls, missing try/catch
+- **DELEGATECALL Safety:** Storage layout mismatch between Core and Extension, selector collision in fallback routing
+- **XMTP Security:** Endpoint spoofing, malicious URI injection, public key hash manipulation
+- **EIP-3009 Replay:** Nonce reuse, time-bound bypass, EIP-712 domain separator issues
 
 ### Out of Scope
 
@@ -195,7 +201,7 @@ For detailed threat modeling and mitigation strategies, see [`docs/SECURITY.md`]
 |-------|--------|------|
 | Slither Static Analysis | Completed (0 high/medium) | Feb 2025 |
 | Forge Coverage | >95% on production contracts | Feb 2026 |
-| Forge Tests | 352 tests, 34 suites, 0 failures | Feb 2026 |
+| Forge Tests | 381 tests, 35 suites, 0 failures | Feb 2026 |
 | Invariant Testing | 4 property-based tests | Feb 2025 |
 | Formal Verification | Planned | TBD |
 | External Audit | Planned | TBD |

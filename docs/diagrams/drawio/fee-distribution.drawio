@@ -6,8 +6,13 @@
         <mxCell id="1" parent="0" />
 
         <!-- Title -->
-        <mxCell id="title" value="Fee Calculation and Distribution" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontFamily=Inter,system-ui;fontStyle=1;fontColor=#1E293B;" vertex="1" parent="1">
+        <mxCell id="title" value="Fee Calculation and Distribution (v2.6)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontFamily=Inter,system-ui;fontStyle=1;fontColor=#1E293B;" vertex="1" parent="1">
           <mxGeometry x="250" y="30" width="500" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Subtitle -->
+        <mxCell id="subtitle" value="FixerLib (2.3KB) + FixerRegistryExtension (14.7KB) via DELEGATECALL · ERC-8004 Reputation Bonuses · Max 5000 FIX gross reward" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=2;fontColor=#94A3B8;fontFamily=Inter,system-ui;" vertex="1" parent="1">
+          <mxGeometry x="200" y="65" width="560" height="20" as="geometry" />
         </mxCell>
 
         <!-- Arrows (back layer) -->

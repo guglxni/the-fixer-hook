@@ -241,7 +241,7 @@
         <mxCell id="gas-formula" value="&lt;b&gt;Reward Formula:&lt;/b&gt; netReward = (volume x rateBps / 10000) x tierMultiplier x (1 + agentBonus) x (1 - protocolFee)" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="600" y="800" width="800" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="gas-cap" value="&lt;b&gt;Caps:&lt;/b&gt; Supply: 1B FIX | Hourly: 1M FIX | Daily: 10M FIX | Per-swap: max 1000 FIX, min 1 FIX" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+        <mxCell id="gas-cap" value="&lt;b&gt;Caps:&lt;/b&gt; Supply: 1B FIX | Hourly: 1M FIX | Daily: 10M FIX | Per-swap: max 5000 FIX, min 1 FIX" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="600" y="820" width="700" height="18" as="geometry" />
         </mxCell>
 

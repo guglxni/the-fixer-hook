@@ -2,7 +2,7 @@
 
 > Consolidated roadmap, architecture decisions, and feature plan for the FixerHook referral reward system.
 
-**Document Version:** 1.0.0
+**Document Version:** 2.6.0
 **Created:** February 23, 2026
 **Status:** Active Development
 **Source Documents:** `internal/ENHANCEMENT_BRAINSTORM.md`, `internal/FUTURE_ENHANCEMENTS.md`, `internal/MARKET_SENTIMENT_ANALYSIS.md`, `internal/UPGRADEABILITY_AND_AI_AGENTS.md`, `internal/IMPLEMENTATION_TASKS.md`, `internal/X402_ENHANCEMENT_ANALYSIS.md`
@@ -39,11 +39,11 @@
 
 | Metric | Value |
 |--------|-------|
-| **Tests** | 352 passing across 34 suites |
+| **Tests** | 381 passing across 35 suites |
 | **Coverage** | 98.69% |
 | **Gas (referral processing)** | ~140,875 avg |
-| **Live testnets** | Base Sepolia, Arbitrum Sepolia, Unichain Sepolia |
-| **Architecture** | UUPS upgradeable registry + lightweight per-pool hooks |
+| **Live testnets** | Base Sepolia, Arbitrum Sepolia, Unichain Sepolia, Lasna (Reactive Network) |
+| **Architecture** | UUPS proxy + DELEGATECALL Extension + lightweight per-pool hooks |
 
 ---
 
@@ -74,24 +74,33 @@ The project follows these design principles:
 | **v2.1** | NFT Credentials | Soulbound `FixerCredential` (ERC-721 + ERC-5192), on-chain SVG |
 | **v2.2** | UUPS + AI Agents | `FixerRegistryUpgradeable`, ERC-7201 storage, agent types, 48hr timelock |
 | **v2.4** | Emergency Module | Circuit breakers (1M FIX/hr, 10M FIX/day), granular pause states |
+| **v2.5** | Reactive Modular Architecture | DELEGATECALL Extension pattern (Core 20.5KB + Extension 14.7KB), FixerLib external library, EIP-170 split |
+| **v2.6** | XMTP Communication & Agent Infrastructure Stack | XMTP wallet-to-wallet messaging, x402/EIP-3009 gasless payments, full ERC-8004 integration |
 
 ### Architectural Evolution
 
 ```
-v1.0 (Monolithic)           v2.0+ (Modular)
+v1.0 (Monolithic)           v2.6+ (Modular + DELEGATECALL Extension)
 ┌──────────────────┐        ┌─────────────────────────────────────────┐
-│   FixerHook.sol  │        │ ERC1967Proxy                            │
-│   BaseHook       │        │   └─ FixerRegistryUpgradeable           │
+│   FixerHook.sol  │        │ ERC1967Proxy (user-facing)              │
+│   BaseHook       │        │   └─ FixerRegistryUpgradeable (20.5KB)  │
 │   + ERC20        │   →    │       ├─ ERC20 (FIX token, 1B supply)   │
-│   + Stats        │        │       ├─ Tier system                    │
-│   + Rewards      │        │       ├─ Agent registry                 │
-│   755 lines      │        │       ├─ EmergencyModule                │
-└──────────────────┘        │       └─ ERC-7201 storage               │
+│   + Stats        │        │       ├─ Tier system + rewards          │
+│   + Rewards      │        │       ├─ EmergencyModule                │
+│   755 lines      │        │       ├─ ERC-7201 storage (38-slot gap) │
+└──────────────────┘        │       └─ fallback → DELEGATECALL ───┐   │
+                            ├─────────────────────────────────────┤   │
+                            │ FixerRegistryExtension (14.7KB)   ◄─┘   │
+                            │   ├─ Agent registration (ERC-8004)      │
+                            │   ├─ XMTP endpoint management          │
+                            │   └─ EIP-3009 gasless transfers         │
                             ├─────────────────────────────────────────┤
-                            │ FixerHookV2 (per-pool, 361 lines)       │
+                            │ FixerLib (2.3KB external library)       │
+                            ├─────────────────────────────────────────┤
+                            │ FixerHookV2 (per-pool, 4.5KB)          │
                             │   └─ afterSwap → registry.recordReferral│
                             ├─────────────────────────────────────────┤
-                            │ FixerCredential (soulbound NFT, 397 ln) │
+                            │ FixerCredential (soulbound NFT, ERC-5192)│
                             └─────────────────────────────────────────┘
 ```
 
@@ -104,8 +113,8 @@ These decisions were made based on market research documented in `internal/MARKE
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | **Token upgradeability** | FIX = Non-upgradeable; Registry = UUPS | User trust ("code is law") + logic flexibility. Industry standard: UNI, AAVE tokens are immutable. |
-| **Agent staking** | 100 FIX (Starter) to 10,000 FIX (Enterprise) | Low barrier to experiment; meaningful skin in the game at higher tiers. |
-| **Team limits** | 5 (Bronze) to 50 (Platinum) | Avoids MLM perception; scales with tier. |
+| **Contract splitting** | Core (20.5KB) + Extension (14.7KB) via DELEGATECALL | EIP-170 compliance; shared ERC-7201 storage; single proxy address |
+| **Agent registration** | ERC-8004 permissionless (NFT ownership proof) | No staking barrier; trust established via reputation, not capital |
 | **Protocol fee** | 5% at launch, DAO-governed (max 10% hard cap) | Competitive with StakeWise V3 (5%); sustainable revenue. |
 | **Bridge technology** | Reactive Network + Hyperlane + LayerZero OFT | Complementary stack: Reactive=automation, Hyperlane=data sync, LayerZero=token bridging. |
 
@@ -162,24 +171,26 @@ These decisions were made based on market research documented in `internal/MARKE
 
 | Version | Feature | Dependencies | Status |
 |---------|---------|--------------|--------|
-| **v2.5** | FIX Token Staking (veFIX) + Governance | v2.4 | Planned |
-| **v2.6** | Referrer Teams & Reputation System | v2.2 | Planned |
-| **v2.7** | AI Agent Marketplace + Multi-Agent Chains | v2.3, v2.5 | Planned |
-| **v2.8** | Cross-Chain Token Bridge & Leaderboards | v2.3 | Planned |
-| **v3.0** | Full DAO Transition | v2.5 | Future |
+| **v2.5** | Reactive Modular Architecture (DELEGATECALL Extension + FixerLib) | v2.4 | ✅ Complete |
+| **v2.6** | XMTP Communication + Agent Infrastructure Stack | v2.5 | ✅ Complete |
+| **v2.7** | FIX Token Staking (veFIX) + Governance | v2.6 | Planned |
+| **v2.8** | Referrer Teams & Reputation System | v2.7 | Planned |
+| **v2.9** | AI Agent Marketplace + Multi-Agent Chains | v2.7 | Planned |
+| **v3.0** | Cross-Chain Token Bridge & Leaderboards + Full DAO | v2.7 | Future |
 
 ### Dependency Graph
 
 ```
 v1.2 (Tiers) ─── v2.0 (Cross-Pool) ─┬─ v2.1 (NFT Credentials)
                                       ├─ v2.2 (UUPS + AI) ─────┬─ v2.3 (Reactive Network)
-                                      │                         ├─ v2.5 (Staking + DAO)
-                                      │                         └─ v2.6 (Teams / Reputation)
+                                      │                         ├─ v2.4 (Emergency)
+                                      │                         ├─ v2.5 (DELEGATECALL Extension) ✅
+                                      │                         └─ v2.6 (XMTP + Agent Stack) ✅
                                       └─ v2.4 (Emergency)
                                                                      │
-                                      v2.3 + v2.5 ──────────── v2.7 (AI Marketplace)
+                                      v2.6 ──────────────── v2.7 (Staking + DAO)
                                                                      │
-                                                              v2.8 (Cross-Chain Bridge)
+                                                              v2.8+ (Teams, Marketplace, Bridge)
 ```
 
 ---
@@ -294,9 +305,10 @@ The cross-chain stack uses three complementary technologies:
 
 | Chain | Registry Proxy | FixerHookV2 | FixerCredential |
 |-------|---------------|-------------|-----------------|
-| Base Sepolia | `0x43c75D09...F94` | `0xb66603...040` | `0xd2fD5c...3ef` |
-| Arbitrum Sepolia | `0xC7206C...B9e` | `0x7A5E4C...040` | `0x0F94b6...c79` |
-| Unichain Sepolia | `0xC13080...56f` | `0x983eA9...040` | `0x88a31b...5c0` |
+| Base Sepolia | `0x3Fb805C6C01e8Dd8534fA9FD52Ee699e256Eb960` | `0x92Cb...040` | `0xd2fD5c...3ef` |
+| Arbitrum Sepolia | `0x07dF8c1c6d5Fc2109bf442dFBc1e7050eDf4f9Eb` | `0x7A5E4C...040` | `0x0F94b6...c79` |
+| Unichain Sepolia | `0xa5589Eed2A8831eEFbCdD39BF9FE59D6ef4344d9` | `0x983eA9...040` | `0x88a31b...5c0` |
+| Lasna (Reactive) | `0xd2f11a95F1ca8cc94FB63926dc3A92655aAc6fF3` | N/A (registry-only) | N/A |
 
 ### Cross-Chain Leaderboards (Planned v2.8)
 
@@ -346,7 +358,7 @@ votingPower = fixBalance * (1 + durationMultiplier)
 | **Upgrade timelock** | 48-hour delay between proposal and execution |
 | **Self-referral prevention** | Referrer cannot equal swapper |
 | **Reentrancy guard** | OpenZeppelin ReentrancyGuard on state-changing functions |
-| **Storage safety** | ERC-7201 namespaced storage with 50-slot gap |
+| **Storage safety** | ERC-7201 namespaced storage with 38-slot gap |
 | **Initialization safety** | `_disableInitializers()` in implementation constructor |
 
 ### Emergency Module
@@ -360,9 +372,9 @@ votingPower = fixBalance * (1 + durationMultiplier)
 
 | Risk | Mitigation |
 |------|------------|
-| Sybil agents | Tiered staking requirement |
-| Malicious agents | Slashing mechanism (10-20% by tier) |
-| Agent impersonation | Operator signature verification |
+| Sybil agents | ERC-8004 NFT identity + reputation scoring |
+| Malicious agents | Reputation degradation + validation registry |
+| Agent impersonation | ERC-8004 NFT ownership proof + agentWallet verification |
 | Wash trading | Volume caps + graph analysis |
 | MEV extraction | Flashbots integration (optional) |
 
@@ -405,14 +417,16 @@ x402 (Coinbase's HTTP 402 payment standard) enables **Referral-as-a-Service (Raa
 
 | Gap | Priority | Status |
 |-----|----------|--------|
-| Token Staking (veFIX) | High | Planned (v2.5) |
-| Governance Module | High | Planned (v2.5) |
-| Emergency Pause | High | Complete (v2.4) |
-| Protocol Fee Collection | High | Planned (v2.5) |
-| Referrer Teams | Medium | Planned (v2.6) |
+| DELEGATECALL Extension | High | ✅ Complete (v2.5) |
+| XMTP + Agent Infrastructure Stack | High | ✅ Complete (v2.6) |
+| Emergency Pause | High | ✅ Complete (v2.4) |
+| Token Staking (veFIX) | High | Planned (v2.7) |
+| Governance Module | High | Planned (v2.7) |
+| Protocol Fee Collection | High | Planned (v2.7) |
+| Referrer Teams | Medium | Planned (v2.8) |
 | MEV Protection | Medium | Planned (v3.1) |
 | SDK/Library | Medium | Planned |
-| Gamification (Achievements) | Low | Planned (v2.6) |
+| Gamification (Achievements) | Low | Planned (v2.8) |
 | Time-Based Decay | Low | Under consideration |
 | Oracle Integration | Medium | Planned |
 
@@ -444,17 +458,19 @@ x402 (Coinbase's HTTP 402 payment standard) enables **Referral-as-a-Service (Raa
 | Epic | Version | Tasks | Done | Progress |
 |------|---------|-------|------|----------|
 | UUPS Infrastructure | v2.2.1 | 6 | 6 | 100% |
-| AI Agent Registration & Staking | v2.2.2 | 4 | 1 | 25% |
 | Emergency Module | v2.4 | 2 | 2 | 100% |
+| DELEGATECALL Extension + FixerLib | v2.5 | 4 | 4 | 100% |
+| XMTP + Agent Infrastructure Stack | v2.6 | 3 | 3 | 100% |
+| ERC-8004 Agent Registration | v2.6 | 4 | 4 | 100% |
 | Reactive Network Core | v2.3.1 | 3 | 0 | 0% |
 | Hyperlane Integration | v2.3.2 | 3 | 0 | 0% |
-| LayerZero OFT Bridge | v2.8 | 2 | 0 | 0% |
-| Staking (veFIX) | v2.5.1 | 1 | 0 | 0% |
-| Governance Module | v2.5.2 | 1 | 0 | 0% |
-| Protocol Fee System | v2.5.3 | 1 | 0 | 0% |
-| Referrer Teams | v2.6 | 2 | 0 | 0% |
-| AI Agent Marketplace | v2.7 | TBD | 0 | 0% |
-| **Total** | | **25+** | **9** | **~30%** |
+| LayerZero OFT Bridge | v3.0 | 2 | 0 | 0% |
+| Staking (veFIX) | v2.7 | 1 | 0 | 0% |
+| Governance Module | v2.7 | 1 | 0 | 0% |
+| Protocol Fee System | v2.7 | 1 | 0 | 0% |
+| Referrer Teams | v2.8 | 2 | 0 | 0% |
+| AI Agent Marketplace | v2.9 | TBD | 0 | 0% |
+| **Total** | | **32+** | **19** | **~60%** |
 
 ### Sprint Plan
 

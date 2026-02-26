@@ -1,20 +1,18 @@
 <mxfile host="app.diagrams.net" agent="Claude" version="26.0.0">
-  <diagram name="Tier Progression" id="tier-system-01">
-    <mxGraphModel dx="1100" dy="500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1100" pageHeight="500" math="0" shadow="0">
+  <diagram name="Tier Progression v2.6" id="tier-system-v26">
+    <mxGraphModel dx="1100" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1100" pageHeight="600" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
         <!-- Title -->
-        <mxCell id="title" value="Referral Tier Progression" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+        <mxCell id="title" value="Referral Tier Progression (v2.6)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="50" y="30" width="1000" height="40" as="geometry" />
         </mxCell>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- TIER 1: Bronze                             -->
-        <!-- ═══════════════════════════════════════════ -->
+        <!-- TIER 1: Bronze -->
         <mxCell id="bronze-box" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F8FAFC;strokeColor=#94A3B8;strokeWidth=1.5;" vertex="1" parent="1">
-          <mxGeometry x="50" y="100" width="210" height="150" as="geometry" />
+          <mxGeometry x="50" y="100" width="210" height="180" as="geometry" />
         </mxCell>
         <mxCell id="bronze-header" value="Bronze" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="50" y="110" width="210" height="30" as="geometry" />
@@ -22,15 +20,13 @@
         <mxCell id="bronze-line" value="" style="line;strokeColor=#CBD5E1;strokeWidth=1;html=1;" vertex="1" parent="1">
           <mxGeometry x="75" y="140" width="160" height="1" as="geometry" />
         </mxCell>
-        <mxCell id="bronze-detail" value="&lt;div style=&quot;text-align:left;line-height:1.7;&quot;&gt;Min Stake: 0 FIX&lt;br&gt;Multiplier: 1.0x&lt;br&gt;No privileges&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="60" y="150" width="190" height="90" as="geometry" />
+        <mxCell id="bronze-detail" value="&lt;div style='text-align:left;line-height:1.7;'&gt;Min Volume: $0&lt;br&gt;Min Referrals: 0&lt;br&gt;Multiplier: 1.0x&lt;br&gt;Default tier&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="60" y="150" width="190" height="120" as="geometry" />
         </mxCell>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- TIER 2: Silver                             -->
-        <!-- ═══════════════════════════════════════════ -->
+        <!-- TIER 2: Silver -->
         <mxCell id="silver-box" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#F1F5F9;strokeColor=#94A3B8;strokeWidth=1.5;" vertex="1" parent="1">
-          <mxGeometry x="310" y="100" width="210" height="150" as="geometry" />
+          <mxGeometry x="310" y="100" width="210" height="180" as="geometry" />
         </mxCell>
         <mxCell id="silver-header" value="Silver" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="310" y="110" width="210" height="30" as="geometry" />
@@ -38,15 +34,13 @@
         <mxCell id="silver-line" value="" style="line;strokeColor=#CBD5E1;strokeWidth=1;html=1;" vertex="1" parent="1">
           <mxGeometry x="335" y="140" width="160" height="1" as="geometry" />
         </mxCell>
-        <mxCell id="silver-detail" value="&lt;div style=&quot;text-align:left;line-height:1.7;&quot;&gt;Min Stake: 100 FIX&lt;br&gt;Multiplier: 1.25x&lt;br&gt;Basic rewards&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="320" y="150" width="190" height="90" as="geometry" />
+        <mxCell id="silver-detail" value="&lt;div style='text-align:left;line-height:1.7;'&gt;Min Volume: $10,000&lt;br&gt;Min Referrals: 10&lt;br&gt;Multiplier: 1.25x&lt;br&gt;Basic rewards&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="320" y="150" width="190" height="120" as="geometry" />
         </mxCell>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- TIER 3: Gold                               -->
-        <!-- ═══════════════════════════════════════════ -->
+        <!-- TIER 3: Gold -->
         <mxCell id="gold-box" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#E2E8F0;strokeColor=#94A3B8;strokeWidth=1.5;" vertex="1" parent="1">
-          <mxGeometry x="570" y="100" width="210" height="150" as="geometry" />
+          <mxGeometry x="570" y="100" width="210" height="180" as="geometry" />
         </mxCell>
         <mxCell id="gold-header" value="Gold" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="570" y="110" width="210" height="30" as="geometry" />
@@ -54,15 +48,13 @@
         <mxCell id="gold-line" value="" style="line;strokeColor=#94A3B8;strokeWidth=1;html=1;" vertex="1" parent="1">
           <mxGeometry x="595" y="140" width="160" height="1" as="geometry" />
         </mxCell>
-        <mxCell id="gold-detail" value="&lt;div style=&quot;text-align:left;line-height:1.7;&quot;&gt;Min Stake: 1,000 FIX&lt;br&gt;Multiplier: 1.5x&lt;br&gt;Multi-chain access&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="580" y="150" width="190" height="90" as="geometry" />
+        <mxCell id="gold-detail" value="&lt;div style='text-align:left;line-height:1.7;'&gt;Min Volume: $100,000&lt;br&gt;Min Referrals: 50&lt;br&gt;Multiplier: 1.5x&lt;br&gt;Enhanced rewards&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="580" y="150" width="190" height="120" as="geometry" />
         </mxCell>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- TIER 4: Platinum                           -->
-        <!-- ═══════════════════════════════════════════ -->
+        <!-- TIER 4: Platinum -->
         <mxCell id="platinum-box" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;" vertex="1" parent="1">
-          <mxGeometry x="830" y="100" width="210" height="150" as="geometry" />
+          <mxGeometry x="830" y="100" width="210" height="180" as="geometry" />
         </mxCell>
         <mxCell id="platinum-header" value="Platinum" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="830" y="110" width="210" height="30" as="geometry" />
@@ -70,34 +62,45 @@
         <mxCell id="platinum-line" value="" style="line;strokeColor=#64748B;strokeWidth=1;html=1;" vertex="1" parent="1">
           <mxGeometry x="855" y="140" width="160" height="1" as="geometry" />
         </mxCell>
-        <mxCell id="platinum-detail" value="&lt;div style=&quot;text-align:left;line-height:1.7;&quot;&gt;Min Stake: 10,000 FIX&lt;br&gt;Multiplier: 2.0x&lt;br&gt;All features&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#CBD5E1;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="840" y="150" width="190" height="90" as="geometry" />
+        <mxCell id="platinum-detail" value="&lt;div style='text-align:left;line-height:1.7;'&gt;Min Volume: $1,000,000&lt;br&gt;Min Referrals: 200&lt;br&gt;Multiplier: 2.0x&lt;br&gt;Maximum rewards&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#CBD5E1;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="840" y="150" width="190" height="120" as="geometry" />
         </mxCell>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- ARROWS between tiers                       -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="arrow-bronze-silver" value="100 FIX" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;fontSize=12;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;" edge="1" source="bronze-box" target="silver-box" parent="1">
-          <mxGeometry x="-0.01" y="10" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
+        <!-- ARROWS between tiers -->
+        <mxCell id="arrow-bronze-silver" value="$10K / 10 refs" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#64748B;strokeWidth=1.5;fontSize=11;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;" edge="1" source="bronze-box" target="silver-box" parent="1">
+          <mxGeometry x="-0.01" y="10" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
         </mxCell>
-        <mxCell id="arrow-silver-gold" value="1,000 FIX" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;fontSize=12;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;" edge="1" source="silver-box" target="gold-box" parent="1">
-          <mxGeometry x="-0.01" y="10" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
+        <mxCell id="arrow-silver-gold" value="$100K / 50 refs" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#64748B;strokeWidth=1.5;fontSize=11;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;" edge="1" source="silver-box" target="gold-box" parent="1">
+          <mxGeometry x="-0.01" y="10" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
         </mxCell>
-        <mxCell id="arrow-gold-platinum" value="10,000 FIX" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;fontSize=12;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;" edge="1" source="gold-box" target="platinum-box" parent="1">
-          <mxGeometry x="-0.01" y="10" relative="1" as="geometry">
-            <mxPoint as="offset" />
-          </mxGeometry>
+        <mxCell id="arrow-gold-platinum" value="$1M / 200 refs" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#64748B;strokeWidth=1.5;fontSize=11;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;endArrow=blockThin;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;" edge="1" source="gold-box" target="platinum-box" parent="1">
+          <mxGeometry x="-0.01" y="10" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
         </mxCell>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- Subtitle / legend                          -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="subtitle" value="Stake FIX tokens to unlock higher reward tiers. Multipliers apply to all referral earnings." style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=2;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="50" y="280" width="1000" height="30" as="geometry" />
+        <!-- Subtitle -->
+        <mxCell id="legend" value="Tiers upgrade automatically when volume + referral count thresholds are met. Multipliers apply to all referral earnings. ERC-8004 reputation bonuses (0%–50%) stack on top." style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=2;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="50" y="310" width="1000" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Reputation Bonus Row -->
+        <mxCell id="rep-title" value="ERC-8004 Reputation Bonuses (additive)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=15;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="50" y="370" width="1000" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rep1" value="Unrated&lt;br&gt;&lt;b&gt;+0%&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="50" y="410" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="rep2" value="Newcomer&lt;br&gt;&lt;b&gt;+5%&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="200" y="410" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="rep3" value="Established&lt;br&gt;&lt;b&gt;+15%&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#E2E8F0;strokeColor=#94A3B8;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="350" y="410" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="rep4" value="Trusted&lt;br&gt;&lt;b&gt;+30%&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#CBD5E1;strokeColor=#94A3B8;strokeWidth=1;fontSize=13;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="510" y="410" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="rep5" value="Elite&lt;br&gt;&lt;b&gt;+50%&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1;fontSize=13;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+          <mxGeometry x="660" y="410" width="120" height="50" as="geometry" />
         </mxCell>
 
       </root>

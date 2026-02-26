@@ -22,7 +22,8 @@ This document will contain live mainnet deployment addresses once the protocol i
 | **Ethereum** | 1 | 🚧 Planned | 0.5-5 ETH |
 | **Base** | 8453 | 🚧 Planned | ~0.01 ETH |
 | **Arbitrum** | 42161 | 🚧 Planned | ~0.01 ETH |
-| **Unichain** | 1300 | 🚧 Planned | <0.001 ETH |
+| **Unichain** | 130 | 🚧 Planned | <0.001 ETH |
+| **Lasna (Reactive)** | 5318007 | 🚧 Planned | <0.001 ETH |
 
 ---
 
@@ -99,10 +100,14 @@ forge script script/DeployArbSepolia.s.sol \
 
 Each mainnet deployment will include:
 
-1. **FixerRegistryUpgradeable (Implementation)** — UUPS logic contract
-2. **ERC1967Proxy** — Transparent proxy users interact with (the "Registry")
-3. **FixerHookV2** — Uniswap v4 `afterSwap` hook (CREATE2-mined address)
-4. **FixerCredential** — Soulbound ERC-721 reputation NFT
+1. **FixerRegistryUpgradeable (Implementation)** — UUPS logic contract (20.5KB core)
+2. **FixerRegistryExtension** — DELEGATECALL extension for agents, XMTP, EIP-3009 (14.7KB)
+3. **FixerLib** — External library for tier calculations and reward math (2.3KB)
+4. **ERC1967Proxy** — Transparent proxy users interact with (the "Registry")
+5. **FixerHookV2** — Uniswap v4 `afterSwap` hook (CREATE2-mined address)
+6. **FixerCredential** — Soulbound ERC-721 reputation NFT
+
+> **Note:** Lasna (Reactive Network) deploys registry-only (no hook, no FixerCredential).
 
 ---
 

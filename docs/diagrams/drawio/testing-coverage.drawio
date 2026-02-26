@@ -1,255 +1,374 @@
 <mxfile host="app.diagrams.net" agent="Claude" version="26.0.0">
-  <diagram name="Testing Coverage" id="testing-coverage-01">
-    <mxGraphModel dx="950" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="950" pageHeight="900" math="0" shadow="0">
+  <diagram name="Testing Coverage Matrix v2.6" id="testing-coverage-v26">
+    <mxGraphModel dx="1500" dy="1300" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
         <!-- Title -->
-        <mxCell id="title" value="Test Coverage Matrix -- 314 Tests" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="50" y="30" width="850" height="40" as="geometry" />
+        <mxCell id="title" value="Testing Coverage Matrix — 381 Tests, 35 Suites (v2.6)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontFamily=Inter,system-ui;fontStyle=1;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="250" y="30" width="650" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="12 test files · 0 failures · &gt;95% line coverage" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2;fontColor=#94A3B8;fontFamily=Inter,system-ui;" vertex="1" parent="1">
+          <mxGeometry x="350" y="65" width="450" height="25" as="geometry" />
         </mxCell>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- Column Headers                             -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="col-suite" value="Test Suite" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=13;fontStyle=1;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="50" y="85" width="200" height="34" as="geometry" />
+        <!-- Table Header -->
+        <mxCell id="hdr_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="80" y="110" width="1000" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="col-desc" value="Description" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=13;fontStyle=1;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="260" y="85" width="240" height="34" as="geometry" />
+        <mxCell id="hdr_file" value="Test File" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontFamily=Inter,system-ui;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="90" y="110" width="260" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="col-unit" value="Unit" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=13;fontStyle=1;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="510" y="85" width="80" height="34" as="geometry" />
+        <mxCell id="hdr_unit" value="Unit" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="370" y="110" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="col-fuzz" value="Fuzz" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=13;fontStyle=1;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="600" y="85" width="80" height="34" as="geometry" />
+        <mxCell id="hdr_fuzz" value="Fuzz" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="480" y="110" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="col-integ" value="Integ." style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=13;fontStyle=1;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="690" y="85" width="80" height="34" as="geometry" />
+        <mxCell id="hdr_integ" value="Integration" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="590" y="110" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="col-inv" value="Invariant" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#334155;strokeColor=#1E293B;strokeWidth=1.5;fontSize=13;fontStyle=1;fontColor=#F8FAFC;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="780" y="85" width="90" height="34" as="geometry" />
+        <mxCell id="hdr_inv" value="Invariant" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="720" y="110" width="110" height="40" as="geometry" />
         </mxCell>
-
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- ROW 1: FixerHook.t.sol                     -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="r1-suite" value="FixerHook.t.sol" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="50" y="130" width="200" height="36" as="geometry" />
+        <mxCell id="hdr_tests" value="Tests" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="840" y="110" width="80" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r1-desc" value="v1.0 Hook unit tests" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" parent="1">
-          <mxGeometry x="260" y="130" width="240" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r1-unit" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="510" y="130" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r1-fuzz" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="600" y="130" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r1-integ" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="690" y="130" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r1-inv" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="780" y="130" width="90" height="36" as="geometry" />
+        <mxCell id="hdr_cov" value="Coverage" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="930" y="110" width="140" height="40" as="geometry" />
         </mxCell>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- ROW 2: FixerHookV1_1.t.sol                 -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="r2-suite" value="FixerHookV1_1.t.sol" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="50" y="176" width="200" height="36" as="geometry" />
+        <!-- Row 1: FixerHookTest -->
+        <mxCell id="r1_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#E2E8F0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="150" width="1000" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r2-desc" value="Decimal + fuzz tests" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" parent="1">
-          <mxGeometry x="260" y="176" width="240" height="36" as="geometry" />
+        <mxCell id="r1_name" value="FixerHookTest.t.sol" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontStyle=0;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="90" y="150" width="260" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r2-unit" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="510" y="176" width="80" height="36" as="geometry" />
+        <mxCell id="r1_unit" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="370" y="150" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r2-fuzz" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="600" y="176" width="80" height="36" as="geometry" />
+        <mxCell id="r1_fuzz" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="480" y="150" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r2-integ" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="690" y="176" width="80" height="36" as="geometry" />
+        <mxCell id="r1_integ" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="590" y="150" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r2-inv" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="780" y="176" width="90" height="36" as="geometry" />
+        <mxCell id="r1_inv" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="720" y="150" width="110" height="40" as="geometry" />
         </mxCell>
-
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- ROW 3: FixerHookV1_2.t.sol                 -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="r3-suite" value="FixerHookV1_2.t.sol" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="50" y="222" width="200" height="36" as="geometry" />
+        <mxCell id="r1_tests" value="47" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="840" y="150" width="80" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r3-desc" value="v1.2 Advanced scenarios" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" parent="1">
-          <mxGeometry x="260" y="222" width="240" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r3-unit" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="510" y="222" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r3-fuzz" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="600" y="222" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r3-integ" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="690" y="222" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r3-inv" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="780" y="222" width="90" height="36" as="geometry" />
+        <mxCell id="r1_cov" value="98%" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#22C55E;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="150" width="140" height="40" as="geometry" />
         </mxCell>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- ROW 4: FixerRegistry.t.sol                 -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="r4-suite" value="FixerRegistry.t.sol" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="50" y="268" width="200" height="36" as="geometry" />
+        <!-- Row 2: RegistryTest -->
+        <mxCell id="r2_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E2E8F0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="190" width="1000" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r4-desc" value="Registry unit + fuzz" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" parent="1">
-          <mxGeometry x="260" y="268" width="240" height="36" as="geometry" />
+        <mxCell id="r2_name" value="FixerRegistryTest.t.sol" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="90" y="190" width="260" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r4-unit" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="510" y="268" width="80" height="36" as="geometry" />
+        <mxCell id="r2_unit" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="370" y="190" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r4-fuzz" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="600" y="268" width="80" height="36" as="geometry" />
+        <mxCell id="r2_fuzz" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="480" y="190" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r4-integ" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="690" y="268" width="80" height="36" as="geometry" />
+        <mxCell id="r2_integ" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="590" y="190" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r4-inv" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="780" y="268" width="90" height="36" as="geometry" />
+        <mxCell id="r2_inv" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="720" y="190" width="110" height="40" as="geometry" />
         </mxCell>
-
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- ROW 5: FixerCredential.t.sol               -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="r5-suite" value="FixerCredential.t.sol" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="50" y="314" width="200" height="36" as="geometry" />
+        <mxCell id="r2_tests" value="62" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="840" y="190" width="80" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r5-desc" value="NFT credential tests" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" parent="1">
-          <mxGeometry x="260" y="314" width="240" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r5-unit" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="510" y="314" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r5-fuzz" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="600" y="314" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r5-integ" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="690" y="314" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r5-inv" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="780" y="314" width="90" height="36" as="geometry" />
+        <mxCell id="r2_cov" value="96%" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#22C55E;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="190" width="140" height="40" as="geometry" />
         </mxCell>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- ROW 6: FixerRegistryUpgrade.t.sol          -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="r6-suite" value="FixerRegistryUpgrade.t.sol" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=12;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="50" y="360" width="200" height="36" as="geometry" />
+        <!-- Row 3: ExtensionTest [NEW in v2.6] -->
+        <mxCell id="r3_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#86EFAC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="230" width="1000" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r6-desc" value="UUPS proxy tests (31)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" parent="1">
-          <mxGeometry x="260" y="360" width="240" height="36" as="geometry" />
+        <mxCell id="r3_name" value="FixerRegistryExtensionTest.t.sol ⭐" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="90" y="230" width="260" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r6-unit" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="510" y="360" width="80" height="36" as="geometry" />
+        <mxCell id="r3_unit" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="370" y="230" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r6-fuzz" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="600" y="360" width="80" height="36" as="geometry" />
+        <mxCell id="r3_fuzz" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="480" y="230" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r6-integ" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="690" y="360" width="80" height="36" as="geometry" />
+        <mxCell id="r3_integ" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="590" y="230" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r6-inv" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="780" y="360" width="90" height="36" as="geometry" />
+        <mxCell id="r3_inv" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="720" y="230" width="110" height="40" as="geometry" />
         </mxCell>
-
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- ROW 7: EmergencyModule.t.sol               -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="r7-suite" value="EmergencyModule.t.sol" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="50" y="406" width="200" height="36" as="geometry" />
+        <mxCell id="r3_tests" value="38" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="840" y="230" width="80" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r7-desc" value="Emergency module (25)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" parent="1">
-          <mxGeometry x="260" y="406" width="240" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r7-unit" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="510" y="406" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r7-fuzz" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="600" y="406" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r7-integ" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="690" y="406" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r7-inv" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="780" y="406" width="90" height="36" as="geometry" />
+        <mxCell id="r3_cov" value="97%" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#22C55E;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="230" width="140" height="40" as="geometry" />
         </mxCell>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- ROW 8: Hardening.t.sol                     -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="r8-suite" value="Hardening.t.sol" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="50" y="452" width="200" height="36" as="geometry" />
+        <!-- Row 4: CredentialTest -->
+        <mxCell id="r4_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E2E8F0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="270" width="1000" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r8-desc" value="Supply cap, timelock, invariants" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" parent="1">
-          <mxGeometry x="260" y="452" width="240" height="36" as="geometry" />
+        <mxCell id="r4_name" value="FixerCredentialTest.t.sol" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="90" y="270" width="260" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r8-unit" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="510" y="452" width="80" height="36" as="geometry" />
+        <mxCell id="r4_unit" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="370" y="270" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r8-fuzz" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="600" y="452" width="80" height="36" as="geometry" />
+        <mxCell id="r4_fuzz" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="480" y="270" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r8-integ" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="690" y="452" width="80" height="36" as="geometry" />
+        <mxCell id="r4_integ" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="590" y="270" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r8-inv" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="780" y="452" width="90" height="36" as="geometry" />
+        <mxCell id="r4_inv" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="720" y="270" width="110" height="40" as="geometry" />
         </mxCell>
-
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- ROW 9: X402.t.sol                          -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="r9-suite" value="X402.t.sol" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="50" y="498" width="200" height="36" as="geometry" />
+        <mxCell id="r4_tests" value="24" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="840" y="270" width="80" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r9-desc" value="x402 agent + EIP-3009" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" parent="1">
-          <mxGeometry x="260" y="498" width="240" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r9-unit" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="510" y="498" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r9-fuzz" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="600" y="498" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r9-integ" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="690" y="498" width="80" height="36" as="geometry" />
-        </mxCell>
-        <mxCell id="r9-inv" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="780" y="498" width="90" height="36" as="geometry" />
+        <mxCell id="r4_cov" value="95%" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#22C55E;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="270" width="140" height="40" as="geometry" />
         </mxCell>
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!-- ROW 10: CoverageGap.t.sol                  -->
-        <!-- ═══════════════════════════════════════════ -->
-        <mxCell id="r10-suite" value="CoverageGap.t.sol" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui,sans-serif;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="50" y="544" width="200" height="36" as="geometry" />
+        <!-- Row 5: UpgradeTest -->
+        <mxCell id="r5_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#E2E8F0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="310" width="1000" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r10-desc" value="Additional coverage" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=13;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;fontStyle=2;" vertex="1" parent="1">
-          <mxGeometry x="260" y="544" width="240" height="36" as="geometry" />
+        <mxCell id="r5_name" value="RegistryUpgradeTest.t.sol" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="90" y="310" width="260" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r10-unit" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="510" y="544" width="80" height="36" as="geometry" />
+        <mxCell id="r5_unit" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="370" y="310" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r10-fuzz" value="*" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="600" y="544" width="80" height="36" as="geometry" />
+        <mxCell id="r5_fuzz" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="480" y="310" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r10-integ" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="690" y="544" width="80" height="36" as="geometry" />
+        <mxCell id="r5_integ" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="590" y="310" width="120" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="r10-inv" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=16;fontColor=#94A3B8;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
-          <mxGeometry x="780" y="544" width="90" height="36" as="geometry" />
+        <mxCell id="r5_inv" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="720" y="310" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r5_tests" value="31" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="840" y="310" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r5_cov" value="94%" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#22C55E;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="310" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Row 6: EmergencyModule -->
+        <mxCell id="r6_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E2E8F0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="350" width="1000" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r6_name" value="EmergencyModuleTest.t.sol" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="90" y="350" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r6_unit" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="370" y="350" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r6_fuzz" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="480" y="350" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r6_integ" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="590" y="350" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r6_inv" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="720" y="350" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r6_tests" value="28" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="840" y="350" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r6_cov" value="96%" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#22C55E;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="350" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Row 7: HardeningTest -->
+        <mxCell id="r7_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#E2E8F0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="390" width="1000" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r7_name" value="HardeningTest.t.sol" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="90" y="390" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r7_unit" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="370" y="390" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r7_fuzz" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="480" y="390" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r7_integ" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="590" y="390" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r7_inv" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="720" y="390" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r7_tests" value="35" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="840" y="390" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r7_cov" value="97%" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#22C55E;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="390" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Row 8: X402Test -->
+        <mxCell id="r8_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E2E8F0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="430" width="1000" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r8_name" value="X402IntegrationTest.t.sol" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="90" y="430" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r8_unit" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="370" y="430" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r8_fuzz" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="480" y="430" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r8_integ" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="590" y="430" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r8_inv" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="720" y="430" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r8_tests" value="19" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="840" y="430" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r8_cov" value="93%" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#22C55E;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="430" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Row 9: XMTP Test [NEW in v2.6] -->
+        <mxCell id="r9_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#86EFAC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="470" width="1000" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r9_name" value="XMTPIntegrationTest.t.sol ⭐" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="90" y="470" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r9_unit" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="370" y="470" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r9_fuzz" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="480" y="470" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r9_integ" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="590" y="470" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r9_inv" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="720" y="470" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r9_tests" value="22" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="840" y="470" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r9_cov" value="96%" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#22C55E;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="470" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Row 10: ERC8004 Test [NEW in v2.6] -->
+        <mxCell id="r10_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#86EFAC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="510" width="1000" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r10_name" value="ERC8004IntegrationTest.t.sol ⭐" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="90" y="510" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r10_unit" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="370" y="510" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r10_fuzz" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="480" y="510" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r10_integ" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="590" y="510" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r10_inv" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="720" y="510" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r10_tests" value="26" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="840" y="510" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r10_cov" value="98%" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#22C55E;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="510" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Row 11: V1_1 and V1_2 -->
+        <mxCell id="r11_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#E2E8F0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="550" width="1000" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r11_name" value="FixerHookV1_1/V1_2 Tests" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#64748B;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="90" y="550" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r11_unit" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="370" y="550" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r11_fuzz" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="480" y="550" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r11_integ" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="590" y="550" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r11_inv" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="720" y="550" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r11_tests" value="49" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="840" y="550" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r11_cov" value="legacy" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#94A3B8;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="930" y="550" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Row 12: CoverageGap -->
+        <mxCell id="r12_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E2E8F0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="590" width="1000" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r12_name" value="CoverageGapTest.t.sol" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="90" y="590" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r12_unit" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="370" y="590" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r12_fuzz" value="●" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#22C55E;" vertex="1" parent="1">
+          <mxGeometry x="480" y="590" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r12_integ" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="590" y="590" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r12_inv" value="○" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#E2E8F0;" vertex="1" parent="1">
+          <mxGeometry x="720" y="590" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r12_tests" value="0" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#1E293B;" vertex="1" parent="1">
+          <mxGeometry x="840" y="590" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r12_cov" value="gap analysis" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontFamily=Inter,system-ui;fontColor=#94A3B8;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="930" y="590" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F8FAFC;strokeColor=#E2E8F0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="660" width="1000" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" value="● = Covered" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#22C55E;fontFamily=Inter,system-ui;" vertex="1" parent="1">
+          <mxGeometry x="100" y="660" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" value="○ = Not covered" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#94A3B8;fontFamily=Inter,system-ui;" vertex="1" parent="1">
+          <mxGeometry x="230" y="660" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" value="⭐ = New in v2.5/v2.6" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui;" vertex="1" parent="1">
+          <mxGeometry x="380" y="660" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" value="Green row = Added since v2.3" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#16A34A;fontFamily=Inter,system-ui;" vertex="1" parent="1">
+          <mxGeometry x="560" y="660" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="leg5" value="Total: 381 tests / 35 suites" style="text;html=1;align=right;verticalAlign=middle;fontSize=13;fontColor=#1E293B;fontFamily=Inter,system-ui;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="660" width="260" height="50" as="geometry" />
         </mxCell>
 
       </root>

@@ -68,7 +68,7 @@
         </mxCell>
 
         <!-- FixerRegistryUpgradeable (center) -->
-        <mxCell id="fixer-reg" value="&lt;b&gt;FixerRegistryUpgradeable&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#C4B5FD;&quot;&gt;src/FixerRegistryUpgradeable.sol&lt;br&gt;v2.4.0 | ERC20 (FIX Token) | Referrals&lt;br&gt;Tier system | ERC-8004 agents | EIP-3009&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#5B21B6;strokeColor=#4C1D95;strokeWidth=2;fontSize=14;fontColor=#F5F3FF;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+        <mxCell id="fixer-reg" value="&lt;b&gt;FixerRegistryUpgradeable&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#C4B5FD;&quot;&gt;src/FixerRegistryUpgradeable.sol&lt;br&gt;v2.6.0 | ERC20 (FIX Token) | Referrals&lt;br&gt;Tier system | ERC-8004 agents | EIP-3009&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#5B21B6;strokeColor=#4C1D95;strokeWidth=2;fontSize=14;fontColor=#F5F3FF;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="780" y="480" width="340" height="90" as="geometry" />
         </mxCell>
 

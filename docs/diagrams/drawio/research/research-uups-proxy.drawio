@@ -67,7 +67,7 @@
         <mxCell id="impl-detail" value="&lt;font style=&quot;font-size:10px;&quot;&gt;Code-only (no state stored here)&lt;br&gt;constructor calls _disableInitializers()&lt;br&gt;_authorizeUpgrade() restricted to owner via proposeExecute pattern&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#C4B5FD;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="120" y="455" width="460" height="46" as="geometry" />
         </mxCell>
-        <mxCell id="impl-version" value="VERSION = 2_004_000 (v2.4.0)" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#E9D5FF;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+        <mxCell id="impl-version" value="VERSION = 2_006_000 (v2.6.0)" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#E9D5FF;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="200" y="505" width="300" height="18" as="geometry" />
         </mxCell>
 
@@ -113,7 +113,7 @@
         <mxCell id="sg-emergency" value="&lt;b&gt;EmergencyState&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;pausedReferrals, pausedAgents,&lt;br&gt;pausedRewards, circuitBreaker,&lt;br&gt;securityCouncil, governance&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#FFFFFF;strokeColor=#DC2626;strokeWidth=1;fontSize=10;fontColor=#78350F;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="975" y="255" width="200" height="72" as="geometry" />
         </mxCell>
-        <mxCell id="sg-gap" value="&lt;b&gt;__gap[45]&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;Reserved for&lt;br&gt;future upgrades&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=10;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+        <mxCell id="sg-gap" value="&lt;b&gt;__gap[38]&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:9px;&quot;&gt;Reserved for&lt;br&gt;future upgrades&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F1F5F9;strokeColor=#CBD5E1;strokeWidth=1;fontSize=10;fontColor=#64748B;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="1190" y="255" width="60" height="72" as="geometry" />
         </mxCell>
 
@@ -187,7 +187,7 @@
         <mxCell id="s3-text" value="&lt;b&gt;Initializer Protection:&lt;/b&gt; constructor calls _disableInitializers(). initialize() is restricted to proxy deployment via initializer modifier." style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="80" y="833" width="800" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="s4-text" value="&lt;b&gt;Storage Gap:&lt;/b&gt; 45 reserved uint256 slots (__gap[45]) ensure future upgrades can add state variables without corrupting mappings." style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
+        <mxCell id="s4-text" value="&lt;b&gt;Storage Gap:&lt;/b&gt; 38 reserved uint256 slots (__gap[38]) ensure future upgrades can add state variables without corrupting mappings." style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;" vertex="1" parent="1">
           <mxGeometry x="80" y="853" width="800" height="18" as="geometry" />
         </mxCell>
 
