@@ -1,0 +1,52 @@
+# Dependencies
+/lib/
+/node_modules/
+
+# Build outputs
+/out/
+/cache/
+/artifacts/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Coverage
+lcov.info
+coverage/
+
+# Broadcast (deployment artifacts)
+/broadcast/
+
+# Docs build
+/docs/_build/
+
+# Research paper (LaTeX source, compiled output, and markdown draft)
+docs/research-paper/
+
+# Repository analysis output
+repomix-output.xml
+
+# Internal documentation (audits, reports, code reviews)
+# These contain sensitive internal analysis and are not for public release
+/internal/
+
+# Temporary skill repository
+temp_skill_repo/
+/scripts/
+*Screenshot*
+
+# Social content and marketing materials
+social-content/
