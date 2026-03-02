@@ -1,14 +1,27 @@
-# The Fixer Hook
+<p align="center">
+  <img src="./fixer_hook_logo.png" alt="The Fixer Hook" width="120" />
+</p>
 
-> **A Learning-Focused Implementation of On-Chain Referral Rewards for Uniswap v4**
+<h1 align="center">The Fixer Hook</h1>
 
-"Everybody pays the Fixer."
+<p align="center">
+  <strong>A Learning-Focused Implementation of On-Chain Referral Rewards for Uniswap v4</strong><br/>
+  <em>"Everybody pays the Fixer."</em>
+</p>
+
+<p align="center">
+  <a href="https://fixerhook.tech">🌐 fixerhook.tech</a> &nbsp;·&nbsp;
+  <a href="https://sepolia.basescan.org/address/0x3Fb805C6C01e8Dd8534fA9FD52Ee699e256Eb960">📄 Contract</a> &nbsp;·&nbsp;
+  <a href="https://fixerhook.tech/#dashboard">📊 Dashboard</a>
+</p>
 
 ---
 
 ## About This Project
 
 This repository documents my journey building my first Uniswap v4 hook. If you're new to v4 hooks, this codebase is designed to be **educational first, functional second**. Every design decision is explained, every concept is broken down, and the code is heavily commented for learning.
+
+**🌐 Live at [fixerhook.tech](https://fixerhook.tech)** — connect your wallet to view your dashboard, tier progress, and generate your hookData payload.
 
 **What you'll learn:**
 - How Uniswap v4 hooks work
