@@ -48,5 +48,15 @@ temp_skill_repo/
 /scripts/
 *Screenshot*
 
+# Landing page — kept local/private, served from droplet
+landing/
+
+# x402 service .env files (contain private keys, treasury address)
+x402/**/.env
+x402/*/.env
+
 # Social content and marketing materials
 social-content/
+
+# Temporary files
+tmp/

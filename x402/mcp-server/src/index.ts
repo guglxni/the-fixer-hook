@@ -619,12 +619,86 @@ server.tool(
 
 // ============================================================================
 // START SERVER
+// Supports two transport modes:
+//   MCP_TRANSPORT=stdio  (default) — for Claude Desktop / local AI clients
+//   MCP_TRANSPORT=http   — exposes SSE endpoint at http://host:MCP_PORT/sse
 // ============================================================================
 
 async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("FixerHook MCP Server running on stdio");
+  const transport = process.env.MCP_TRANSPORT;
+
+  if (transport === "http") {
+    // ── HTTP / SSE transport (for remote AI agent access) ──────────────────
+    // Dynamically import SSE transport + Node http to avoid loading them in
+    // stdio-only environments.
+    const { SSEServerTransport } = await import(
+      "@modelcontextprotocol/sdk/server/sse.js"
+    );
+    const http = await import("node:http");
+
+    const port = Number(process.env.MCP_PORT ?? 3403);
+    const connections = new Map<string, InstanceType<typeof SSEServerTransport>>();
+
+    const httpServer = http.createServer(async (req, res) => {
+      const url = new URL(req.url ?? "/", `http://localhost:${port}`);
+
+      // SSE connection endpoint — AI client connects here
+      if (req.method === "GET" && url.pathname === "/sse") {
+        const sseTransport = new SSEServerTransport("/message", res);
+        connections.set(sseTransport.sessionId, sseTransport);
+        await server.connect(sseTransport);
+        res.on("close", () => connections.delete(sseTransport.sessionId));
+        return;
+      }
+
+      // Message post endpoint — AI client sends tool calls here
+      if (req.method === "POST" && url.pathname === "/message") {
+        const sessionId = url.searchParams.get("sessionId") ?? "";
+        const sseTransport = connections.get(sessionId);
+        if (!sseTransport) {
+          res.writeHead(404);
+          res.end("Session not found");
+          return;
+        }
+        await sseTransport.handlePostMessage(req, res);
+        return;
+      }
+
+      // Health check
+      if (req.method === "GET" && url.pathname === "/") {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            service: "FixerHook MCP Server",
+            transport: "http+sse",
+            endpoints: { sse: "/sse", message: "/message" },
+            tools: [
+              "fixer_get_pools",
+              "fixer_check_rewards",
+              "fixer_referrer_profile",
+              "fixer_submit_referral",
+              "fixer_agent_dashboard",
+              "fixer_xmtp_lookup",
+              "fixer_xmtp_stats",
+            ],
+          })
+        );
+        return;
+      }
+
+      res.writeHead(404);
+      res.end("Not found");
+    });
+
+    httpServer.listen(port, () => {
+      console.error(`FixerHook MCP Server running on http://0.0.0.0:${port}/sse`);
+    });
+  } else {
+    // ── stdio transport (default — Claude Desktop, local AI clients) ────────
+    const sTransport = new StdioServerTransport();
+    await server.connect(sTransport);
+    console.error("FixerHook MCP Server running on stdio");
+  }
 }
 
 main().catch(console.error);
